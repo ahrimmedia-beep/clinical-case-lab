@@ -320,6 +320,12 @@ def test_diagnosis_candidates_splits_on_every_hedge_separator() -> None:
     assert diagnosis_candidates("") == []
     # "or" inside a word is not a separator.
     assert diagnosis_candidates("panic disorder") == ["panic disorder"]
+    # Spaced dashes, "|" and line breaks separate too; a hyphen inside a name does not.
+    assert diagnosis_candidates("a - b – c — d | e\nf\r\ng -- h") == list("abcdefgh")
+    assert diagnosis_candidates("Alpha-1 antitrypsin deficiency") == [
+        "Alpha-1 antitrypsin deficiency"
+    ]
+    assert diagnosis_candidates("Birt–Hogg–Dubé syndrome") == ["Birt–Hogg–Dubé syndrome"]
 
 
 def test_matching_uses_token_sort_not_token_set() -> None:
@@ -422,6 +428,73 @@ def test_a_comma_list_of_diagnoses_is_a_hedge(seed: str, answer: str) -> None:
     assert judged(seed_case(seed), answer) == (False, True), answer
 
 
+@pytest.mark.parametrize(
+    ("seed", "answer"),
+    [
+        # Every list separator besides the comma (review I1).
+        ("01-pe.json", "PE - pneumothorax"),
+        ("01-pe.json", "PE – pneumothorax"),
+        ("01-pe.json", "PE — pneumothorax"),
+        ("01-pe.json", "PE -- pneumothorax"),
+        ("01-pe.json", "PE | pneumothorax"),
+        ("01-pe.json", "PE | DVT"),  # "|" is an explicit marker, like "/"
+        ("01-pe.json", "PE + pneumothorax"),
+        ("01-pe.json", "PE plus pneumothorax"),
+        ("01-pe.json", "PE & pneumothorax"),
+        ("01-pe.json", "PE\npneumothorax"),
+        ("01-pe.json", "PE\r\npneumothorax"),
+        ("03-lam.json", "LAM — Birt-Hogg-Dube"),
+        # No separator at all: two case diagnoses with no connector between them.
+        ("01-pe.json", "PE pneumothorax"),
+        ("01-pe.json", "Pulmonary embolism pneumothorax"),
+        ("01-pe.json", "Pneumothorax pulmonary embolism"),
+        ("01-pe.json", "Pulmonary embolism also pneumothorax"),
+        ("01-pe.json", "Acute PE likely pneumothorax"),
+        ("03-lam.json", "LAM BHD"),
+        ("03-lam.json", "LAM Birt-Hogg-Dube"),
+        ("03-lam.json", "Sporadic LAM primary spontaneous pneumothorax"),
+        (
+            "03-lam.json",
+            "Lymphangioleiomyomatosis pulmonary langerhans cell histiocytosis pulmonary embolism "
+            "birt hogg dube primary spontaneous pneumothorax",
+        ),
+        ("02-aatd.json", "AATD COPD"),
+        ("02-aatd.json", "Alpha-1 antitrypsin deficiency asthma"),
+    ],
+)
+def test_a_list_without_commas_is_a_hedge(seed: str, answer: str) -> None:
+    assert judged(seed_case(seed), answer) == (False, True), answer
+
+
+@pytest.mark.parametrize(
+    ("seed", "answer"),
+    [
+        # The same separators in front of a qualifier, or of a diagnosis outside the case.
+        ("01-pe.json", "Acute PE - provoked"),
+        ("01-pe.json", "Acute PE — secondary to DVT"),
+        ("01-pe.json", "Acute PE\nprovoked by the flight"),
+        ("01-pe.json", "Acute PE + DVT"),
+        ("01-pe.json", "PE plus DVT"),
+        ("03-lam.json", "LAM – sporadic"),
+        ("03-lam.json", "LAM with recurrent pneumothorax & renal angiomyolipoma"),
+        ("03-lam.json", "LAM with recurrent pneumothorax plus renal angiomyolipoma"),
+        # A diagnosis the case names, introduced by a connector, qualifies the answer.
+        ("01-pe.json", "PE complicated by pneumothorax"),
+        ("01-pe.json", "PE associated with pneumothorax and DVT"),
+        ("03-lam.json", "LAM causing pneumothorax"),
+        ("03-lam.json", "Pneumothorax caused by LAM"),
+        # Two names of the one diagnosis, or words the vocabulary does not list.
+        ("01-pe.json", "Pulmonary embolism (pulmonary thromboembolism)"),
+        ("02-aatd.json", "AATD emphysema"),
+        ("02-aatd.json", "Alpha-1 antitrypsin deficiency pulmonary emphysema"),
+        ("02-aatd.json", "AATD in a former smoker"),
+        ("03-lam.json", "Sporadic LAM recurrent pneumothorax"),
+    ],
+)
+def test_new_separators_keep_a_specific_diagnosis_right(seed: str, answer: str) -> None:
+    assert judged(seed_case(seed), answer) == (True, False), answer
+
+
 def test_a_comma_list_names_the_case_vocabulary(case_pe: dict[str, Any]) -> None:
     data = copy.deepcopy(case_pe)
     data["differential"] += [{"name": "Pneumonia"}, {"name": "COPD exacerbation"}]
@@ -465,6 +538,24 @@ def test_less_specific_than_the_accepted_answer_is_wrong() -> None:
 def test_a_negated_diagnosis_is_wrong(answer: str) -> None:
     correct, _ = judged(seed_case("01-pe.json"), answer)
     assert correct is False, answer
+
+
+@pytest.mark.parametrize(
+    ("answer", "expected"),
+    [
+        # A negation before the name reaches only inside its own comma part (review Minor 9).
+        ("not pneumothorax, PE", (True, False)),
+        ("No pneumothorax, acute PE", (True, False)),
+        ("Not pneumothorax - PE", (True, False)),
+        ("not pneumothorax\nPE", (True, False)),
+        # Inside the part it still cancels the name; a cue right after it still counts.
+        ("Not PE", (False, False)),
+        ("Pneumothorax, not PE", (False, False)),
+        ("PE, ruled out", (False, False)),
+    ],
+)
+def test_negation_scope_is_the_comma_part(answer: str, expected: tuple[bool, bool]) -> None:
+    assert judged(seed_case("01-pe.json"), answer) == expected, answer
 
 
 def test_judge_diagnosis_without_a_vocabulary_still_works() -> None:
