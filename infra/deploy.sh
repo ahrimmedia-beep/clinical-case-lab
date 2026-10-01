@@ -245,7 +245,7 @@ ensure_public() {  # ensure_public SERVICE PATH: fall back to --no-invoker-iam-c
 deploy_api() {
   local secrets fallback
   log "Cloud Run service $API_SERVICE"
-  { db_env; env_line CORS_ORIGINS "$(cors_origins)"; env_line REQUIRE_INGEST_KEY true; } > "$TMP_DIR/api.env.yaml"
+  { db_env; env_line CORS_ORIGINS "$(cors_origins)"; env_line REQUIRE_INGEST_KEY true; env_line EXTRACT_RATE_PER_MINUTE 5; env_line EXTRACT_DAILY_CAP 30; } > "$TMP_DIR/api.env.yaml"
   secrets="DB_PASSWORD=${SECRET_DB_PASSWORD}:latest,INTERNAL_API_KEY=${SECRET_INTERNAL_KEY}:latest"
   fallback="$(fallback_secret_list)"
   if [ -n "$fallback" ]; then secrets="$secrets,$fallback"; fi
