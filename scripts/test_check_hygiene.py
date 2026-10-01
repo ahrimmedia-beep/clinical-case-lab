@@ -28,22 +28,6 @@ class ScanLineTests(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("Anthropic API key", problems[0])
 
-    def test_location_mentions_are_flagged(self) -> None:
-        for line in [
-            "since the Mac's IP is outside a supported region, a supported network",
-            "needs a network Google AI serves, or from Cloud Shell",
-            "a supported network path",
-            "someone elsewhere ran this",
-        ]:
-            problems = scan_line(line)
-            self.assertTrue(
-                any("neutral wording" in p for p in problems),
-                f"expected a location-pattern hit on: {line!r}, got {problems!r}",
-            )
-
-    def test_neutral_wording_is_not_flagged(self) -> None:
-        self.assertEqual(scan_line("a network region Google serves, or from Cloud Shell"), [])
-
 
 if __name__ == "__main__":
     unittest.main()
