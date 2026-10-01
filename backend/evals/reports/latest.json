@@ -1,0 +1,161 @@
+{
+  "generated_at": "2026-10-01T17:02:28+00:00",
+  "prompt_version": "v1",
+  "split": "all",
+  "gold_cases": 8,
+  "models": [
+    {
+      "provider": "fake",
+      "model": "fake-gold",
+      "cases": 8,
+      "schema_valid_rate": 1.0,
+      "schema_valid_first_try_rate": 1.0,
+      "macro_f1": 0.9906,
+      "fields": {
+        "patient_age": 1.0,
+        "patient_sex": 1.0,
+        "chief_complaint": 1.0,
+        "final_diagnosis": 1.0,
+        "findings_precision": 0.9691,
+        "findings_recall": 0.9216,
+        "findings_f1": 0.9447,
+        "measurements_precision": 1.0,
+        "measurements_recall": 1.0,
+        "measurements_f1": 1.0
+      },
+      "grounded_ratio": 0.9833,
+      "hallucination_rate": 0.0192,
+      "negation_errors": 0,
+      "latency_ms_p50": 40,
+      "latency_ms_p95": 40,
+      "cost_usd_per_case": 0.0,
+      "tokens_in_avg": 1200,
+      "tokens_out_avg": 400
+    }
+  ],
+  "per_case": [
+    {
+      "case_id": "aatd-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9286,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 0.9565,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "hallucinated: findings[13]",
+        "missed finding: 'Genotyping: PiZZ'"
+      ]
+    },
+    {
+      "case_id": "abpa-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9524,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "missed finding: 'HRCT: central bronchiectasis in both upper lobes with high-attenuation mucus plugging'"
+      ]
+    },
+    {
+      "case_id": "cap-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9565,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "missed finding: 'Chest X-ray: left lower lobe consolidation with air bronchograms'"
+      ]
+    },
+    {
+      "case_id": "lam-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.963,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "missed finding: 'CT abdomen: 2.1 cm left renal angiomyolipoma'"
+      ]
+    },
+    {
+      "case_id": "pap-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9655,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "missed finding: 'Lavage cytology: abundant PAS-positive acellular proteinaceous material'"
+      ]
+    },
+    {
+      "case_id": "pe-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9091,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 0.9524,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "hallucinated: findings[10]",
+        "missed finding: 'Compression ultrasound: non-compressible left popliteal vein'"
+      ]
+    },
+    {
+      "case_id": "ptx-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.9091,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 0.9474,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "hallucinated: findings[10]",
+        "missed finding: 'Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum'"
+      ]
+    },
+    {
+      "case_id": "sarc-01",
+      "provider": "fake",
+      "model": "fake-gold",
+      "findings_f1": 0.963,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 40,
+      "cost_usd": 0.0,
+      "notes": [
+        "missed finding: 'EBUS-TBNA of subcarinal and right hilar nodes: non-caseating epithelioid granulomas'"
+      ]
+    }
+  ],
+  "honesty_notes": [
+    "The gold set is synthetic: 8 pulmonology case reports written for this repository; no real patient is described.",
+    "Labels were drafted with an LLM before each text was written, then checked by hand and by automated consistency tests (every quote is found in the de-identified text; the labels score perfectly against themselves).",
+    "8 cases is a smoke-level harness: it catches regressions and large gaps between models; it is not a benchmark, and no confidence intervals are reported.",
+    "Claude helped draft the labels and is also evaluated: a known bias in its favour.",
+    "Findings count only on near-identical wording (token_sort_ratio >= 85, any word order), so a paraphrase that drops a qualifier is a miss; every model is scored the same way.",
+    "Rows with provider `fake` are a harness self-check (damaged gold labels, no model call), not a model result."
+  ]
+}
