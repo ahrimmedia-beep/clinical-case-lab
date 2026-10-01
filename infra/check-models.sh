@@ -2,8 +2,8 @@
 # Prove that every configured model answers for this project: one tiny call per model.
 # Default: runs infra/model_check.py as the Cloud Run Job "check-models" with the api service
 # account (same identity and network as production) and reads the result from Cloud Logging.
-# --local: runs it on this machine with your ADC (needs a network Google AI serves,
-# or from Cloud Shell).
+# --local: runs it on this machine with your ADC (needs a network region Google AI serves, or
+# run it from Cloud Shell).
 # Default model list is the four models of spec SS15: gemini-3.8-flash, claude-sonnet-5,
 # claude-opus-4-8, claude-opus-5-5. Claude Opus 5.5 is optional (amendments.md D): a FAIL on it
 # prints WARN instead and never fails the run. No Haiku, no flash-lite.

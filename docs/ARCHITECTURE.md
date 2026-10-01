@@ -52,7 +52,7 @@ flowchart LR
 
 ## Data model
 
-Nine tables, generated from `backend/app/db/tables.py` by `backend/alembic/versions/0001_initial.py`; CI runs `alembic upgrade head` and `alembic check` so the two cannot drift.
+Nine domain tables, generated from `backend/app/db/tables.py` by `backend/alembic/versions/0001_initial.py`, plus one cache table (`extract_cache`, migration `0002_extract_cache.py`); CI runs `alembic upgrade head` and `alembic check` so the models and migrations cannot drift.
 
 ```mermaid
 erDiagram
@@ -205,7 +205,7 @@ Tests: `backend/tests/test_scoring.py` (including select-all, harmful and hedged
 
 **AI players on the percentile curve.** `backend/pipeline/ai_player.py` plays a stored case blinded: it receives only `CasePublic`, asks for reveals of the options it chose, and commits to one diagnosis, a confidence and a treatment plan in two structured-output turns. The attempt goes through the same scorer and is stored as `ai:<model>`. The debrief draws each model as a labelled marker on the curve, outside the cohort. Run: `make ai-players` after seeding (`backend/seeds/ai_players.py`).
 
-**AI draft → physician review gate.** Cases built by the pipeline are stored as `draft`, with their de-identified source text. `GET /api/cases/{slug}/review` returns the full answer key and a checklist computed without an LLM: quotes not found in the source, harmful options to sign off, diagnosis leaks, the answer pathway, and leftover identifiers. `POST /api/cases/{slug}/approve` moves the case to `approved`. Code: `backend/app/repository/review.py`.
+**AI draft → physician review gate.** Cases built by the pipeline are stored as `draft`, with their de-identified source text. The Studio publishes by reference, not by content: the browser never sends case JSON, only the cache key from `/api/extract`, and the server re-extracts the case from its own cache before storing it, so a draft cannot be tampered with in transit. `GET /api/cases/{slug}/review` returns the full answer key and a checklist computed without an LLM: quotes not found in the source, harmful options to sign off, diagnosis leaks, the answer pathway, and leftover identifiers. `POST /api/cases/{slug}/approve` re-runs that checklist server-side and refuses when anything fails, then moves the case to `approved`. Code: `backend/app/repository/review.py`.
 
 **Sponsor insights per decision point.** `GET /api/cases/{slug}/insights` (one query, `backend/app/db/sql/insights.sql`) returns pick rates per option, how often each correct step was missed, the most common wrong diagnoses, and the key-test effect: diagnostic accuracy for physicians who ordered each correct workup test versus those who did not. The simulated cohort is causal (0.8 vs 0.3 chance of the right diagnosis), so the effect is visible and labelled as simulated.
 
@@ -213,7 +213,7 @@ Tests: `backend/tests/test_scoring.py` (including select-all, harmful and hedged
 
 ## Limits
 
-- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP and 200 per day (in memory, per instance), results cached by text, provider, model and prompt version — an in-memory LRU per instance backed by a Postgres table (`extract_cache`), so a cache built up before a scale-to-zero instance sleeps survives the restart.
+- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP (in memory) and 30 per day, counted in Postgres so the cap holds across instances and restarts, not reset on scale-to-zero. Results are cached by text, provider, model and prompt version — an in-memory LRU per instance backed by a Postgres table (`extract_cache`), so a cache built up before a scale-to-zero instance sleeps survives the restart.
 - Case ingest is capped at 256 KB.
-- The async pool (5 + 2 overflow) times at most 3 api instances stays under the 25 connections of `db-f1-micro`.
+- The async pool (5 + 2 overflow) times at most 1 api instance stays under the 25 connections of `db-f1-micro`.
 - Pipeline and AI-player logs carry provider, model, tokens, cost, latency and counts, never the text, the facts or the answers.

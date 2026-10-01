@@ -45,10 +45,9 @@ make eval-offline      # CI-safe: re-scores the recordings committed under backe
                         # — no API keys, no network, used by the metric floor test.
 make eval              # live: calls all four models in pipeline/pricing.yaml on all 8 cases.
                         # Needs GCP_PROJECT + Application Default Credentials
-                        # (gcloud auth application-default login) and, since the Mac's IP is
-                        # outside a supported region, a supported network (or run it from Cloud Shell
-                        # instead). Vertex AI model calls never go from the Mac on a plain
-                        # connection.
+                        # (gcloud auth application-default login) and a network region Google
+                        # serves (or run it from Cloud Shell instead). Vertex AI model calls
+                        # never go from a network Google does not serve.
 make sync-evals        # copies backend/evals/reports/latest.json into web/src/data/, which the
                         # /evals page renders.
 ```
@@ -102,10 +101,10 @@ move to the newer model" rather than a guess.
 
 ## The current table
 
-The row below is a self-check, not a model result: `fake/fake-gold` runs a deterministic fake
-provider against deliberately damaged gold labels (so it is expected to score high, not perfect)
-and proves the scoring code itself is correct before any paid call is made. It is what is
-committed right now; a live run with real models replaces it following the steps above.
+A live run of the four models in `pipeline/pricing.yaml` on all 8 gold cases, following the steps
+above. A separate `fake/fake-gold` row (a deterministic fake provider against deliberately damaged
+gold labels) is not shown here; it exists only as a harness sanity check and backs the metric
+floor test in CI (see "How CI uses this").
 
 <!-- The table between the markers is generated: python3 scripts/update_eval_tables.py copies the first table of backend/evals/reports/latest.md. -->
 <!-- eval-table:start -->
@@ -121,10 +120,10 @@ committed right now; a live run with real models replaces it following the steps
 
 The original plan ran the live eval as a Cloud Run Job (`evals`, on the `api` image, with Cloud
 Storage volumes for `reports/` and `.cache/`, driven by a script that would copy the job's
-reports back into the repo) so the Mac's IP never had to reach Vertex AI directly. For this submission that path is **WON'T**: the live eval
-instead runs directly from the Mac on a network Google AI serves (or from Cloud Shell),
-using `make eval` as documented above — simpler to operate for a one-time run, at the cost of
-needing a supported network path for that one command. `infra/deploy.sh` keeps `ENABLE_EVALS=0`
+reports back into the repo) so the caller's machine never had to reach Vertex AI directly. For this submission that path is **WON'T**: the live eval
+instead runs directly from the developer's machine on a network region Google serves (or from
+Cloud Shell), using `make eval` as documented above — simpler to operate for a one-time run, at
+the cost of needing that one command to run somewhere Google serves. `infra/deploy.sh` keeps `ENABLE_EVALS=0`
 by default and never deploys the `evals` job or its bucket; setting `ENABLE_EVALS=1` restores the
 job definition (`python -m evals.run`, mounted on `gs://<project>-case-lab-evals/{reports,cache}`)
 for anyone who wants the Cloud Run Job path later.

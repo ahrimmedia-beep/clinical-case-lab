@@ -1,4 +1,5 @@
--- Catalogue cards: approved cases before drafts, newest first within each group.
+-- Catalogue cards: approved cases before drafts, curated (source_kind = manual) before LLM-built
+-- within each of those, newest first within each group.
 -- attempts_count counts humans and the simulated cohort; AI players are not attempts by people.
 SELECT
     c.id,

@@ -1,7 +1,9 @@
-"""Postgres fixtures for tests marked `db`. Skips cleanly when the database is unreachable."""
+"""Postgres fixtures for tests marked `db`. Skips cleanly when the database is unreachable,
+unless REQUIRE_DB=1 is set (CI sets it), in which case an unreachable database fails the run."""
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
 
 import httpx
@@ -48,10 +50,13 @@ async def db_engine() -> AsyncIterator[AsyncEngine]:
         await _ensure_database()
     except (OSError, TimeoutError, SQLAlchemyError) as exc:
         safe = make_url(TEST_DATABASE_URL).render_as_string(hide_password=True)
-        pytest.skip(
+        message = (
             f"Postgres not reachable at {safe} ({type(exc).__name__}); "
             "start it with `make db` or set TEST_DATABASE_URL"
         )
+        if os.environ.get("REQUIRE_DB") == "1":
+            pytest.fail(message)
+        pytest.skip(message)
     engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
     async with engine.connect() as lock_conn:
         await lock_conn.execute(text("SET lock_timeout = '300s'"))

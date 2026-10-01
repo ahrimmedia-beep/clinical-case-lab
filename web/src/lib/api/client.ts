@@ -7,10 +7,8 @@ import type { paths } from "./schema";
 import type {
   AttemptIn,
   AttemptResult,
-  CaseCreated,
   CasePublic,
   CaseSummary,
-  ClinicalCase,
   ExtractRequest,
   ExtractResponse,
   RevealIn,
@@ -82,18 +80,11 @@ export async function extractCase(body: ExtractRequest, clientIp: string | null 
   if (isFixtureMode()) return fixtures.extractResponse;
   const key = internalApiKey();
   const headers: Record<string, string> = {};
-  if (key) headers["X-Internal-Key"] = key; // the only call that carries the key
+  if (key) headers["X-Internal-Key"] = key; // the only call in this file that carries the key; lib/api/internal.ts has its own key-bearing calls
   if (clientIp) headers["X-Forwarded-For"] = clientIp;
   const { data, error, response } = await guard(() =>
     api().POST("/api/extract", { body, headers, ...init(EXTRACT_TIMEOUT_MS) }),
   );
-  if (data !== undefined) return data;
-  throw problemToError(response.status, error);
-}
-
-export async function createCase(body: ClinicalCase): Promise<CaseCreated> {
-  if (isFixtureMode()) return fixtures.caseCreated;
-  const { data, error, response } = await guard(() => api().POST("/api/cases", { body, ...init() }));
   if (data !== undefined) return data;
   throw problemToError(response.status, error);
 }

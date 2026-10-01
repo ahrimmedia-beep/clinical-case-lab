@@ -7,7 +7,7 @@ set -euo pipefail
 # shellcheck source=lib.sh
 source "$(dirname "$0")/lib.sh"
 
-echo "This permanently deletes Case Lab from project $PROJECT_ID: services web and api, all jobs,"
+echo "This permanently deletes Case Lab from project $PROJECT_ID: services $WEB_SERVICE and $API_SERVICE, all jobs,"
 echo "Cloud SQL $SQL_INSTANCE with its data and backups, secrets, images, the eval bucket, service accounts."
 answer="${CONFIRM:-}"
 if [ -z "$answer" ]; then read -r -p "Type the project id to confirm: " answer; fi

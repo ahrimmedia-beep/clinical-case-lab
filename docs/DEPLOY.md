@@ -1,6 +1,6 @@
 # Deploying Case Lab to Google Cloud
 
-Everything runs in one GCP project in `us-central1`: two Cloud Run services (`web`, `api`), Cloud Run jobs (`migrate`, `simulate`, and `check-models` when you run the model check), Cloud SQL for PostgreSQL 18, Artifact Registry and Secret Manager. `infra/deploy.sh` creates all of it, is safe to re-run after an interruption, and is the script used for the live deployment:
+Everything runs in one GCP project in `us-central1`: two Cloud Run services (`case-lab` for web, `api`), Cloud Run jobs (`migrate`, `simulate`, and `check-models` when you run the model check), Cloud SQL for PostgreSQL 18, Artifact Registry and Secret Manager. `infra/deploy.sh` creates all of it, is safe to re-run after an interruption, and is the script used for the live deployment:
 
 - Web: https://case-lab-456417120472.us-central1.run.app
 - API docs: https://api-456417120472.us-central1.run.app/docs
@@ -44,7 +44,7 @@ Later changes: `infra/deploy.sh` again (images that already exist for the curren
 | 8 | Database and user | waits until the instance is `RUNNABLE`, creates database `caselab` and user `caselab` with the password from Secret Manager; an existing user's password is left alone unless the secret was just created or `RESET_DB_PASSWORD=1` |
 | 9 | Migrations | deploys the Cloud Run job `migrate` (`alembic upgrade head`, api image) and executes it with `--wait`. If it fails, the script stops before a new api revision exists |
 | 10 | Jobs | deploys the `simulate` job (`python -m seeds.simulate_cohort`); it is executed during seeding, not here |
-| 11 | api | Cloud SQL socket through `--add-cloudsql-instances`, 1 vCPU, 1 GiB, concurrency 80, at most 3 instances, startup CPU boost, HTTP startup probe on `/readyz` (every 5 s, up to 120 s) and liveness probe on `/healthz`, `--allow-unauthenticated` |
+| 11 | api | Cloud SQL socket through `--add-cloudsql-instances`, 1 vCPU, 1 GiB, concurrency 80, at most 1 instance, startup CPU boost, HTTP startup probe on `/readyz` (every 5 s, up to 120 s) and liveness probe on `/healthz`, `--allow-unauthenticated` |
 | 12 | web | `API_BASE_URL` and `API_PUBLIC_URL` set to the api URL, 1 vCPU, 512 MiB, at most 3 instances, `--allow-unauthenticated` |
 | 13 | Public access check | if a service answers 403 because an organization policy blocks `allUsers`, the script switches it to `--no-invoker-iam-check` |
 | 14 | CORS | sets the api's `CORS_ORIGINS` to the web service's URLs (the deterministic `run.app` URL is known before web exists) |
@@ -63,7 +63,7 @@ Optional knobs: `MIN_INSTANCES` (default 0), `REGION` (default `us-central1`), `
 
 The api and both database jobs take their settings from one function in `infra/lib.sh` (`db_env`), so a migration cannot target a different database than the service.
 
-`POST /api/cases` checks `X-Internal-Key` when `REQUIRE_INGEST_KEY=true`, which `deploy.sh` sets in production so nobody can add cases to the public catalogue; locally (compose) it stays open. New cases reach production through `/studio` (the web server holds the key) or `seeds.load --key`. Every ingested case is validated and capped at 256 KB. `/api/extract`, review, approve, insights and AI attempts always require the key.
+`POST /api/cases` checks `X-Internal-Key` when `REQUIRE_INGEST_KEY=true`, which `deploy.sh` sets in production so cases reach the public catalogue only as AI drafts, through the Studio; locally (compose) it stays open. New cases reach production through `/studio` (the web server holds the key) or `seeds.load --key`. The Studio publishes by reference: the browser sends only the `/api/extract` cache key it was given, never the case JSON, and the server re-extracts the case from that cache before storing it. Every ingested case is validated and capped at 256 KB. `/api/extract`, review, approve, insights and AI attempts always require the key. Approval (`POST /api/cases/{slug}/approve`) re-checks the review checklist server-side and refuses when anything fails, rather than trusting the reviewer's client.
 
 ## Secrets
 
@@ -74,11 +74,11 @@ The api and both database jobs take their settings from one function in `infra/l
 | `anthropic-api-key` | `infra/set-fallback-key.sh anthropic` | `case-lab-api` | active in production: Vertex AI has zero Claude quota for this project, so `make_claude_client` uses this key (see [Models](#models-gemini-on-vertex-ai-claude-on-the-anthropic-api)) |
 | `gemini-api-key` | `infra/set-fallback-key.sh gemini`, optional | `case-lab-api` | only if Gemini itself cannot be used through Vertex AI |
 
-Secrets are injected as environment variables at instance start. The scripts never print secret values, and `set-fallback-key.sh` reads the key with echo off.
+Secrets are injected as environment variables at instance start. The scripts never print secret values, and `set-fallback-key.sh` reads the key with echo off. One trade-off: `infra/deploy.sh` passes the database password to `gcloud sql users create` / `set-password` as `--password=...`, which is visible to anyone who can run `ps` on the deploying machine while it runs. Accepted for this demo (a single operator's own machine, short-lived); the stricter alternative is calling the Cloud SQL Admin REST API directly with the password in the request body instead of argv.
 
 ## Cloud SQL connection
 
-Cloud Run mounts the instance as a unix socket under `/cloudsql/<project>:us-central1:case-lab-db`. When `CLOUD_SQL_INSTANCE` is set, `Settings.sqlalchemy_url` in `backend/app/config.py` builds `postgresql+asyncpg://caselab:<password>@/caselab?host=/cloudsql/<instance>`; locally and in CI a plain `DATABASE_URL` is used. The startup probe hits `/readyz`, which runs `SELECT 1` with a 2 s timeout, so a revision that cannot reach the database never receives traffic and the deploy fails instead of serving 500s. `db-f1-micro` allows 25 connections: a pool of 5 + 2 overflow per instance × 3 instances leaves room for a job.
+Cloud Run mounts the instance as a unix socket under `/cloudsql/<project>:us-central1:case-lab-db`. When `CLOUD_SQL_INSTANCE` is set, `Settings.sqlalchemy_url` in `backend/app/config.py` builds `postgresql+asyncpg://caselab:<password>@/caselab?host=/cloudsql/<instance>`; locally and in CI a plain `DATABASE_URL` is used. The startup probe hits `/readyz`, which runs `SELECT 1` with a 2 s timeout, so a revision that cannot reach the database never receives traffic and the deploy fails instead of serving 500s. `db-f1-micro` allows 25 connections: a pool of 5 + 2 overflow on the single api instance leaves room for a job.
 
 ## IAM matrix
 
@@ -89,7 +89,7 @@ Cloud Run mounts the instance as a unix socket under `/cloudsql/<project>:us-cen
 | `case-lab-api` | `roles/secretmanager.secretAccessor` | secrets `db-password`, `internal-api-key`, fallback keys | read its secrets at startup |
 | `case-lab-web` | `roles/secretmanager.secretAccessor` | secret `internal-api-key` | send `X-Internal-Key` to the api |
 | default Cloud Build account | `roles/cloudbuild.builds.builder` | project | build and push the images |
-| `allUsers` | `roles/run.invoker` | services `web`, `api` | public site and public API docs |
+| `allUsers` | `roles/run.invoker` | services `case-lab`, `api` | public site and public API docs |
 | deployer (you) | Owner or equivalent | project | runs the script; in production a deployer service account through Workload Identity Federation |
 
 With `ENABLE_EVALS=1`, `case-lab-api` also gets `roles/storage.objectUser` on the eval bucket.
@@ -108,7 +108,7 @@ Claude runs on the direct Anthropic API in production, not on Vertex AI. This pr
 
 ```bash
 WEB_URL=$(gcloud run services describe case-lab --region=us-central1 --format='value(status.url)')
-curl -fsS "$API_URL/healthz"; curl -fsS "$API_URL/readyz"                 # {"status":"ok"} twice
+curl -fsS "$API_URL/readyz"                                               # {"status":"ok"}; /healthz is 404 from outside Cloud Run
 curl -fsS "$API_URL/api/cases" | jq 'length'                              # 3 after seeding
 SLUG=$(curl -fsS "$API_URL/api/cases" | jq -r '.[0].slug')
 curl -fsS "$API_URL/api/cases/$SLUG" | grep -cE '"(is_correct|is_harmful|accepted_answers|feedback|explanation|reveal)"'   # 0
@@ -150,7 +150,7 @@ gcloud run services update-traffic api --region=us-central1 --to-revisions=<revi
 gcloud run services update-traffic api --region=us-central1 --to-latest
 ```
 
-The same works for `web`. While traffic is pinned to a revision, new deploys receive no traffic until `--to-latest`. A schema rollback is `gcloud run jobs execute migrate --region=us-central1 --args=downgrade,-1 --wait`, after rolling back the code that needs the newer schema; with a single migration this drops every table, so prefer a new forward migration.
+The same works for `web`. While traffic is pinned to a revision, new deploys receive no traffic until `--to-latest`. A schema rollback is `gcloud run jobs execute migrate --region=us-central1 --args=downgrade,-1 --wait`, after rolling back the code that needs the newer schema; with 2 migrations, `downgrade,-1` drops only `extract_cache` (migration 0002), so prefer a new forward migration over going further back.
 
 **Canary:** `gcloud run deploy api --image=<image> --region=us-central1 --no-traffic --tag=canary`, test the `canary---` URL, then `gcloud run services update-traffic api --region=us-central1 --to-tags=canary=10`, and finally `--to-latest`.
 

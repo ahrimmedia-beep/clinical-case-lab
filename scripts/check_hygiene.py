@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Public-repo hygiene gate: no Cyrillic text, no secret-shaped strings, no committed env files.
+"""Public-repo hygiene gate: no Cyrillic text, no secret-shaped strings, no committed env files,
+no personal network notes.
 
 Scans every file tracked by git (text files only). Run: python3 scripts/check_hygiene.py
 """
@@ -23,6 +24,13 @@ SECRET_PATTERNS = {
 }
 ENV_FILE = re.compile(r"(^|/)\.env(\.(?!example$)[^/]+)?$")
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2", ".ttf", ".pdf"}
+# Personal network/location notes do not belong in a public repo; keep wording neutral
+# ("a network region Google serves", "Cloud Shell") instead. Built from fragments so this file's
+# own source does not trip the pattern it defines.
+_LOCATION_WORDS = ("x" + "-placeholder",)
+LOCATION_PATTERN = re.compile("|".join(_LOCATION_WORDS), re.IGNORECASE)
+# Contains the above words as test fixtures on purpose; excluded from the scan it tests.
+EXEMPT_FILES = {"scripts/test_check_hygiene.py"}
 
 
 def tracked_files() -> list[str]:
@@ -32,10 +40,25 @@ def tracked_files() -> list[str]:
     return [path for path in out.split("\0") if path]
 
 
+def scan_line(line: str) -> list[str]:
+    """Problems on one line of text, without file/line context (unit-testable in isolation)."""
+    problems: list[str] = []
+    if CYRILLIC.search(line):
+        problems.append("Cyrillic text (the public repo is English only)")
+    for name, pattern in SECRET_PATTERNS.items():
+        if pattern.search(line):
+            problems.append(f"looks like a {name}")
+    if LOCATION_PATTERN.search(line):
+        problems.append("names a specific country/VPN (use neutral wording instead)")
+    return problems
+
+
 def scan(rel: str) -> list[str]:
     problems: list[str] = []
     if ENV_FILE.search(rel):
         problems.append(f"{rel}: env files must not be committed")
+    if rel in EXEMPT_FILES:
+        return problems
     path = ROOT / rel
     if path.suffix.lower() in BINARY_SUFFIXES or not path.is_file():
         return problems
@@ -44,11 +67,8 @@ def scan(rel: str) -> list[str]:
     except UnicodeDecodeError:
         return problems
     for number, line in enumerate(text.splitlines(), 1):
-        if CYRILLIC.search(line):
-            problems.append(f"{rel}:{number}: Cyrillic text (the public repo is English only)")
-        for name, pattern in SECRET_PATTERNS.items():
-            if pattern.search(line):
-                problems.append(f"{rel}:{number}: looks like a {name}")
+        for problem in scan_line(line):
+            problems.append(f"{rel}:{number}: {problem}")
     return problems
 
 

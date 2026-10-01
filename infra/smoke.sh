@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
-# Production smoke test: API health and docs, spoiler-free case JSON, reveal, a full attempt with
-# debrief and percentile, /api/extract auth and both providers, CORS, and the web pages (including
-# a check that the player HTML carries no answer fields).
-# Usage: infra/smoke.sh [--no-llm]     --no-llm skips the two paid /api/extract calls
-# Each run records one real attempt on the first showcase case.
+# Production smoke test: API health and docs, spoiler-free case JSON, reveal, /api/extract auth
+# and both providers, CORS, and the web pages (including a check that the player HTML carries no
+# answer fields).
+# Usage: infra/smoke.sh [--no-llm] [--with-attempt]
+#   --no-llm         skips the two paid /api/extract calls
+#   --with-attempt   also posts one test attempt and checks the debrief and percentile; off by
+#                     default because it leaves a "smoke test" diagnosis in the human cohort
+#                     (visible in the sponsor view's wrong-diagnosis list on repeated runs)
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(dirname "$0")/lib.sh"
 
 NO_LLM=0
-if [ "${1:-}" = "--no-llm" ]; then NO_LLM=1; fi
+WITH_ATTEMPT=0
+for arg in "$@"; do
+  case "$arg" in
+    --no-llm) NO_LLM=1 ;;
+    --with-attempt) WITH_ATTEMPT=1 ;;
+    *) die "usage: infra/smoke.sh [--no-llm] [--with-attempt]" ;;
+  esac
+done
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 PASSES=0
@@ -68,20 +78,24 @@ else
     expect 200 "$(http POST "$API_URL/api/cases/$SLUG/reveal" -H 'Content-Type: application/json' -d "$REVEAL")" "POST reveal (interview)"
   fi
 
-  ATTEMPT="$(jq -c '{
-      choices: ([.stages[] | select(.kind == "decision" and .input == "multi_select" and (.options | length) > 0)
-                | {(.key): [.options[0].key]}] | add // {}),
-      diagnosis_text: "smoke test", confidence: 3, duration_ms: 1000}' "$TMP/case.json")"
-  expect 201 "$(http POST "$API_URL/api/cases/$SLUG/attempts" -H 'Content-Type: application/json' -d "$ATTEMPT")" "POST attempt"
-  if jq -e '.points <= .max_points and (.stages | length) == 9' "$TMP/body" >/dev/null 2>&1; then
-    pass "debrief: $(jq -r '"\(.points)/\(.max_points) points, \(.right) right, \(.wrong) wrong, \(.missed) missed"' "$TMP/body")"
+  if [ "$WITH_ATTEMPT" = "1" ]; then
+    ATTEMPT="$(jq -c '{
+        choices: ([.stages[] | select(.kind == "decision" and .input == "multi_select" and (.options | length) > 0)
+                  | {(.key): [.options[0].key]}] | add // {}),
+        diagnosis_text: "smoke test", confidence: 3, duration_ms: 1000}' "$TMP/case.json")"
+    expect 201 "$(http POST "$API_URL/api/cases/$SLUG/attempts" -H 'Content-Type: application/json' -d "$ATTEMPT")" "POST attempt"
+    if jq -e '.points <= .max_points and (.stages | length) == 9' "$TMP/body" >/dev/null 2>&1; then
+      pass "debrief: $(jq -r '"\(.points)/\(.max_points) points, \(.right) right, \(.wrong) wrong, \(.missed) missed"' "$TMP/body")"
+    else
+      fail "debrief shape: $(excerpt)"
+    fi
+    if jq -e '.percentile != null and .cohort_size >= 5' "$TMP/body" >/dev/null 2>&1; then
+      pass "percentile $(jq -r '.percentile' "$TMP/body") in a cohort of $(jq -r '.cohort_size' "$TMP/body") (simulated: $(jq -r '.cohort_is_simulated' "$TMP/body"))"
+    else
+      fail "no percentile (cohort under 5?): run infra/seed-prod.sh"
+    fi
   else
-    fail "debrief shape: $(excerpt)"
-  fi
-  if jq -e '.percentile != null and .cohort_size >= 5' "$TMP/body" >/dev/null 2>&1; then
-    pass "percentile $(jq -r '.percentile' "$TMP/body") in a cohort of $(jq -r '.cohort_size' "$TMP/body") (simulated: $(jq -r '.cohort_is_simulated' "$TMP/body"))"
-  else
-    fail "no percentile (cohort under 5?): run infra/seed-prod.sh"
+    warn_check "skipped posting a test attempt (pass --with-attempt to also check the debrief and percentile)"
   fi
 fi
 
@@ -95,7 +109,8 @@ else
   KEY="$(secret_value "$SECRET_INTERNAL_KEY")"
   for provider in gemini claude; do
     REQ="$(jq -cn --arg t "$SAMPLE" --arg p "$provider" '{text: $t, provider: $p}')"
-    code="$(http POST "$API_URL/api/extract" -H 'Content-Type: application/json' -H "X-Internal-Key: $KEY" -d "$REQ")"
+    # The key header is read from stdin (-H @-), not the command line, so it never shows up in `ps`.
+    code="$(printf 'X-Internal-Key: %s' "$KEY" | http POST "$API_URL/api/extract" -H 'Content-Type: application/json' -H @- -d "$REQ")"
     if [ "$code" = "200" ]; then
       pass "extract via $provider: $(jq -r '"\(.model), grounded \(.grounded_ratio), \(.usage.latency_ms) ms, $\(.usage.cost_usd)"' "$TMP/body")"
     elif { [ "$code" = "502" ] || [ "$code" = "503" ]; } && grep -qi '^content-type: application/problem+json' "$TMP/headers"; then
