@@ -1,0 +1,22 @@
+{
+  "patient": {"age_years": 34, "sex": "female"},
+  "chief_complaint": "Sudden shortness of breath and pleuritic chest pain",
+  "findings": [
+    {"category": "symptom", "text": "Sudden shortness of breath", "evidence": "sudden shortness of breath"},
+    {"category": "symptom", "text": "Pleuritic right-sided chest pain", "evidence": "sharp right-sided chest pain that worsens on inspiration"},
+    {"category": "history", "text": "14-hour flight the day before", "evidence": "returned yesterday from a 14-hour flight"},
+    {"category": "medication", "text": "Combined oral contraceptive pill", "evidence": "takes a combined oral contraceptive"},
+    {"category": "exam", "text": "Swollen, tender left calf", "evidence": "The left calf is swollen and tender"},
+    {"category": "imaging", "text": "CT pulmonary angiography: filling defect in the right lower lobe pulmonary artery", "evidence": "filling defect in the right lower lobe pulmonary artery"}
+  ],
+  "measurements": [
+    {"kind": "vital", "name": "Heart rate", "value": 112, "value_text": "", "unit": "", "flag": "not_stated", "evidence": "heart rate 112"},
+    {"kind": "vital", "name": "SpO2", "value": 91, "value_text": "", "unit": "%", "flag": "not_stated", "evidence": "SpO2 91% on room air"},
+    {"kind": "vital", "name": "Respiratory rate", "value": 24, "value_text": "", "unit": "", "flag": "not_stated", "evidence": "respiratory rate 24"},
+    {"kind": "lab", "name": "D-dimer", "value": 2.4, "value_text": "", "unit": "mg/L FEU", "flag": "not_stated", "evidence": "D-dimer 2.4 mg/L FEU"}
+  ],
+  "final_diagnosis": {"name": "Pulmonary embolism", "icd10": "I26.99", "evidence": "acute pulmonary embolism"},
+  "differential": [
+    {"name": "Pneumothorax", "icd10": "J93.9", "evidence": "Pneumothorax was considered and excluded"}
+  ]
+}
