@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+backend/evals/.cache/
+
+# Node / Next
+node_modules/
+.next/
+out/
+web/next-env.d.ts
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*-key.json
+application_default_credentials.json
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

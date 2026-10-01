@@ -1,0 +1,56 @@
+[project]
+name = "case-lab-backend"
+version = "0.1.0"
+description = "Case Lab API, LLM pipeline and eval harness"
+requires-python = ">=3.13,<3.15"
+dependencies = [
+  "fastapi[standard]>=0.142.2,<0.143",
+  "pydantic>=2.13,<3",
+  "pydantic-settings>=2.15,<3",
+  "sqlalchemy[asyncio]>=2.1.1,<2.2",
+  "asyncpg>=0.31,<0.32",
+  "alembic>=1.20,<2",
+  "structlog>=26.1",
+  "rapidfuzz>=3.10",
+  "google-genai>=2.26,<3",
+  "anthropic[vertex]>=1.11,<2",
+  "pyyaml>=6.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.1",
+  "pytest-asyncio>=1.4",
+  "httpx>=0.28",
+  "ruff>=0.16",
+  "mypy>=1.15",
+  "types-pyyaml>=6.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Body"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+markers = ["db: needs the Postgres test database"]
