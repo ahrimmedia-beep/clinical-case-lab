@@ -37,6 +37,8 @@ services:
       GCP_PROJECT: ${GCP_PROJECT:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Key-less local demo: the deterministic fake LLM. Set PIPELINE_FAKE_LLM=0 to call Vertex AI.
+      PIPELINE_FAKE_LLM: ${PIPELINE_FAKE_LLM:-1}
     ports:
       - "127.0.0.1:8000:8080"
     depends_on:
