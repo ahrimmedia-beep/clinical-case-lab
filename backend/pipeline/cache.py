@@ -4,9 +4,10 @@ Key = sha256 of (raw text, provider, model, PROMPT_VERSION). The same text with 
 prompt version gives the same draft, so a repeat answers instantly and costs nothing; the
 `/studio` samples are pre-warmed after a deploy (`python -m pipeline.cli prewarm`).
 
-Two layers: an in-memory LRU per process (a Cloud Run instance) and an optional directory
-(`EXTRACT_CACHE_DIR`) for local runs and the CLI. Only the de-identified response is stored; the
-raw text appears nowhere except inside the hash.
+Layers: an in-memory LRU per process (a Cloud Run instance), an optional directory
+(`EXTRACT_CACHE_DIR`) for local runs and the CLI, and Postgres (`app.repository.extract_cache`,
+wired in by `app.routers.extract`) so a cold instance restart does not lose a warm cache. Only
+the de-identified response is stored; the raw text appears nowhere except inside the hash.
 """
 
 from __future__ import annotations
@@ -57,6 +58,10 @@ class ExtractCache:
             tmp = self.directory / f"{key}.json.tmp"
             tmp.write_text(response.model_dump_json(), encoding="utf-8")
             tmp.replace(self.directory / f"{key}.json")  # atomic: never a half-written entry
+
+    def remember(self, key: str, response: ExtractResponse) -> None:
+        """Warm the in-memory layer only, e.g. after a Postgres hit on a fresh instance."""
+        self._remember(key, response)
 
     def _remember(self, key: str, response: ExtractResponse) -> None:
         self._items[key] = response

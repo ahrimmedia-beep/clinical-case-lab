@@ -7,8 +7,11 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.pool import NullPool
 
 from app.config import get_settings
+from app.db.engine import get_engine
 from app.main import create_app
 from app.ratelimit import ExtractLimiter, RateLimited, get_limiter
 from pipeline.cache import get_extract_cache
@@ -18,6 +21,13 @@ from pipeline.run import run_pipeline
 
 SAMPLE = SAMPLE_TEXT_FILE.read_text()
 KEY = {"X-Internal-Key": "test-key"}
+
+# A port nothing listens on: engine.connect() fails instantly (no DNS, no real Postgres needed).
+# These are pure unit tests for the in-memory cache and the rest of the handler; the Postgres
+# read-through/write-through is covered against the real test database by
+# tests/db/test_extract_cache_db.py. This also exercises the same "DB unreachable -> treat as a
+# miss, never fail the request" path production takes if Cloud SQL is briefly unreachable.
+UNREACHABLE_DB_URL = "postgresql+asyncpg://caselab:caselab@127.0.0.1:1/caselab"
 
 
 @pytest.fixture(autouse=True)
@@ -36,7 +46,11 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     get_settings.cache_clear()
     get_limiter.cache_clear()
     get_extract_cache.cache_clear()
-    yield TestClient(create_app())
+    app = create_app()
+    app.dependency_overrides[get_engine] = lambda: create_async_engine(
+        UNREACHABLE_DB_URL, poolclass=NullPool
+    )
+    yield TestClient(app)
     get_limiter.cache_clear()
     get_extract_cache.cache_clear()
 

@@ -211,7 +211,7 @@ Tests: `backend/tests/test_scoring.py` (including select-all, harmful and hedged
 
 ## Limits
 
-- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP and 200 per day (in memory, per instance), results cached by text, provider, model and prompt version.
+- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP and 200 per day (in memory, per instance), results cached by text, provider, model and prompt version — an in-memory LRU per instance backed by a Postgres table (`extract_cache`), so a cache built up before a scale-to-zero instance sleeps survives the restart.
 - Case ingest is capped at 256 KB.
 - The async pool (5 + 2 overflow) times at most 3 api instances stays under the 25 connections of `db-f1-micro`.
 - Pipeline and AI-player logs carry provider, model, tokens, cost, latency and counts, never the text, the facts or the answers.

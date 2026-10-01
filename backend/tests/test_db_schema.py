@@ -16,6 +16,7 @@ SPEC_TABLES = {
     "decision_accepted_answers",
     "attempts",
     "attempt_choices",
+    "extract_cache",
 }
 
 

@@ -6,10 +6,14 @@ from typing import Annotated
 
 import structlog
 from fastapi import APIRouter, Depends, Header, Request
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.config import get_settings
+from app.db.engine import EngineDep
 from app.problems import raise_problem
 from app.ratelimit import RateLimited, client_ip, get_limiter
+from app.repository import extract_cache as extract_cache_db
 from app.schemas.common import ProblemDetail
 from app.schemas.extract import ExtractRequest, ExtractResponse
 from app.security import require_internal_key
@@ -22,6 +26,38 @@ from pipeline.run import run_pipeline
 
 router = APIRouter(tags=["pipeline"])
 log = structlog.get_logger()
+
+
+# Postgres being unreachable can surface as a raw driver/socket error (e.g. asyncpg raises
+# ConnectionRefusedError, an OSError, before SQLAlchemy gets a chance to wrap it) rather than
+# a SQLAlchemyError, so both are treated as "no cache today" — never as a request failure.
+DB_CACHE_ERRORS = (OSError, TimeoutError, SQLAlchemyError)
+
+
+async def _db_lookup(engine: AsyncEngine, key: str) -> ExtractResponse | None:
+    """Postgres read-through under the in-memory LRU. A DB error is a miss, not a failure."""
+    try:
+        return await extract_cache_db.lookup(engine, key)
+    except DB_CACHE_ERRORS as exc:
+        log.warning("extract_cache_db_lookup_failed", error=type(exc).__name__)
+        return None
+
+
+async def _db_store(
+    engine: AsyncEngine, *, key: str, provider: str, model: str, response: ExtractResponse
+) -> None:
+    """Postgres write-through after a successful run. A DB error here never fails the request."""
+    try:
+        await extract_cache_db.store(
+            engine,
+            key=key,
+            provider=provider,
+            model=model,
+            prompt_version=PROMPT_VERSION,
+            response=response,
+        )
+    except DB_CACHE_ERRORS as exc:
+        log.warning("extract_cache_db_store_failed", error=type(exc).__name__)
 
 
 @router.post(
@@ -41,6 +77,7 @@ log = structlog.get_logger()
 async def extract_case(
     body: ExtractRequest,
     request: Request,
+    engine: EngineDep,
     x_internal_key: Annotated[str | None, Header()] = None,  # documents the header; checked above
 ) -> ExtractResponse:
     # Order: 401 key -> 422 unknown model -> cached answer (free, instant) -> 429 rate limit
@@ -53,6 +90,10 @@ async def extract_case(
     cache = get_extract_cache()
     key = cache_key(body.text, body.provider.value, model, PROMPT_VERSION)
     cached = cache.get(key)
+    if cached is None:
+        cached = await _db_lookup(engine, key)
+        if cached is not None:
+            cache.remember(key, cached)  # warm this instance's LRU; already in Postgres
     if cached is not None:
         log.info("extract_cache_hit", provider=body.provider.value, model=model)
         return cached
@@ -74,4 +115,5 @@ async def extract_case(
         log.warning("extract_failed", provider=body.provider.value, error=type(exc).__name__)
         raise_problem(502, "The model's answer could not be used", str(exc))
     cache.put(key, response)
+    await _db_store(engine, key=key, provider=body.provider.value, model=model, response=response)
     return response

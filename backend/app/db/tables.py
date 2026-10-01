@@ -23,6 +23,7 @@ from sqlalchemy import (
     func,
     text,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 
 from app.schemas.case import (
     Difficulty,
@@ -218,4 +219,18 @@ attempt_choices = Table(
     ),
     PrimaryKeyConstraint("attempt_id", "option_id"),
     Index("ix_attempt_choices_option_id", "option_id"),
+)
+
+# POST /api/extract result cache (pipeline/cache.py's in-memory LRU, persisted): survives a
+# Cloud Run instance restart. key = sha256(text, provider, model, PROMPT_VERSION); response is
+# the full ExtractResponse JSON exactly as first returned.
+extract_cache = Table(
+    "extract_cache",
+    metadata,
+    Column("key", CHAR(64), primary_key=True),
+    Column("provider", Text),
+    Column("model", Text),
+    Column("prompt_version", Text),
+    Column("response", JSONB, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
 )
