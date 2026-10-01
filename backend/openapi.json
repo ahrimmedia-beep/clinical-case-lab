@@ -1,0 +1,3009 @@
+{
+  "components": {
+    "schemas": {
+      "AiAttemptRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/Provider"
+          }
+        },
+        "required": [
+          "provider"
+        ],
+        "title": "AiAttemptRequest",
+        "type": "object"
+      },
+      "AiAttemptSummary": {
+        "properties": {
+          "attempt_id": {
+            "title": "Attempt Id",
+            "type": "integer"
+          },
+          "calibration": {
+            "$ref": "#/components/schemas/Calibration"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "diagnosis_correct": {
+            "title": "Diagnosis Correct",
+            "type": "boolean"
+          },
+          "diagnosis_text": {
+            "title": "Diagnosis Text",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "max_points": {
+            "title": "Max Points",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "label",
+          "provider",
+          "model",
+          "points",
+          "max_points",
+          "diagnosis_text",
+          "diagnosis_correct",
+          "confidence",
+          "calibration",
+          "latency_ms",
+          "cost_usd"
+        ],
+        "title": "AiAttemptSummary",
+        "type": "object"
+      },
+      "AnswerKey": {
+        "properties": {
+          "accepted_answers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Accepted Answers",
+            "type": "array"
+          },
+          "final_diagnosis": {
+            "$ref": "#/components/schemas/Diagnosis"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/AnswerKeyStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "final_diagnosis",
+          "accepted_answers",
+          "stages"
+        ],
+        "title": "AnswerKey",
+        "type": "object"
+      },
+      "AnswerKeyOption": {
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "is_correct": {
+            "title": "Is Correct",
+            "type": "boolean"
+          },
+          "is_harmful": {
+            "title": "Is Harmful",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reveal"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "is_correct",
+          "is_harmful"
+        ],
+        "title": "AnswerKeyOption",
+        "type": "object"
+      },
+      "AnswerKeyStage": {
+        "properties": {
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/AnswerKeyOption"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/DecisionStage"
+          }
+        },
+        "required": [
+          "stage",
+          "prompt",
+          "explanation"
+        ],
+        "title": "AnswerKeyStage",
+        "type": "object"
+      },
+      "ApproveResponse": {
+        "properties": {
+          "review_status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "reviewed_at": {
+            "format": "date-time",
+            "title": "Reviewed At",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "review_status",
+          "reviewed_at"
+        ],
+        "title": "ApproveResponse",
+        "type": "object"
+      },
+      "AttemptIn": {
+        "additionalProperties": false,
+        "properties": {
+          "choices": {
+            "additionalProperties": {
+              "items": {
+                "pattern": "^[A-L]$",
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/MultiSelectStage"
+            },
+            "title": "Choices",
+            "type": "object"
+          },
+          "confidence": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "diagnosis_text": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Diagnosis Text",
+            "type": "string"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "maximum": 3600000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          }
+        },
+        "required": [
+          "confidence"
+        ],
+        "title": "AttemptIn",
+        "type": "object"
+      },
+      "AttemptResult": {
+        "properties": {
+          "attempt_id": {
+            "title": "Attempt Id",
+            "type": "integer"
+          },
+          "benchmarks": {
+            "items": {
+              "$ref": "#/components/schemas/Benchmark"
+            },
+            "title": "Benchmarks",
+            "type": "array"
+          },
+          "case_slug": {
+            "title": "Case Slug",
+            "type": "string"
+          },
+          "cohort_is_simulated": {
+            "title": "Cohort Is Simulated",
+            "type": "boolean"
+          },
+          "cohort_size": {
+            "title": "Cohort Size",
+            "type": "integer"
+          },
+          "diagnosis": {
+            "$ref": "#/components/schemas/DiagnosisResult"
+          },
+          "final_diagnosis": {
+            "$ref": "#/components/schemas/Diagnosis"
+          },
+          "harmful": {
+            "title": "Harmful",
+            "type": "integer"
+          },
+          "histogram": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBin"
+            },
+            "title": "Histogram",
+            "type": "array"
+          },
+          "max_points": {
+            "title": "Max Points",
+            "type": "integer"
+          },
+          "missed": {
+            "title": "Missed",
+            "type": "integer"
+          },
+          "percentile": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "right": {
+            "title": "Right",
+            "type": "integer"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "total_decisions": {
+            "title": "Total Decisions",
+            "type": "integer"
+          },
+          "wrong": {
+            "title": "Wrong",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "case_slug",
+          "points",
+          "max_points",
+          "right",
+          "wrong",
+          "missed",
+          "harmful",
+          "total_decisions",
+          "cohort_size",
+          "cohort_is_simulated",
+          "histogram",
+          "final_diagnosis",
+          "diagnosis",
+          "stages"
+        ],
+        "title": "AttemptResult",
+        "type": "object"
+      },
+      "Benchmark": {
+        "description": "An AI model that played the same case blinded (latest attempt per model).",
+        "properties": {
+          "calibration": {
+            "$ref": "#/components/schemas/Calibration"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "diagnosis_correct": {
+            "title": "Diagnosis Correct",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "max_points": {
+            "title": "Max Points",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "provider",
+          "model",
+          "points",
+          "max_points",
+          "diagnosis_correct",
+          "confidence",
+          "calibration"
+        ],
+        "title": "Benchmark",
+        "type": "object"
+      },
+      "Calibration": {
+        "enum": [
+          "overconfident",
+          "underconfident",
+          "calibrated"
+        ],
+        "title": "Calibration",
+        "type": "string"
+      },
+      "CaseCreated": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "created"
+        ],
+        "title": "CaseCreated",
+        "type": "object"
+      },
+      "CaseInsights": {
+        "properties": {
+          "benchmarks": {
+            "items": {
+              "$ref": "#/components/schemas/Benchmark"
+            },
+            "title": "Benchmarks",
+            "type": "array"
+          },
+          "cohort_is_simulated": {
+            "title": "Cohort Is Simulated",
+            "type": "boolean"
+          },
+          "cohort_size": {
+            "title": "Cohort Size",
+            "type": "integer"
+          },
+          "diagnosis_accuracy": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diagnosis Accuracy"
+          },
+          "key_tests": {
+            "items": {
+              "$ref": "#/components/schemas/KeyTestEffect"
+            },
+            "title": "Key Tests",
+            "type": "array"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/InsightStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "top_wrong_diagnoses": {
+            "items": {
+              "$ref": "#/components/schemas/WrongDiagnosis"
+            },
+            "title": "Top Wrong Diagnoses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "cohort_size",
+          "cohort_is_simulated"
+        ],
+        "title": "CaseInsights",
+        "type": "object"
+      },
+      "CasePublic": {
+        "properties": {
+          "chief_complaint": {
+            "title": "Chief Complaint",
+            "type": "string"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "estimated_minutes": {
+            "title": "Estimated Minutes",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/Patient"
+          },
+          "review_status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "source_kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "specialty": {
+            "title": "Specialty",
+            "type": "string"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/PublicStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "vignette": {
+            "title": "Vignette",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "specialty",
+          "difficulty",
+          "estimated_minutes",
+          "patient",
+          "chief_complaint",
+          "vignette",
+          "source_kind",
+          "review_status",
+          "stages"
+        ],
+        "title": "CasePublic",
+        "type": "object"
+      },
+      "CaseReview": {
+        "properties": {
+          "answer_key": {
+            "$ref": "#/components/schemas/AnswerKey"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewChecklistItem"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "review_status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ReviewSource"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "review_status",
+          "source",
+          "answer_key",
+          "checklist"
+        ],
+        "title": "CaseReview",
+        "type": "object"
+      },
+      "CaseSource": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "CaseSource",
+        "type": "object"
+      },
+      "CaseSummary": {
+        "properties": {
+          "attempts_count": {
+            "title": "Attempts Count",
+            "type": "integer"
+          },
+          "chief_complaint": {
+            "title": "Chief Complaint",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision_count": {
+            "title": "Decision Count",
+            "type": "integer"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "estimated_minutes": {
+            "title": "Estimated Minutes",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/Patient"
+          },
+          "review_status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "source_kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "specialty": {
+            "title": "Specialty",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "specialty",
+          "difficulty",
+          "estimated_minutes",
+          "patient",
+          "chief_complaint",
+          "decision_count",
+          "attempts_count",
+          "source_kind",
+          "review_status",
+          "created_at"
+        ],
+        "title": "CaseSummary",
+        "type": "object"
+      },
+      "CheckStatus": {
+        "enum": [
+          "ok",
+          "warn",
+          "fail"
+        ],
+        "title": "CheckStatus",
+        "type": "string"
+      },
+      "ClinicalCase": {
+        "additionalProperties": false,
+        "properties": {
+          "chief_complaint": {
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Chief Complaint",
+            "type": "string"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Decisions",
+            "type": "array"
+          },
+          "differential": {
+            "items": {
+              "$ref": "#/components/schemas/Diagnosis"
+            },
+            "maxItems": 12,
+            "title": "Differential",
+            "type": "array"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "estimated_minutes": {
+            "maximum": 30.0,
+            "minimum": 3.0,
+            "title": "Estimated Minutes",
+            "type": "integer"
+          },
+          "final_diagnosis": {
+            "$ref": "#/components/schemas/Diagnosis"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "maxItems": 80,
+            "title": "Findings",
+            "type": "array"
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/Measurement"
+            },
+            "maxItems": 80,
+            "title": "Measurements",
+            "type": "array"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/Patient"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specialty": {
+            "maxLength": 60,
+            "minLength": 2,
+            "title": "Specialty",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          },
+          "vignette": {
+            "maxLength": 3000,
+            "minLength": 20,
+            "title": "Vignette",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "specialty",
+          "difficulty",
+          "estimated_minutes",
+          "patient",
+          "chief_complaint",
+          "vignette",
+          "final_diagnosis",
+          "decisions"
+        ],
+        "title": "ClinicalCase",
+        "type": "object"
+      },
+      "DebriefOption": {
+        "properties": {
+          "chosen": {
+            "title": "Chosen",
+            "type": "boolean"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "is_harmful": {
+            "title": "Is Harmful",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "pick_rate": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pick Rate"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reveal"
+          },
+          "state": {
+            "$ref": "#/components/schemas/OptionState"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "chosen",
+          "state",
+          "is_harmful"
+        ],
+        "title": "DebriefOption",
+        "type": "object"
+      },
+      "DebriefStage": {
+        "properties": {
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "hint": {
+            "title": "Hint",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StageItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Stage"
+          },
+          "kind": {
+            "enum": [
+              "given",
+              "decision"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "max_points": {
+            "default": 0,
+            "title": "Max Points",
+            "type": "integer"
+          },
+          "missed": {
+            "default": 0,
+            "title": "Missed",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefOption"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "points": {
+            "default": 0,
+            "title": "Points",
+            "type": "integer"
+          },
+          "right": {
+            "default": 0,
+            "title": "Right",
+            "type": "integer"
+          },
+          "scored": {
+            "title": "Scored",
+            "type": "boolean"
+          },
+          "wrong": {
+            "default": 0,
+            "title": "Wrong",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number",
+          "key",
+          "label",
+          "hint",
+          "kind",
+          "scored"
+        ],
+        "title": "DebriefStage",
+        "type": "object"
+      },
+      "Decision": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_answers": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Accepted Answers",
+            "type": "array"
+          },
+          "explanation": {
+            "maxLength": 1200,
+            "minLength": 1,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "maxItems": 12,
+            "title": "Options",
+            "type": "array"
+          },
+          "prompt": {
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Prompt",
+            "type": "string"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/DecisionStage"
+          }
+        },
+        "required": [
+          "stage",
+          "prompt",
+          "explanation"
+        ],
+        "title": "Decision",
+        "type": "object"
+      },
+      "DecisionStage": {
+        "enum": [
+          "interview",
+          "differential",
+          "workup",
+          "diagnosis",
+          "treatment"
+        ],
+        "title": "DecisionStage",
+        "type": "string"
+      },
+      "Diagnosis": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "anyOf": [
+              {
+                "maxLength": 600,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "icd10": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][0-9][0-9A-Z](\\.[0-9A-Z]{1,4})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icd10"
+          },
+          "name": {
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Diagnosis",
+        "type": "object"
+      },
+      "DiagnosisResult": {
+        "properties": {
+          "answered": {
+            "title": "Answered",
+            "type": "boolean"
+          },
+          "calibration": {
+            "$ref": "#/components/schemas/Calibration"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "correct": {
+            "title": "Correct",
+            "type": "boolean"
+          },
+          "hedged": {
+            "default": false,
+            "title": "Hedged",
+            "type": "boolean"
+          },
+          "your_text": {
+            "title": "Your Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "your_text",
+          "correct",
+          "answered",
+          "confidence",
+          "calibration"
+        ],
+        "title": "DiagnosisResult",
+        "type": "object"
+      },
+      "Difficulty": {
+        "enum": [
+          "easy",
+          "medium",
+          "hard"
+        ],
+        "title": "Difficulty",
+        "type": "string"
+      },
+      "EvidenceSpan": {
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "grounded": {
+            "title": "Grounded",
+            "type": "boolean"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          }
+        },
+        "required": [
+          "path",
+          "quote",
+          "grounded"
+        ],
+        "title": "EvidenceSpan",
+        "type": "object"
+      },
+      "ExtractRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/Provider",
+            "default": "gemini"
+          },
+          "text": {
+            "maxLength": 20000,
+            "minLength": 50,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ExtractRequest",
+        "type": "object"
+      },
+      "ExtractResponse": {
+        "properties": {
+          "case": {
+            "$ref": "#/components/schemas/ClinicalCase"
+          },
+          "grounded_ratio": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Grounded Ratio",
+            "type": "number"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "phi": {
+            "items": {
+              "$ref": "#/components/schemas/PhiCount"
+            },
+            "title": "Phi",
+            "type": "array"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/Provider"
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceSpan"
+            },
+            "title": "Spans",
+            "type": "array"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case",
+          "source_text",
+          "spans",
+          "phi",
+          "grounded_ratio",
+          "warnings",
+          "provider",
+          "model",
+          "prompt_version",
+          "usage"
+        ],
+        "title": "ExtractResponse",
+        "type": "object"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FindingCategory"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "maxLength": 600,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "text": {
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "text"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingCategory": {
+        "enum": [
+          "symptom",
+          "history",
+          "medication",
+          "allergy",
+          "social",
+          "family",
+          "exam",
+          "imaging",
+          "procedure"
+        ],
+        "title": "FindingCategory",
+        "type": "string"
+      },
+      "Flag": {
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "abnormal"
+        ],
+        "title": "Flag",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HistogramBin": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "points",
+          "count"
+        ],
+        "title": "HistogramBin",
+        "type": "object"
+      },
+      "InsightOption": {
+        "properties": {
+          "is_correct": {
+            "title": "Is Correct",
+            "type": "boolean"
+          },
+          "is_harmful": {
+            "title": "Is Harmful",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "pick_rate": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Pick Rate",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "is_correct",
+          "is_harmful",
+          "pick_rate"
+        ],
+        "title": "InsightOption",
+        "type": "object"
+      },
+      "InsightStage": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "missed_correct": {
+            "items": {
+              "$ref": "#/components/schemas/MissedOption"
+            },
+            "title": "Missed Correct",
+            "type": "array"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/InsightOption"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/DecisionStage"
+          }
+        },
+        "required": [
+          "stage",
+          "label"
+        ],
+        "title": "InsightStage",
+        "type": "object"
+      },
+      "KeyTestEffect": {
+        "description": "Diagnostic accuracy of those who ordered a correct work-up option vs those who did not.",
+        "properties": {
+          "chose_rate": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Chose Rate",
+            "type": "number"
+          },
+          "dx_accuracy_if_chosen": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dx Accuracy If Chosen"
+          },
+          "dx_accuracy_if_not": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dx Accuracy If Not"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "chose_rate"
+        ],
+        "title": "KeyTestEffect",
+        "type": "object"
+      },
+      "Measurement": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "anyOf": [
+              {
+                "maxLength": 600,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Flag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MeasurementKind"
+          },
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 30,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "value_text": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Text"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ],
+        "title": "Measurement",
+        "type": "object"
+      },
+      "MeasurementKind": {
+        "enum": [
+          "vital",
+          "lab"
+        ],
+        "title": "MeasurementKind",
+        "type": "string"
+      },
+      "MissedOption": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "missed_rate": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Missed Rate",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "missed_rate"
+        ],
+        "title": "MissedOption",
+        "type": "object"
+      },
+      "MultiSelectStage": {
+        "enum": [
+          "interview",
+          "differential",
+          "workup",
+          "treatment"
+        ],
+        "title": "MultiSelectStage",
+        "type": "string"
+      },
+      "Option": {
+        "additionalProperties": false,
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "is_correct": {
+            "title": "Is Correct",
+            "type": "boolean"
+          },
+          "is_harmful": {
+            "default": false,
+            "title": "Is Harmful",
+            "type": "boolean"
+          },
+          "key": {
+            "pattern": "^[A-L]$",
+            "title": "Key",
+            "type": "string"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reveal"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text",
+          "is_correct"
+        ],
+        "title": "Option",
+        "type": "object"
+      },
+      "OptionState": {
+        "enum": [
+          "right",
+          "wrong",
+          "missed",
+          "neutral"
+        ],
+        "title": "OptionState",
+        "type": "string"
+      },
+      "Patient": {
+        "additionalProperties": false,
+        "properties": {
+          "age_years": {
+            "anyOf": [
+              {
+                "maximum": 120.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Years"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "sex": {
+            "$ref": "#/components/schemas/Sex",
+            "default": "unknown"
+          }
+        },
+        "title": "Patient",
+        "type": "object"
+      },
+      "PhiCount": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "count"
+        ],
+        "title": "PhiCount",
+        "type": "object"
+      },
+      "ProblemDetail": {
+        "description": "RFC 9457 problem details, returned for every error.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "default": "about:blank",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "status"
+        ],
+        "title": "ProblemDetail",
+        "type": "object"
+      },
+      "Provider": {
+        "enum": [
+          "gemini",
+          "claude"
+        ],
+        "title": "Provider",
+        "type": "string"
+      },
+      "PublicOption": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text"
+        ],
+        "title": "PublicOption",
+        "type": "object"
+      },
+      "PublicStage": {
+        "properties": {
+          "hint": {
+            "title": "Hint",
+            "type": "string"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "enum": [
+                  "multi_select",
+                  "free_text"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StageItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Stage"
+          },
+          "kind": {
+            "enum": [
+              "given",
+              "decision"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/PublicOption"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "scored": {
+            "title": "Scored",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "number",
+          "key",
+          "label",
+          "hint",
+          "kind",
+          "scored"
+        ],
+        "title": "PublicStage",
+        "type": "object"
+      },
+      "RevealIn": {
+        "additionalProperties": false,
+        "properties": {
+          "option_keys": {
+            "items": {
+              "pattern": "^[A-L]$",
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Option Keys",
+            "type": "array"
+          },
+          "stage": {
+            "enum": [
+              "interview",
+              "workup"
+            ],
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "option_keys"
+        ],
+        "title": "RevealIn",
+        "type": "object"
+      },
+      "RevealOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "reveal": {
+            "title": "Reveal",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "reveal"
+        ],
+        "title": "RevealOut",
+        "type": "object"
+      },
+      "ReviewChecklistItem": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CheckStatus"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "status",
+          "detail"
+        ],
+        "title": "ReviewChecklistItem",
+        "type": "object"
+      },
+      "ReviewSource": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "ReviewSource",
+        "type": "object"
+      },
+      "ReviewStatus": {
+        "description": "LLM-authored cases start as drafts; only a physician review approves them.",
+        "enum": [
+          "draft",
+          "approved"
+        ],
+        "title": "ReviewStatus",
+        "type": "string"
+      },
+      "Sex": {
+        "enum": [
+          "female",
+          "male",
+          "other",
+          "unknown"
+        ],
+        "title": "Sex",
+        "type": "string"
+      },
+      "SourceKind": {
+        "enum": [
+          "manual",
+          "llm"
+        ],
+        "title": "SourceKind",
+        "type": "string"
+      },
+      "Stage": {
+        "enum": [
+          "presenting_complaint",
+          "history",
+          "interview",
+          "examination",
+          "differential",
+          "workup",
+          "results",
+          "diagnosis",
+          "treatment"
+        ],
+        "title": "Stage",
+        "type": "string"
+      },
+      "StageItem": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Flag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "finding",
+              "measurement"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "withheld": {
+            "default": false,
+            "title": "Withheld",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "category",
+          "text"
+        ],
+        "title": "StageItem",
+        "type": "object"
+      },
+      "Usage": {
+        "properties": {
+          "cost_usd": {
+            "default": 0.0,
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "input_tokens": {
+            "default": 0,
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "latency_ms": {
+            "default": 0,
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "output_tokens": {
+            "default": 0,
+            "title": "Output Tokens",
+            "type": "integer"
+          }
+        },
+        "title": "Usage",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WrongDiagnosis": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "count"
+        ],
+        "title": "WrongDiagnosis",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Clinical cases: ingest, play, score, and extract from raw text with an LLM.",
+    "title": "Case Lab API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/cases": {
+      "get": {
+        "operationId": "list_cases",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaseSummary"
+                  },
+                  "title": "Response List Cases",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cases",
+        "tags": [
+          "cases"
+        ]
+      },
+      "post": {
+        "operationId": "create_case",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClinicalCase"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseCreated"
+                }
+              }
+            },
+            "description": "Identical case already stored"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Content Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create Case",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/cases/{slug}": {
+      "get": {
+        "operationId": "get_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CasePublic"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Content Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get Case",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/cases/{slug}/ai-attempts": {
+      "post": {
+        "operationId": "create_ai_attempt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiAttemptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiAttemptSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Create Ai Attempt",
+        "tags": [
+          "ai-players"
+        ]
+      }
+    },
+    "/api/cases/{slug}/approve": {
+      "post": {
+        "operationId": "approve_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve Case",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/api/cases/{slug}/attempts": {
+      "post": {
+        "operationId": "create_attempt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create Attempt",
+        "tags": [
+          "attempts"
+        ]
+      }
+    },
+    "/api/cases/{slug}/insights": {
+      "get": {
+        "operationId": "get_case_insights",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseInsights"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Case Insights",
+        "tags": [
+          "insights"
+        ]
+      }
+    },
+    "/api/cases/{slug}/reveal": {
+      "post": {
+        "operationId": "reveal_options",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevealIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RevealOut"
+                  },
+                  "title": "Response Reveal Options",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Content Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Reveal Options",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/cases/{slug}/review": {
+      "get": {
+        "operationId": "get_case_review",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9-]{3,100}$",
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseReview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Case Review",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/api/extract": {
+      "post": {
+        "operationId": "extract_case",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-internal-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Extract Case",
+        "tags": [
+          "pipeline"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Healthz",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "readyz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Readyz",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

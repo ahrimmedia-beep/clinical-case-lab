@@ -1,0 +1,542 @@
+{
+  "$defs": {
+    "CaseSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "prompt_version": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prompt Version"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "maxLength": 20000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "CaseSource",
+      "type": "object"
+    },
+    "Decision": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_answers": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Accepted Answers",
+          "type": "array"
+        },
+        "explanation": {
+          "maxLength": 1200,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/Option"
+          },
+          "maxItems": 12,
+          "title": "Options",
+          "type": "array"
+        },
+        "prompt": {
+          "maxLength": 300,
+          "minLength": 3,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "stage": {
+          "$ref": "#/$defs/DecisionStage"
+        }
+      },
+      "required": [
+        "stage",
+        "prompt",
+        "explanation"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "DecisionStage": {
+      "enum": [
+        "interview",
+        "differential",
+        "workup",
+        "diagnosis",
+        "treatment"
+      ],
+      "title": "DecisionStage",
+      "type": "string"
+    },
+    "Diagnosis": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "icd10": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][0-9][0-9A-Z](\\.[0-9A-Z]{1,4})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Icd10"
+        },
+        "name": {
+          "maxLength": 160,
+          "minLength": 2,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Diagnosis",
+      "type": "object"
+    },
+    "Difficulty": {
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/FindingCategory"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "text": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "text"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "FindingCategory": {
+      "enum": [
+        "symptom",
+        "history",
+        "medication",
+        "allergy",
+        "social",
+        "family",
+        "exam",
+        "imaging",
+        "procedure"
+      ],
+      "title": "FindingCategory",
+      "type": "string"
+    },
+    "Flag": {
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "abnormal"
+      ],
+      "title": "Flag",
+      "type": "string"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "flag": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Flag"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "$ref": "#/$defs/MeasurementKind"
+        },
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 30,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "value_text": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value Text"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "title": "Measurement",
+      "type": "object"
+    },
+    "MeasurementKind": {
+      "enum": [
+        "vital",
+        "lab"
+      ],
+      "title": "MeasurementKind",
+      "type": "string"
+    },
+    "Option": {
+      "additionalProperties": false,
+      "properties": {
+        "feedback": {
+          "anyOf": [
+            {
+              "maxLength": 400,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feedback"
+        },
+        "is_correct": {
+          "title": "Is Correct",
+          "type": "boolean"
+        },
+        "is_harmful": {
+          "default": false,
+          "title": "Is Harmful",
+          "type": "boolean"
+        },
+        "key": {
+          "pattern": "^[A-L]$",
+          "title": "Key",
+          "type": "string"
+        },
+        "reveal": {
+          "anyOf": [
+            {
+              "maxLength": 400,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reveal"
+        },
+        "text": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "text",
+        "is_correct"
+      ],
+      "title": "Option",
+      "type": "object"
+    },
+    "Patient": {
+      "additionalProperties": false,
+      "properties": {
+        "age_years": {
+          "anyOf": [
+            {
+              "maximum": 120,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Years"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "sex": {
+          "$ref": "#/$defs/Sex",
+          "default": "unknown"
+        }
+      },
+      "title": "Patient",
+      "type": "object"
+    },
+    "Sex": {
+      "enum": [
+        "female",
+        "male",
+        "other",
+        "unknown"
+      ],
+      "title": "Sex",
+      "type": "string"
+    },
+    "SourceKind": {
+      "enum": [
+        "manual",
+        "llm"
+      ],
+      "title": "SourceKind",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/ahrimmedia-beep/clinical-case-lab/schemas/clinical-case.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "chief_complaint": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Chief Complaint",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/Decision"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Decisions",
+      "type": "array"
+    },
+    "differential": {
+      "items": {
+        "$ref": "#/$defs/Diagnosis"
+      },
+      "maxItems": 12,
+      "title": "Differential",
+      "type": "array"
+    },
+    "difficulty": {
+      "$ref": "#/$defs/Difficulty"
+    },
+    "estimated_minutes": {
+      "maximum": 30,
+      "minimum": 3,
+      "title": "Estimated Minutes",
+      "type": "integer"
+    },
+    "final_diagnosis": {
+      "$ref": "#/$defs/Diagnosis"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "maxItems": 80,
+      "title": "Findings",
+      "type": "array"
+    },
+    "measurements": {
+      "items": {
+        "$ref": "#/$defs/Measurement"
+      },
+      "maxItems": 80,
+      "title": "Measurements",
+      "type": "array"
+    },
+    "patient": {
+      "$ref": "#/$defs/Patient"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CaseSource"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "specialty": {
+      "maxLength": 60,
+      "minLength": 2,
+      "title": "Specialty",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 120,
+      "minLength": 3,
+      "title": "Title",
+      "type": "string"
+    },
+    "vignette": {
+      "maxLength": 3000,
+      "minLength": 20,
+      "title": "Vignette",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "specialty",
+    "difficulty",
+    "estimated_minutes",
+    "patient",
+    "chief_complaint",
+    "vignette",
+    "final_diagnosis",
+    "decisions"
+  ],
+  "title": "ClinicalCase",
+  "type": "object"
+}
