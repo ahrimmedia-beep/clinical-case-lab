@@ -195,6 +195,18 @@ def test_claude_client_is_anthropic_vertex_on_the_global_region() -> None:
     assert (client.project_id, client.region) == ("demo-project", "global")
 
 
+def test_claude_api_key_wins_over_vertex_when_both_are_set() -> None:
+    # Vertex AI may grant a new project no Claude quota; a configured key is the explicit fallback.
+    from anthropic import AsyncAnthropic
+    from pydantic import SecretStr
+
+    settings = no_keys().model_copy(
+        update={"gcp_project": "demo-project", "anthropic_api_key": SecretStr("test-key")}
+    )
+    client = make_claude_client(settings)
+    assert isinstance(client, AsyncAnthropic)
+
+
 async def test_claude_refusal_is_not_repairable() -> None:
     with pytest.raises(ProviderError, match="refusal") as excinfo:
         await claude_with(StubClaudeMessages(claude_message(None, "refusal"))).generate(

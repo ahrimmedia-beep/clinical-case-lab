@@ -1,4 +1,4 @@
-"""Claude on Vertex AI via AnthropicVertex (ADC); ANTHROPIC_API_KEY fallback for dev."""
+"""Claude on Vertex AI via AnthropicVertex (ADC), or the direct API if ANTHROPIC_API_KEY is set."""
 
 from __future__ import annotations
 
@@ -31,17 +31,19 @@ OUTPUT_CONFIG: dict[str, str] = {"effort": "low"}
 
 
 def make_claude_client(settings: Settings) -> AsyncAnthropic | AsyncAnthropicVertex:
+    # An explicit ANTHROPIC_API_KEY wins: Vertex AI can grant a new project zero Claude quota
+    # (NOT_ENOUGH_USAGE_HISTORY), and the key is only ever configured as that fallback.
+    if settings.anthropic_api_key:
+        return AsyncAnthropic(
+            api_key=settings.anthropic_api_key.get_secret_value(),
+            timeout=TIMEOUT_S,
+            max_retries=2,
+        )
     if settings.gcp_project:
         # Newest Claude models are served on the "global" (or "us"/"eu") Vertex endpoints only.
         return AsyncAnthropicVertex(
             project_id=settings.gcp_project,
             region=settings.claude_region,
-            timeout=TIMEOUT_S,
-            max_retries=2,
-        )
-    if settings.anthropic_api_key:
-        return AsyncAnthropic(
-            api_key=settings.anthropic_api_key.get_secret_value(),
             timeout=TIMEOUT_S,
             max_retries=2,
         )
