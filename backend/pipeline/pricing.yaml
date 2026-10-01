@@ -1,0 +1,24 @@
+# LLM price table: USD per 1M tokens, global endpoints.
+# Verified 2026-10-01 (spec §15): Anthropic first-party list prices and Google's Vertex price for
+# Gemini; Vertex partner pricing for Claude may differ slightly. Re-check the model IDs in Model
+# Garden on the first live call (infra/check-models.sh). Thinking tokens are billed as output.
+# This file is also the model allowlist (/api/extract, AI players) and the eval's default models.
+models:
+  - provider: gemini
+    model: gemini-3.8-flash
+    input: 0.75   # promotional price until 2026-12-31, then 1.50
+    output: 3.75  # then 7.50
+    default: true
+  - provider: claude
+    model: claude-sonnet-5
+    input: 2.00
+    output: 10.00
+    default: true
+  - provider: claude
+    model: claude-opus-4-8   # what Eximion runs in production
+    input: 5.00
+    output: 25.00
+  - provider: claude
+    model: claude-opus-5-5   # the next Opus; drop this row if Model Garden does not list it
+    input: 4.00
+    output: 20.00

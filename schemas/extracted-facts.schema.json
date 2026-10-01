@@ -1,0 +1,290 @@
+{
+  "$defs": {
+    "Diagnosis": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "icd10": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][0-9][0-9A-Z](\\.[0-9A-Z]{1,4})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Icd10"
+        },
+        "name": {
+          "maxLength": 160,
+          "minLength": 2,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Diagnosis",
+      "type": "object"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/FindingCategory"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "text": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "text"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "FindingCategory": {
+      "enum": [
+        "symptom",
+        "history",
+        "medication",
+        "allergy",
+        "social",
+        "family",
+        "exam",
+        "imaging",
+        "procedure"
+      ],
+      "title": "FindingCategory",
+      "type": "string"
+    },
+    "Flag": {
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "abnormal"
+      ],
+      "title": "Flag",
+      "type": "string"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "flag": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Flag"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "$ref": "#/$defs/MeasurementKind"
+        },
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 30,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "value_text": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value Text"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "title": "Measurement",
+      "type": "object"
+    },
+    "MeasurementKind": {
+      "enum": [
+        "vital",
+        "lab"
+      ],
+      "title": "MeasurementKind",
+      "type": "string"
+    },
+    "Patient": {
+      "additionalProperties": false,
+      "properties": {
+        "age_years": {
+          "anyOf": [
+            {
+              "maximum": 120,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Years"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "sex": {
+          "$ref": "#/$defs/Sex",
+          "default": "unknown"
+        }
+      },
+      "title": "Patient",
+      "type": "object"
+    },
+    "Sex": {
+      "enum": [
+        "female",
+        "male",
+        "other",
+        "unknown"
+      ],
+      "title": "Sex",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/ahrimmedia-beep/clinical-case-lab/schemas/extracted-facts.schema.json",
+  "additionalProperties": false,
+  "description": "Pipeline step 1 output and the unit the eval grades (spec \u00a76.3).",
+  "properties": {
+    "chief_complaint": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Chief Complaint",
+      "type": "string"
+    },
+    "differential": {
+      "items": {
+        "$ref": "#/$defs/Diagnosis"
+      },
+      "maxItems": 12,
+      "title": "Differential",
+      "type": "array"
+    },
+    "final_diagnosis": {
+      "$ref": "#/$defs/Diagnosis"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "maxItems": 80,
+      "title": "Findings",
+      "type": "array"
+    },
+    "measurements": {
+      "items": {
+        "$ref": "#/$defs/Measurement"
+      },
+      "maxItems": 80,
+      "title": "Measurements",
+      "type": "array"
+    },
+    "patient": {
+      "$ref": "#/$defs/Patient"
+    }
+  },
+  "required": [
+    "patient",
+    "chief_complaint",
+    "final_diagnosis"
+  ],
+  "title": "ExtractedFacts",
+  "type": "object"
+}
