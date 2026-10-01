@@ -46,6 +46,10 @@ HONESTY_NOTES: list[str] = [
     "Claude helped draft the labels and is also evaluated: a known bias in its favour.",
     "Findings count only on near-identical wording (token_sort_ratio >= 85, any word order), so "
     "a paraphrase that drops a qualifier is a miss; every model is scored the same way.",
+    "The diagnosis rule was relaxed after the first live run: all four models were marked wrong "
+    "on the same two cases while naming the right diagnosis more specifically (e.g. 'Sarcoidosis, "
+    "Scadding stage II' for 'Sarcoidosis'). Naming the gold diagnosis as a phrase now counts; a "
+    "hedge ('X or Y', 'X vs Y') still does not. All models were re-scored from the same answers.",
 ]
 ROUTE_NOTE = (
     "Route: Gemini runs on Vertex AI; Claude runs on the direct Anthropic API because Vertex AI "

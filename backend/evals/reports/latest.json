@@ -1,151 +1,644 @@
 {
-  "generated_at": "2026-10-01T17:02:28+00:00",
+  "generated_at": "2026-10-01T18:52:06+00:00",
   "prompt_version": "v1",
   "split": "all",
   "gold_cases": 8,
   "models": [
     {
-      "provider": "fake",
-      "model": "fake-gold",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
       "cases": 8,
       "schema_valid_rate": 1.0,
       "schema_valid_first_try_rate": 1.0,
-      "macro_f1": 0.9906,
+      "macro_f1": 0.9257,
+      "fields": {
+        "patient_age": 1.0,
+        "patient_sex": 1.0,
+        "chief_complaint": 0.875,
+        "final_diagnosis": 1.0,
+        "findings_precision": 0.69,
+        "findings_recall": 0.6765,
+        "findings_f1": 0.6832,
+        "measurements_precision": 1.0,
+        "measurements_recall": 1.0,
+        "measurements_f1": 1.0
+      },
+      "grounded_ratio": 1.0,
+      "hallucination_rate": 0.0,
+      "negation_errors": 0,
+      "latency_ms_p50": 7934,
+      "latency_ms_p95": 17967,
+      "cost_usd_per_case": 0.007126,
+      "tokens_in_avg": 2500,
+      "tokens_out_avg": 1400
+    },
+    {
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "cases": 8,
+      "schema_valid_rate": 1.0,
+      "schema_valid_first_try_rate": 1.0,
+      "macro_f1": 0.9523,
       "fields": {
         "patient_age": 1.0,
         "patient_sex": 1.0,
         "chief_complaint": 1.0,
         "final_diagnosis": 1.0,
-        "findings_precision": 0.9691,
-        "findings_recall": 0.9216,
-        "findings_f1": 0.9447,
+        "findings_precision": 0.7333,
+        "findings_recall": 0.7549,
+        "findings_f1": 0.744,
+        "measurements_precision": 0.9667,
+        "measurements_recall": 0.9831,
+        "measurements_f1": 0.9748
+      },
+      "grounded_ratio": 1.0,
+      "hallucination_rate": 0.0,
+      "negation_errors": 7,
+      "latency_ms_p50": 10698,
+      "latency_ms_p95": 12970,
+      "cost_usd_per_case": 0.022658,
+      "tokens_in_avg": 3920,
+      "tokens_out_avg": 1482
+    },
+    {
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "cases": 8,
+      "schema_valid_rate": 1.0,
+      "schema_valid_first_try_rate": 1.0,
+      "macro_f1": 0.9618,
+      "fields": {
+        "patient_age": 1.0,
+        "patient_sex": 1.0,
+        "chief_complaint": 1.0,
+        "final_diagnosis": 1.0,
+        "findings_precision": 0.7767,
+        "findings_recall": 0.7843,
+        "findings_f1": 0.7805,
+        "measurements_precision": 1.0,
+        "measurements_recall": 0.9831,
+        "measurements_f1": 0.9915
+      },
+      "grounded_ratio": 1.0,
+      "hallucination_rate": 0.0,
+      "negation_errors": 3,
+      "latency_ms_p50": 14056,
+      "latency_ms_p95": 16606,
+      "cost_usd_per_case": 0.054972,
+      "tokens_in_avg": 3920,
+      "tokens_out_avg": 1415
+    },
+    {
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "cases": 8,
+      "schema_valid_rate": 1.0,
+      "schema_valid_first_try_rate": 1.0,
+      "macro_f1": 0.9695,
+      "fields": {
+        "patient_age": 1.0,
+        "patient_sex": 1.0,
+        "chief_complaint": 1.0,
+        "final_diagnosis": 1.0,
+        "findings_precision": 0.8155,
+        "findings_recall": 0.8235,
+        "findings_f1": 0.8195,
         "measurements_precision": 1.0,
         "measurements_recall": 1.0,
         "measurements_f1": 1.0
       },
-      "grounded_ratio": 0.9833,
-      "hallucination_rate": 0.0192,
-      "negation_errors": 0,
-      "latency_ms_p50": 40,
-      "latency_ms_p95": 40,
-      "cost_usd_per_case": 0.0,
-      "tokens_in_avg": 1200,
-      "tokens_out_avg": 400
+      "grounded_ratio": 1.0,
+      "hallucination_rate": 0.0,
+      "negation_errors": 2,
+      "latency_ms_p50": 12158,
+      "latency_ms_p95": 15406,
+      "cost_usd_per_case": 0.044006,
+      "tokens_in_avg": 3922,
+      "tokens_out_avg": 1416
     }
   ],
   "per_case": [
     {
       "case_id": "aatd-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9286,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.7143,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
-      "grounded_ratio": 0.9565,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "grounded_ratio": 1.0,
+      "latency_ms": 7328,
+      "cost_usd": 0.00723,
       "notes": [
-        "hallucinated: findings[13]",
+        "missed finding: 'Can walk only about 100 yards on the flat before stopping'",
+        "missed finding: 'Salbutamol inhaler as needed, little benefit'",
+        "missed finding: 'Reduced breath sounds at both bases'",
         "missed finding: 'Genotyping: PiZZ'"
       ]
     },
     {
       "case_id": "abpa-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9524,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.8182,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
       "grounded_ratio": 1.0,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "latency_ms": 7516,
+      "cost_usd": 0.007216,
       "notes": [
-        "missed finding: 'HRCT: central bronchiectasis in both upper lobes with high-attenuation mucus plugging'"
+        "missed finding: 'Asthma since childhood'",
+        "missed finding: 'Asthma control deteriorating over 6 months despite high-dose inhaled therapy'"
       ]
     },
     {
       "case_id": "cap-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9565,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.75,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
       "grounded_ratio": 1.0,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "latency_ms": 9467,
+      "cost_usd": 0.007755,
       "notes": [
-        "missed finding: 'Chest X-ray: left lower lobe consolidation with air bronchograms'"
+        "missed finding: 'Fever for 3 days'",
+        "missed finding: 'Sharp left-sided pleuritic chest pain since yesterday'",
+        "missed finding: 'Ex-smoker, 30 pack-years, quit in 2016'"
       ]
     },
     {
       "case_id": "lam-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.963,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.6667,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
       "grounded_ratio": 1.0,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "latency_ms": 8266,
+      "cost_usd": 0.007222,
       "notes": [
+        "missed finding: 'Urinary tract infection last spring treated with nitrofurantoin'",
+        "missed finding: 'Previous right pneumothorax treated with a chest tube'",
+        "missed finding: 'HRCT: diffuse thin-walled round cysts in both lungs'",
+        "missed finding: 'Small residual right apical pneumothorax'",
         "missed finding: 'CT abdomen: 2.1 cm left renal angiomyolipoma'"
       ]
     },
     {
       "case_id": "pap-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9655,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.8276,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
       "grounded_ratio": 1.0,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "latency_ms": 14561,
+      "cost_usd": 0.007808,
       "notes": [
-        "missed finding: 'Lavage cytology: abundant PAS-positive acellular proteinaceous material'"
+        "missed finding: 'Mild cough with small amounts of whitish sputum'",
+        "missed finding: 'Two courses of antibiotics without improvement'",
+        "missed finding: 'Bronchoalveolar lavage returned milky, opaque fluid'"
       ]
     },
     {
       "case_id": "pe-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9091,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.6087,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
-      "grounded_ratio": 0.9524,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "grounded_ratio": 1.0,
+      "latency_ms": 19801,
+      "cost_usd": 0.006656,
       "notes": [
-        "hallucinated: findings[10]",
-        "missed finding: 'Compression ultrasound: non-compressible left popliteal vein'"
+        "missed finding: 'Sharp right-sided pleuritic chest pain'",
+        "missed finding: '14-hour flight the day before'",
+        "missed finding: 'Drinks wine socially'",
+        "missed finding: 'Anxious and mildly tachypneic'"
       ]
     },
     {
       "case_id": "ptx-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.9091,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.4545,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
-      "grounded_ratio": 0.9474,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "grounded_ratio": 1.0,
+      "latency_ms": 5966,
+      "cost_usd": 0.005928,
       "notes": [
-        "hallucinated: findings[10]",
+        "missed finding: 'Sudden sharp left-sided chest pain at rest, 3 hours ago'",
+        "missed finding: 'Chest pain worse on deep breathing'",
+        "missed finding: 'Sprained right ankle playing soccer last month, fully mobile'",
+        "missed finding: 'Smokes about 10 cigarettes a day'",
+        "missed finding: 'Tall, thin build'",
         "missed finding: 'Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum'"
       ]
     },
     {
       "case_id": "sarc-01",
-      "provider": "fake",
-      "model": "fake-gold",
-      "findings_f1": 0.963,
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "findings_f1": 0.5926,
       "measurements_f1": 1.0,
       "diagnosis_correct": true,
       "grounded_ratio": 1.0,
-      "latency_ms": 40,
-      "cost_usd": 0.0,
+      "latency_ms": 7603,
+      "cost_usd": 0.007195,
       "notes": [
+        "missed finding: 'Painful red lumps on both shins for 3 weeks'",
+        "missed finding: 'Hypothyroidism (Hashimoto thyroiditis) diagnosed in 2018'",
+        "missed finding: 'Tender erythematous nodules on the front of both shins'",
+        "missed finding: 'CT chest: bilateral hilar and mediastinal lymphadenopathy'",
+        "missed finding: 'CT chest: perilymphatic nodules along bronchovascular bundles in both upper lobes'",
+        "missed finding: 'EBUS-TBNA of subcarinal and right hilar nodes: non-caseating epithelioid granulomas'"
+      ]
+    },
+    {
+      "case_id": "aatd-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.7857,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 10184,
+      "cost_usd": 0.022648,
+      "notes": [
+        "missed finding: 'Can walk only about 100 yards on the flat before stopping'",
+        "missed finding: 'Brother diagnosed with liver cirrhosis in his forties'",
+        "missed finding: 'Genotyping: PiZZ'"
+      ]
+    },
+    {
+      "case_id": "abpa-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.7619,
+      "measurements_f1": 0.875,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 9674,
+      "cost_usd": 0.02163,
+      "notes": [
+        "missed finding: 'Asthma since childhood'",
+        "missed finding: 'Asthma control deteriorating over 6 months despite high-dose inhaled therapy'",
+        "missed finding: 'Scattered expiratory wheeze'"
+      ]
+    },
+    {
+      "case_id": "cap-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.6667,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 10577,
+      "cost_usd": 0.023076,
+      "notes": [
+        "negation error: 'No confusion noted on exam'",
+        "negation error: 'Left lower lobe consolidation with air bronchograms, no pleural effusion'",
+        "missed finding: 'Right total knee replacement in 2019'",
+        "missed finding: 'Bronchial breathing over the left lower zone'",
+        "missed finding: 'Coarse crackles at the left base'",
+        "missed finding: 'Chest X-ray: left lower lobe consolidation with air bronchograms'"
+      ]
+    },
+    {
+      "case_id": "lam-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.8276,
+      "measurements_f1": 0.9333,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 11230,
+      "cost_usd": 0.024378,
+      "notes": [
+        "negation error: 'No known drug allergies'",
+        "missed finding: 'Previous right pneumothorax treated with a chest tube'",
+        "missed finding: 'HRCT: diffuse thin-walled round cysts in both lungs'"
+      ]
+    },
+    {
+      "case_id": "pap-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.9032,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 12256,
+      "cost_usd": 0.025494,
+      "notes": [
+        "negation error: 'No occupational dust exposure'",
+        "missed finding: 'Mild cough with small amounts of whitish sputum'"
+      ]
+    },
+    {
+      "case_id": "pe-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.7826,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 13354,
+      "cost_usd": 0.020594,
+      "notes": [
+        "missed finding: 'Sharp right-sided pleuritic chest pain'",
+        "missed finding: '14-hour flight the day before'"
+      ]
+    },
+    {
+      "case_id": "ptx-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.5833,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 8782,
+      "cost_usd": 0.019862,
+      "notes": [
+        "negation error: 'No tracheal deviation'",
+        "negation error: 'No underlying lung abnormality seen on CXR'",
+        "missed finding: 'Sudden sharp left-sided chest pain at rest, 3 hours ago'",
+        "missed finding: 'Tall, thin build'",
+        "missed finding: 'Left hemithorax hyper-resonant to percussion'",
+        "missed finding: 'Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum'"
+      ]
+    },
+    {
+      "case_id": "sarc-01",
+      "provider": "claude",
+      "model": "claude-sonnet-5",
+      "findings_f1": 0.5926,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 10820,
+      "cost_usd": 0.023578,
+      "notes": [
+        "negation error: 'EBUS-TBNA showed non-caseating epithelioid granulomas, no malignant cells'",
+        "missed finding: 'Painful red lumps on both shins for 3 weeks'",
+        "missed finding: 'Pain in both ankles, walking difficult in the morning'",
+        "missed finding: 'Tender erythematous nodules on the front of both shins'",
+        "missed finding: 'CT chest: bilateral hilar and mediastinal lymphadenopathy'",
+        "missed finding: 'CT chest: perilymphatic nodules along bronchovascular bundles in both upper lobes'"
+      ]
+    },
+    {
+      "case_id": "aatd-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.7143,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 14973,
+      "cost_usd": 0.05562,
+      "notes": [
+        "missed finding: 'Can walk only about 100 yards on the flat before stopping'",
+        "missed finding: 'Raised liver enzymes on routine blood tests in 2021, not investigated'",
+        "missed finding: 'Brother diagnosed with liver cirrhosis in his forties'",
+        "missed finding: 'Genotyping: PiZZ'"
+      ]
+    },
+    {
+      "case_id": "abpa-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.7826,
+      "measurements_f1": 0.9333,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 13702,
+      "cost_usd": 0.054825,
+      "notes": [
+        "missed finding: 'Asthma since childhood'",
+        "missed finding: 'Asthma control deteriorating over 6 months despite high-dose inhaled therapy'"
+      ]
+    },
+    {
+      "case_id": "cap-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.9167,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 13840,
+      "cost_usd": 0.056565,
+      "notes": [
+        "missed finding: 'Sharp left-sided pleuritic chest pain since yesterday'"
+      ]
+    },
+    {
+      "case_id": "lam-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.9286,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 14179,
+      "cost_usd": 0.05702,
+      "notes": [
+        "missed finding: 'Previous right pneumothorax treated with a chest tube'"
+      ]
+    },
+    {
+      "case_id": "pap-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.8,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 16478,
+      "cost_usd": 0.061935,
+      "notes": [
+        "missed finding: 'Mild cough with small amounts of whitish sputum'",
+        "missed finding: 'HRCT: bilateral geographic ground-glass opacities with septal thickening (crazy-paving pattern)'",
+        "missed finding: 'Bronchoalveolar lavage returned milky, opaque fluid'"
+      ]
+    },
+    {
+      "case_id": "pe-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.7273,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 16675,
+      "cost_usd": 0.05001,
+      "notes": [
+        "missed finding: 'Sudden-onset shortness of breath since this morning'",
+        "missed finding: 'Sharp right-sided pleuritic chest pain'",
+        "missed finding: '14-hour flight the day before'"
+      ]
+    },
+    {
+      "case_id": "ptx-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.6957,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 11031,
+      "cost_usd": 0.047255,
+      "notes": [
+        "negation error: 'Large left pneumothorax with 3.5 cm rim of air at hilum, no mediastinal shift'",
+        "negation error: 'No underlying lung abnormality seen'",
+        "missed finding: 'Sudden sharp left-sided chest pain at rest, 3 hours ago'",
+        "missed finding: 'Tall, thin build'",
+        "missed finding: 'Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum'"
+      ]
+    },
+    {
+      "case_id": "sarc-01",
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "findings_f1": 0.6667,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 13934,
+      "cost_usd": 0.056545,
+      "notes": [
+        "negation error: 'EBUS-TBNA showed non-caseating epithelioid granulomas, no malignant cells'",
+        "missed finding: 'Pain in both ankles, walking difficult in the morning'",
+        "missed finding: 'Tender erythematous nodules on the front of both shins'",
+        "missed finding: 'CT chest: bilateral hilar and mediastinal lymphadenopathy'",
+        "missed finding: 'CT chest: perilymphatic nodules along bronchovascular bundles in both upper lobes'",
+        "missed finding: 'EBUS-TBNA of subcarinal and right hilar nodes: non-caseating epithelioid granulomas'"
+      ]
+    },
+    {
+      "case_id": "aatd-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.8571,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 13670,
+      "cost_usd": 0.043924,
+      "notes": [
+        "missed finding: 'Brother diagnosed with liver cirrhosis in his forties'",
+        "missed finding: 'Genotyping: PiZZ'"
+      ]
+    },
+    {
+      "case_id": "abpa-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.6957,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 12064,
+      "cost_usd": 0.044348,
+      "notes": [
+        "missed finding: 'Asthma since childhood'",
+        "missed finding: 'Asthma control deteriorating over 6 months despite high-dose inhaled therapy'",
+        "missed finding: 'HRCT: central bronchiectasis in both upper lobes with high-attenuation mucus plugging'"
+      ]
+    },
+    {
+      "case_id": "cap-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 1.0,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 11050,
+      "cost_usd": 0.0452,
+      "notes": []
+    },
+    {
+      "case_id": "lam-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.8148,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 11467,
+      "cost_usd": 0.044984,
+      "notes": [
+        "missed finding: 'Has to stop after one flight of stairs'",
+        "missed finding: 'Previous right pneumothorax treated with a chest tube'",
+        "missed finding: 'Renal angiomyolipoma found on abdominal ultrasound in 2023'"
+      ]
+    },
+    {
+      "case_id": "pap-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.8387,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 15576,
+      "cost_usd": 0.050616,
+      "notes": [
+        "missed finding: 'Mild cough with small amounts of whitish sputum'",
+        "missed finding: 'Two courses of antibiotics without improvement'"
+      ]
+    },
+    {
+      "case_id": "pe-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.8182,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 15089,
+      "cost_usd": 0.039896,
+      "notes": [
+        "missed finding: 'Sudden-onset shortness of breath since this morning'",
+        "missed finding: '14-hour flight the day before'"
+      ]
+    },
+    {
+      "case_id": "ptx-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.7273,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 9436,
+      "cost_usd": 0.037652,
+      "notes": [
+        "negation error: 'Chest X-ray: large left pneumothorax, 3.5 cm rim at hilum, no mediastinal shift'",
+        "missed finding: 'Sudden sharp left-sided chest pain at rest, 3 hours ago'",
+        "missed finding: 'Tall, thin build'",
+        "missed finding: 'Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum'"
+      ]
+    },
+    {
+      "case_id": "sarc-01",
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "findings_f1": 0.7857,
+      "measurements_f1": 1.0,
+      "diagnosis_correct": true,
+      "grounded_ratio": 1.0,
+      "latency_ms": 12251,
+      "cost_usd": 0.045424,
+      "notes": [
+        "negation error: 'EBUS-TBNA: non-caseating epithelioid granulomas, no malignant cells'",
+        "missed finding: 'Pain in both ankles, walking difficult in the morning'",
+        "missed finding: 'Tender erythematous nodules on the front of both shins'",
         "missed finding: 'EBUS-TBNA of subcarinal and right hilar nodes: non-caseating epithelioid granulomas'"
       ]
     }
@@ -156,6 +649,7 @@
     "8 cases is a smoke-level harness: it catches regressions and large gaps between models; it is not a benchmark, and no confidence intervals are reported.",
     "Claude helped draft the labels and is also evaluated: a known bias in its favour.",
     "Findings count only on near-identical wording (token_sort_ratio >= 85, any word order), so a paraphrase that drops a qualifier is a miss; every model is scored the same way.",
-    "Rows with provider `fake` are a harness self-check (damaged gold labels, no model call), not a model result."
+    "The diagnosis rule was relaxed after the first live run: all four models were marked wrong on the same two cases while naming the right diagnosis more specifically (e.g. 'Sarcoidosis, Scadding stage II' for 'Sarcoidosis'). Naming the gold diagnosis as a phrase now counts; a hedge ('X or Y', 'X vs Y') still does not. All models were re-scored from the same answers.",
+    "Route: Gemini runs on Vertex AI; Claude runs on the direct Anthropic API because Vertex AI granted this new project no Claude quota (NOT_ENOUGH_USAGE_HISTORY). Both go through the same provider interface with the same prompts, schema and scoring."
   ]
 }

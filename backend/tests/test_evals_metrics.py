@@ -90,13 +90,14 @@ def test_chief_complaint_and_diagnosis_matchers() -> None:
     aliases = ["LAM", "Sporadic LAM"]
     assert diagnosis_correct("Lymphangioleiomyomatosis (LAM)", "Lymphangioleiomyomatosis", aliases)
     assert diagnosis_correct("lam", "Lymphangioleiomyomatosis", aliases)
-    # word order does not matter, extra qualifiers need an alias
+    # word order does not matter
     assert diagnosis_correct(
         "Lymphangioleiomyomatosis, sporadic",
         "Lymphangioleiomyomatosis",
         ["Sporadic lymphangioleiomyomatosis"],
     )
-    assert not diagnosis_correct("Lymphangioleiomyomatosis, sporadic", "Lymphangioleiomyomatosis")
+    # a more specific answer that names the diagnosis as a phrase counts (rule since the live run)
+    assert diagnosis_correct("Lymphangioleiomyomatosis, sporadic", "Lymphangioleiomyomatosis")
     assert not diagnosis_correct("Pneumothorax", "Tension pneumothorax")
     assert not diagnosis_correct("", "Pulmonary embolism")
     assert not diagnosis_correct("Pulmonary hypertension", "Pulmonary embolism")
@@ -151,3 +152,18 @@ def test_no_bootstrap_in_the_metrics() -> None:
     import evals.metrics
 
     assert not hasattr(evals.metrics, "bootstrap_ci")
+
+
+def test_a_more_specific_diagnosis_counts_but_a_hedge_does_not() -> None:
+    from evals.metrics import diagnosis_correct
+
+    assert diagnosis_correct(
+        "Sarcoidosis, Scadding stage II, presenting as Löfgren syndrome", "Sarcoidosis"
+    )
+    assert diagnosis_correct(
+        "Severe alpha-1 antitrypsin deficiency (PiZZ) with lower-lobe emphysema",
+        "Alpha-1 antitrypsin deficiency",
+    )
+    assert not diagnosis_correct("Sarcoidosis or tuberculosis", "Sarcoidosis")
+    assert not diagnosis_correct("lymphoma vs sarcoidosis", "Sarcoidosis")
+    assert not diagnosis_correct("Pneumonia", "Pulmonary embolism")

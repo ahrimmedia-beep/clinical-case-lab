@@ -6,7 +6,8 @@ Matching rules:
   as 100, so a finding that drops its key qualifier would count as found);
 - measurements: name (or gold alias) match AND value within 2 % (or same text result) AND
   the same unit after unit normalization;
-- final diagnosis: exact match with the name or an alias, or token_sort_ratio >= 85
+- final diagnosis: exact match with the name or an alias, token_sort_ratio >= 85, or the name
+  named as a whole phrase with qualifiers; a hedge ("X or Y", "X vs Y", "X/Y") never counts
   (token_sort, not token_set: "pneumothorax" must not equal "tension pneumothorax");
 - chief complaint: token_set_ratio >= 80 (a short complaint inside a longer one is fine);
 - negation errors: an unmatched prediction with token_set_ratio >= 80 to a denied phrase.
@@ -15,13 +16,14 @@ No bootstrap confidence intervals: 8 synthetic cases is a smoke-level harness (s
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from rapidfuzz import fuzz
 
 from app.schemas.case import Measurement
-from app.textnorm import normalize
+from app.textnorm import contains_term, normalize
 
 FINDING_MATCH = 85.0
 NEGATION_MATCH = 80.0
@@ -101,13 +103,23 @@ def chief_complaint_score(pred: str, gold: str) -> float:
     return 1.0 if text_similarity(pred, gold) >= CHIEF_COMPLAINT_MATCH else 0.0
 
 
+_HEDGE = re.compile(r"\b(or|vs|versus)\b|/", re.IGNORECASE)
+
+
 def diagnosis_correct(pred: str, gold: str, aliases: Sequence[str] = ()) -> bool:
+    """Equal / near-equal to the name or an alias, or naming it as a whole phrase with extra
+    qualifiers ("Sarcoidosis, Scadding stage II" for "Sarcoidosis"). A hedge naming several
+    candidates ("X or Y", "X vs Y", "X/Y") never counts."""
     p = normalize(pred)
-    if not p:
+    if not p or _HEDGE.search(pred):
         return False
     for candidate in (gold, *aliases):
         c = normalize(candidate)
-        if p == c or fuzz.token_sort_ratio(p, c) >= DIAGNOSIS_MATCH:
+        if (
+            p == c
+            or fuzz.token_sort_ratio(p, c) >= DIAGNOSIS_MATCH
+            or contains_term(pred, candidate)
+        ):
             return True
     return False
 

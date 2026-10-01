@@ -111,7 +111,10 @@ committed right now; a live run with real models replaces it following the steps
 <!-- eval-table:start -->
 | Model | Valid (1st try) | Macro-F1 | Findings F1 | Measurements F1 | Diagnosis | Grounded | Hallucinated | Negation errors | p50 / p95 ms | $ / case |
 |---|---|---|---|---|---|---|---|---|---|---|
-| fake/fake-gold | 100% (100%) | 0.991 | 0.945 | 1.000 | 100% | 98% | 1.9% | 0 | 40 / 40 | 0.0000 |
+| gemini/gemini-3.8-flash | 100% (100%) | 0.926 | 0.683 | 1.000 | 100% | 100% | 0.0% | 0 | 7934 / 17967 | 0.0071 |
+| claude/claude-sonnet-5 | 100% (100%) | 0.952 | 0.744 | 0.975 | 100% | 100% | 0.0% | 7 | 10698 / 12970 | 0.0227 |
+| claude/claude-opus-4-8 | 100% (100%) | 0.962 | 0.780 | 0.992 | 100% | 100% | 0.0% | 3 | 14056 / 16606 | 0.0550 |
+| claude/claude-opus-5-5 | 100% (100%) | 0.970 | 0.820 | 1.000 | 100% | 100% | 0.0% | 2 | 12158 / 15406 | 0.0440 |
 <!-- eval-table:end -->
 
 ## Cloud Run Job variant (not used)
