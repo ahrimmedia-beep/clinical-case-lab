@@ -52,7 +52,7 @@ flowchart LR
 
 ## Data model
 
-Nine domain tables, generated from `backend/app/db/tables.py` by `backend/alembic/versions/0001_initial.py`, plus one cache table (`extract_cache`, migration `0002_extract_cache.py`); CI runs `alembic upgrade head` and `alembic check` so the models and migrations cannot drift.
+Nine domain tables, generated from `backend/app/db/tables.py` by `backend/alembic/versions/0001_initial.py`, plus two operational tables: `extract_cache` (the Postgres-backed extraction cache, migration `0002_extract_cache.py`) and `daily_usage` (the daily paid-extraction counter, migration `0003_daily_usage.py`); CI runs `alembic upgrade head` and `alembic check` so the models and migrations cannot drift.
 
 ```mermaid
 erDiagram
@@ -195,7 +195,12 @@ Pure functions in `backend/app/scoring.py`, used by human attempts, the simulate
 - **Multi-select stages** (interview, differential, workup, treatment): right = chosen ∩ correct, wrong = chosen − correct, missed = correct − chosen; harmful picks are reported in every stage. Only treatment earns points.
 - **Diagnosis:** free text, normalized (case, accents, punctuation, dotted initials, an abbreviation map such as PE, LAM, AATD). Right if it equals an accepted answer, is within `token_sort_ratio ≥ 90` of one (severity words such as "acute" ignored), or names one as a whole phrase with extra qualifiers ("Sporadic LAM with recurrent pneumothorax and renal angiomyolipoma", "AATD-related panlobular emphysema", "Acute PE secondary to DVT"). A negated mention ("not PE") does not count, and a less specific answer ("Pneumothorax" for "Tension pneumothorax") stays wrong.
 - **Points:** diagnosis right = 1; treatment = `max(0, right − wrong)`; `max_points = 1 + correct treatment options`.
-- **Anti-gaming:** any harmful treatment option zeroes the treatment points, so ticking every box scores 0. A diagnosis that names several candidates is wrong and flagged `hedged`: any explicit marker ("PE or pneumonia", "LAM / pneumothorax", "PE vs. pneumonia", "PE; pneumonia", "PE?"), or a comma / "and" list whose items name different diagnoses from the case's vocabulary (accepted answers, final diagnosis, differential, differential options), such as "PE, pneumothorax". A comma followed by qualifiers ("Sarcoidosis, Scadding stage II", "Acute PE, secondary to DVT") is not a list.
+- **Anti-gaming:** any harmful treatment option zeroes the treatment points, so ticking every box scores 0. A diagnosis that names several candidates is wrong and flagged `hedged` (spec §9, `judge_diagnosis` in `backend/app/scoring.py`):
+  - an explicit marker — "or"/"vs"/"versus", `/`, `|`, `;`, `?`, "and/or" — anywhere in the text;
+  - a list, where spaced dashes and line breaks split like commas, and `+`/`&`/"plus" split a part like "and", whose items name two *different* diagnoses from the case's vocabulary (accepted answers, final diagnosis, differential, differential options) — "PE, pneumothorax", "LAM + Birt-Hogg-Dube syndrome";
+  - one item naming two vocabulary diagnoses back to back with no separator and no connector between them — "PE pneumothorax" (known limit: a diagnosis absent from the case's vocabulary is never recognised as a second guess, so "PE, their cold" scores as PE alone).
+
+  A qualifier after a connector ("with", "secondary to", "due to", "caused by", "causing", "complicated by", "associated with", …) is not a second candidate: "Acute PE, secondary to DVT" and "LAM with recurrent pneumothorax" are one diagnosis, not a list.
 - **Calibration:** confidence 4–5 and wrong is overconfident, 1–2 and right is underconfident.
 - **Percentile:** `percent_rank()` over `(points, right_count)` among the case's human and simulated-cohort attempts, shown from 5 attempts on. AI-player attempts (`simulated_label LIKE 'ai:%'`) are excluded from the cohort, the histogram and pick rates.
 
@@ -205,7 +210,7 @@ Tests: `backend/tests/test_scoring.py` (including select-all, harmful and hedged
 
 **AI players on the percentile curve.** `backend/pipeline/ai_player.py` plays a stored case blinded: it receives only `CasePublic`, asks for reveals of the options it chose, and commits to one diagnosis, a confidence and a treatment plan in two structured-output turns. The attempt goes through the same scorer and is stored as `ai:<model>`. The debrief draws each model as a labelled marker on the curve, outside the cohort. Run: `make ai-players` after seeding (`backend/seeds/ai_players.py`).
 
-**AI draft → physician review gate.** Cases built by the pipeline are stored as `draft`, with their de-identified source text. The Studio publishes by reference, not by content: the browser never sends case JSON, only the cache key from `/api/extract`, and the server re-extracts the case from its own cache before storing it, so a draft cannot be tampered with in transit. `GET /api/cases/{slug}/review` returns the full answer key and a checklist computed without an LLM: quotes not found in the source, harmful options to sign off, diagnosis leaks, the answer pathway, and leftover identifiers. `POST /api/cases/{slug}/approve` re-runs that checklist server-side and refuses when anything fails, then moves the case to `approved`. Code: `backend/app/repository/review.py`.
+**AI draft → physician review gate.** Cases built by the pipeline are stored as `draft`, with their de-identified source text. The Studio publishes by reference, not by content: the browser never sends case JSON, only the cache key from `/api/extract`, and the server re-extracts the case from its own cache before storing it, so a draft cannot be tampered with in transit. `GET /api/cases/{slug}/review` returns the full answer key and a checklist computed without an LLM: quotes not found in the source, harmful options to sign off, diagnosis leaks, the answer pathway, and leftover identifiers. `POST /api/cases/{slug}/approve` re-runs that checklist server-side and refuses with 409 when any item `FAIL`s, then moves the case to `approved`. Code: `backend/app/repository/review.py`.
 
 **Sponsor insights per decision point.** `GET /api/cases/{slug}/insights` (one query, `backend/app/db/sql/insights.sql`) returns pick rates per option, how often each correct step was missed, the most common wrong diagnoses, and the key-test effect: diagnostic accuracy for physicians who ordered each correct workup test versus those who did not. The simulated cohort is causal (0.8 vs 0.3 chance of the right diagnosis), so the effect is visible and labelled as simulated.
 
@@ -213,7 +218,11 @@ Tests: `backend/tests/test_scoring.py` (including select-all, harmful and hedged
 
 ## Limits
 
-- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP (in memory) and 30 per day, counted in Postgres so the cap holds across instances and restarts, not reset on scale-to-zero. Results are cached by text, provider, model and prompt version — an in-memory LRU per instance backed by a Postgres table (`extract_cache`), so a cache built up before a scale-to-zero instance sleeps survives the restart.
-- Case ingest is capped at 256 KB.
+- `/api/extract`: `X-Internal-Key`, at most 20 000 characters, 5 model runs per minute per client IP (in memory) and 30 per day, counted in Postgres (`daily_usage`) so the cap holds across instances and restarts, not reset on scale-to-zero. Results are cached by text, provider, model and prompt version — an in-memory LRU per instance backed by a Postgres table (`extract_cache`), so a cache built up before a scale-to-zero instance sleeps survives the restart.
+- AI drafts: at most 20 published to the catalogue per UTC day (`POST /api/cases`, counted from the `cases` table; re-publishing an already-stored draft does not count).
+- Attempts: at most 20 per minute per client IP (`POST /api/cases/{slug}/attempts`, in memory).
+- Every per-IP window keys on the *last* entry of `X-Forwarded-For` (Cloud Run's front end appends the real peer); the one exception is the web server's own forwarded address, trusted as the *first* entry, but only on a request that also carries `X-Internal-Key`.
+- Request bodies: 64 KB generally, 128 KB for `/api/extract`; case ingest (`POST /api/cases`) has its own 256 KB cap.
+- The `closed_<slug>` cookie is HMAC-SHA256-signed (keyed with `INTERNAL_API_KEY`) and marked `Secure` in production.
 - The async pool (5 + 2 overflow) times at most 1 api instance stays under the 25 connections of `db-f1-micro`.
 - Pipeline and AI-player logs carry provider, model, tokens, cost, latency and counts, never the text, the facts or the answers.

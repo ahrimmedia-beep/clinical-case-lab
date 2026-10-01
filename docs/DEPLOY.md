@@ -150,7 +150,7 @@ gcloud run services update-traffic api --region=us-central1 --to-revisions=<revi
 gcloud run services update-traffic api --region=us-central1 --to-latest
 ```
 
-The same works for `web`. While traffic is pinned to a revision, new deploys receive no traffic until `--to-latest`. A schema rollback is `gcloud run jobs execute migrate --region=us-central1 --args=downgrade,-1 --wait`, after rolling back the code that needs the newer schema; with 2 migrations, `downgrade,-1` drops only `extract_cache` (migration 0002), so prefer a new forward migration over going further back.
+The same works for `web`. While traffic is pinned to a revision, new deploys receive no traffic until `--to-latest`. A schema rollback is `gcloud run jobs execute migrate --region=us-central1 --args=downgrade,-1 --wait`, after rolling back the code that needs the newer schema; with 3 migrations, `downgrade,-1` drops only `daily_usage` (migration 0003), so prefer a new forward migration over going further back.
 
 **Canary:** `gcloud run deploy api --image=<image> --region=us-central1 --no-traffic --tag=canary`, test the `canary---` URL, then `gcloud run services update-traffic api --region=us-central1 --to-tags=canary=10`, and finally `--to-latest`.
 
