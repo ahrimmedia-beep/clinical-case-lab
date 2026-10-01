@@ -10,14 +10,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 
 from app.config import get_settings
+from app.db.engine import make_engine
 from app.problems import register_problem_handlers
 from app.routers import ai_players, attempts, cases, extract, health, insights, review
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    # Plan 01: open the async engine here and dispose it on shutdown.
-    yield
+    engine = make_engine(get_settings().sqlalchemy_url)
+    app.state.engine = engine
+    try:
+        yield
+    finally:
+        await engine.dispose()
 
 
 def _operation_id(route: APIRoute) -> str:

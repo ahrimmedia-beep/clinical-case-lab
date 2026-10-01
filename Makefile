@@ -24,3 +24,7 @@ up:
 
 down:
 	docker compose --profile app down
+
+.PHONY: migrate
+migrate:
+	cd backend && uv run alembic upgrade head
