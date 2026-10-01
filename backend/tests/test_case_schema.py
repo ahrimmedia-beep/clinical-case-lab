@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas.attempt import AttemptIn, AttemptResult
-from app.schemas.case import CasePublic, ClinicalCase
+from app.schemas.case import CasePublic, CaseSummary, ClinicalCase
 from app.schemas.extract import ExtractRequest
 
 
@@ -157,3 +157,22 @@ def test_extract_request_limits_text() -> None:
     with pytest.raises(ValidationError):
         ExtractRequest.model_validate({"text": "x" * 20_001, "provider": "gemini"})
     ExtractRequest.model_validate({"text": "x" * 60, "provider": "claude"})
+
+
+def test_reveal_that_names_the_diagnosis_is_a_leak(case_pe: dict[str, Any]) -> None:
+    data = make(case_pe)
+    workup = decision(data, "workup")
+    workup["options"][0]["reveal"] = "CT angiography: findings consistent with pulmonary embolism."
+    with pytest.raises(ValidationError, match="reveal leaks the diagnosis"):
+        ClinicalCase.model_validate(data)
+
+
+def test_source_text_is_accepted_and_public_views_carry_review_status(
+    case_pe: dict[str, Any],
+) -> None:
+    data = make(case_pe)
+    data["source"] = {"kind": "llm", "provider": "gemini", "model": "m", "text": "raw text"}
+    assert ClinicalCase.model_validate(data).source is not None
+    assert "review_status" in CasePublic.model_json_schema()["properties"]
+    assert "review_status" in CaseSummary.model_json_schema()["properties"]
+    assert "benchmarks" in AttemptResult.model_json_schema()["properties"]

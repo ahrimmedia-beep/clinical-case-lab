@@ -11,7 +11,7 @@ from fastapi.routing import APIRoute
 
 from app.config import get_settings
 from app.problems import register_problem_handlers
-from app.routers import attempts, cases, extract, health
+from app.routers import ai_players, attempts, cases, extract, health, insights, review
 
 
 @asynccontextmanager
@@ -45,6 +45,9 @@ def create_app() -> FastAPI:
     app.include_router(cases.router, prefix="/api")
     app.include_router(attempts.router, prefix="/api")
     app.include_router(extract.router, prefix="/api")
+    app.include_router(review.router, prefix="/api")
+    app.include_router(insights.router, prefix="/api")
+    app.include_router(ai_players.router, prefix="/api")
     return app
 
 

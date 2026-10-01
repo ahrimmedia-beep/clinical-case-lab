@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
@@ -15,6 +16,10 @@ EXPECTED_OPERATIONS = {
     "reveal_options",
     "create_attempt",
     "extract_case",
+    "get_case_review",
+    "approve_case",
+    "get_case_insights",
+    "create_ai_attempt",
 }
 
 
@@ -45,3 +50,27 @@ def test_validation_errors_are_problem_json() -> None:
     body = response.json()
     assert body["status"] == 422 and body["title"] == "Validation failed"
     assert isinstance(body["errors"], list) and body["errors"]
+
+
+def test_internal_endpoints_require_the_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("INTERNAL_API_KEY", "secret")
+    client = TestClient(create_app())
+    for method, url in [
+        ("get", "/api/cases/demo-case/review"),
+        ("post", "/api/cases/demo-case/approve"),
+        ("get", "/api/cases/demo-case/insights"),
+    ]:
+        response = getattr(client, method)(url)
+        assert response.status_code == 401, url
+        assert response.headers["content-type"].startswith("application/problem+json")
+    ok = client.get("/api/cases/demo-case/insights", headers={"X-Internal-Key": "secret"})
+    assert ok.status_code == 501  # stub until plan 01 implements it
+
+
+def test_ingest_key_is_enforced_only_when_configured(
+    monkeypatch: pytest.MonkeyPatch, case_pe: dict[str, Any]
+) -> None:
+    monkeypatch.setenv("INTERNAL_API_KEY", "secret")
+    monkeypatch.setenv("REQUIRE_INGEST_KEY", "true")
+    response = TestClient(create_app()).post("/api/cases", json=case_pe)
+    assert response.status_code == 401

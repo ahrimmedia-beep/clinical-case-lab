@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
     internal_api_key: SecretStr | None = None
     max_case_bytes: int = 262_144
+    require_ingest_key: bool = False
 
     gcp_project: str | None = None
     gemini_location: str = "global"

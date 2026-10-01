@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Path, Response
+from fastapi import APIRouter, Depends, Path, Response
 
 from app.problems import raise_problem
 from app.schemas.attempt import RevealIn, RevealOut
 from app.schemas.case import CaseCreated, CasePublic, CaseSummary, ClinicalCase
 from app.schemas.common import ProblemDetail
+from app.security import require_ingest_key
 
 router = APIRouter(tags=["cases"])
 Slug = Annotated[str, Path(pattern=r"^[a-z0-9-]{3,100}$")]
@@ -22,8 +23,10 @@ ERRORS: dict[int | str, dict[str, Any]] = {
     "/cases",
     status_code=201,
     response_model=CaseCreated,
+    dependencies=[Depends(require_ingest_key)],
     responses={
         200: {"model": CaseCreated, "description": "Identical case already stored"},
+        401: {"model": ProblemDetail},
         **ERRORS,
     },
 )

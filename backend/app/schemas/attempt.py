@@ -83,6 +83,8 @@ class DiagnosisResult(BaseModel):
     your_text: str
     correct: bool
     answered: bool
+    # True when the free text named several candidates ("PE or pneumonia"): scored as wrong.
+    hedged: bool = False
     confidence: int
     calibration: Calibration
 
@@ -90,6 +92,19 @@ class DiagnosisResult(BaseModel):
 class HistogramBin(BaseModel):
     points: int
     count: int
+
+
+class Benchmark(BaseModel):
+    """An AI model that played the same case blinded (latest attempt per model)."""
+
+    label: str  # e.g. "ai:claude-opus-4-8"
+    provider: str
+    model: str
+    points: int
+    max_points: int
+    diagnosis_correct: bool
+    confidence: int
+    calibration: Calibration
 
 
 class AttemptResult(BaseModel):
@@ -109,3 +124,4 @@ class AttemptResult(BaseModel):
     final_diagnosis: Diagnosis
     diagnosis: DiagnosisResult
     stages: list[DebriefStage]
+    benchmarks: list[Benchmark] = Field(default_factory=list)

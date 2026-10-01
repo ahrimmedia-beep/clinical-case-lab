@@ -55,6 +55,13 @@ class SourceKind(StrEnum):
     LLM = "llm"
 
 
+class ReviewStatus(StrEnum):
+    """LLM-authored cases start as drafts; only a physician review approves them."""
+
+    DRAFT = "draft"
+    APPROVED = "approved"
+
+
 # Which facts are shown on which "given" stage of the player.
 GIVEN_STAGE_CATEGORIES: dict[Stage, set[str]] = {
     Stage.HISTORY: {"symptom", "history", "medication", "allergy", "social", "family"},
@@ -147,6 +154,8 @@ class CaseSource(StrictModel):
     provider: str | None = Field(default=None, max_length=40)
     model: str | None = Field(default=None, max_length=80)
     prompt_version: str | None = Field(default=None, max_length=40)
+    # De-identified source text (LLM cases only); lets the review page re-check grounding.
+    text: str | None = Field(default=None, max_length=20_000)
 
 
 class ClinicalCase(StrictModel):
@@ -193,6 +202,10 @@ class ClinicalCase(StrictModel):
         }
         for d in self.decisions:
             exposed[f"decisions[{d.stage}].prompt"] = d.prompt
+            if Stage(d.stage) in REVEAL_STAGES:
+                for o in d.options:
+                    if o.reveal:
+                        exposed[f"decisions[{d.stage}].options[{o.key}].reveal"] = o.reveal
         for term in self.diagnosis_terms():
             for where, text in exposed.items():
                 if contains_term(text, term):
@@ -242,6 +255,7 @@ class CasePublic(BaseModel):
     chief_complaint: str
     vignette: str
     source_kind: SourceKind
+    review_status: ReviewStatus
     stages: list[PublicStage]
 
 
@@ -257,6 +271,7 @@ class CaseSummary(BaseModel):
     decision_count: int
     attempts_count: int
     source_kind: SourceKind
+    review_status: ReviewStatus
     created_at: datetime
 
 
