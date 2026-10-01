@@ -20,7 +20,7 @@ const GROUPS: { title: string; fields: FieldKey[] }[] = [
   { title: "Measurements", fields: ["measurements_precision", "measurements_recall", "measurements_f1"] },
 ];
 
-/** One chart for the per-field view: a heat table, fields down, models across, every value printed in its cell. */
+/** One chart for the per-field view: a heat table, fields down, models across, every value printed in its cell. Cells fade in as a wave when scrolled to. */
 export function FieldChart({ models }: { models: ModelRow[] }) {
   const real = models.filter((m) => !isSelfCheck(m));
   return (
@@ -65,12 +65,12 @@ export function FieldChart({ models }: { models: ModelRow[] }) {
                   {group.title}
                 </th>
               </tr>
-              {group.fields.map((field, fi) => {
+              {group.fields.map((field) => {
                 const values = real.map((m) => m.fields[field]);
                 const top = Math.max(0, ...values);
                 const allEqual = values.every((v) => v === top);
                 return (
-                  <tr key={field} className="animate-rise" style={{ animationDelay: `${fi * 55}ms` }}>
+                  <tr key={field}>
                     <th scope="row" className="px-2 py-1.5 text-left text-[13px] font-normal text-body">
                       {FIELD_LABELS[field].replace(/^(Findings|Measurements) · /, "")}
                     </th>
@@ -82,6 +82,7 @@ export function FieldChart({ models }: { models: ModelRow[] }) {
                       return (
                         <td
                           key={modelKey(m)}
+                          data-reveal="fade"
                           title={`${displayModel(m)} · ${FIELD_LABELS[field]}: ${formatScore(value)}`}
                           className={cn(
                             "rounded-[6px] px-2 py-1.5 text-center tabular-nums",

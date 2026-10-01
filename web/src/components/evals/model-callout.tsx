@@ -99,8 +99,8 @@ export function ModelCallout({ comparison, sample }: { comparison: ModelComparis
                 </tr>
               </thead>
               <tbody>
-                {rows(comparison).map((row, i) => (
-                  <tr key={row.label} className="animate-rise border-b border-line last:border-0" style={{ animationDelay: `${i * 55}ms` }}>
+                {rows(comparison).map((row) => (
+                  <tr key={row.label} data-reveal="fade" className="border-b border-line last:border-0">
                     <th scope="row" className="py-2.5 pr-2 sm:pr-3 text-left text-[13.5px] font-normal text-body">
                       {row.label}
                     </th>

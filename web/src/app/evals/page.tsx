@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FieldChart } from "@/components/evals/field-chart";
 import { ModelCallout } from "@/components/evals/model-callout";
 import { ModelTable } from "@/components/evals/model-table";
+import { Reveal } from "@/components/motion/reveal";
 import { Callout } from "@/components/ui/callout";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { MonoTag } from "@/components/ui/mono-tag";
@@ -59,8 +60,8 @@ export default function EvalsPage() {
   const sample = report.sample === true;
 
   return (
-    <div className="mx-auto max-w-site px-4 py-[clamp(48px,7vw,96px)] sm:px-6">
-      <header className="max-w-head">
+    <Reveal className="mx-auto max-w-site px-4 py-[clamp(48px,7vw,96px)] sm:px-6">
+      <header data-reveal="" className="max-w-head">
         <Eyebrow>Extraction evals</Eyebrow>
         <h1 className="mt-3 text-[clamp(27px,3.1vw,38px)]">Gemini and Claude on the same gold set</h1>
         <p className="mt-4 text-lead">
@@ -91,7 +92,7 @@ export default function EvalsPage() {
       </header>
 
       <section aria-labelledby="models-title" className="mt-14">
-        <h2 id="models-title" className={H2}>
+        <h2 id="models-title" data-reveal="" className={H2}>
           Model comparison
         </h2>
         <div className="mt-6">
@@ -99,15 +100,15 @@ export default function EvalsPage() {
         </div>
       </section>
 
-      <div className="mt-14">
+      <div data-reveal="" className="mt-14">
         <ModelCallout comparison={comparison} sample={sample} />
       </div>
 
       <section aria-labelledby="fields-title" className="mt-14">
-        <h2 id="fields-title" className={H2}>
+        <h2 id="fields-title" data-reveal="" className={H2}>
           Accuracy by field
         </h2>
-        <p className="mt-3 max-w-[620px] text-[14.5px]">
+        <p data-reveal="" className="mt-3 max-w-[620px] text-[14.5px]">
           Where the models differ is in the long lists: findings and measurements. Demographics and the diagnosis are nearly solved; recall on
           findings is where a model leaves facts behind.
         </p>
@@ -117,7 +118,7 @@ export default function EvalsPage() {
       </section>
 
       <section id="limits" aria-labelledby="limits-title" className="mt-14 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-        <div>
+        <div data-reveal="">
           <h2 id="limits-title" className={H2}>
             Read this before the numbers
           </h2>
@@ -134,12 +135,12 @@ export default function EvalsPage() {
             ))}
           </ul>
         </div>
-        <Callout className="self-start lg:mt-14" title="How to read this.">
+        <Callout data-reveal="" className="self-start lg:mt-14" title="How to read this.">
           Macro-F1 averages six per-case scores (age, sex, chief complaint, diagnosis, findings F1, measurements F1). Quotes found means the
           model&apos;s verbatim quote was located in the source text. A hallucination is an extracted item that matches no labelled fact and whose
           quote is not in the source. Cost uses list prices per million tokens; thinking tokens count as output.
         </Callout>
       </section>
-    </div>
+    </Reveal>
   );
 }

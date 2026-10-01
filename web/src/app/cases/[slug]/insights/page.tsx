@@ -7,6 +7,7 @@ import { ServiceUnavailable } from "@/components/case/service-unavailable";
 import { DecisionBars } from "@/components/insights/decision-bars";
 import { biggestMiss, closedCookieName, pct } from "@/components/insights/insights";
 import { KeyTest } from "@/components/insights/key-test";
+import { Reveal } from "@/components/motion/reveal";
 import { AiBenchmarks, WrongDiagnoses } from "@/components/insights/side-cards";
 import { buttonClasses } from "@/components/ui/button";
 import { Callout } from "@/components/ui/callout";
@@ -43,7 +44,9 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
   return (
     <div className="px-5 py-5 sm:px-6">
       <dt className="font-mono text-[10.5px] uppercase tracking-[.1em] text-muted">{label}</dt>
-      <dd className="mt-1.5 text-[clamp(26px,3.4vw,36px)] font-semibold leading-none tracking-[-.03em] text-ink tabular-nums">{value}</dd>
+      <dd data-count="" className="mt-1.5 text-[clamp(26px,3.4vw,36px)] font-semibold leading-none tracking-[-.03em] text-ink tabular-nums">
+        {value}
+      </dd>
       <dd className="mt-2 text-[13px] leading-snug text-body [overflow-wrap:anywhere]">{note}</dd>
     </div>
   );
@@ -74,8 +77,8 @@ export default async function InsightsPage({ params }: Props) {
   const empty = insights.cohort_size === 0;
 
   return (
-    <div className="mx-auto max-w-site px-4 py-[clamp(40px,6vw,80px)] sm:px-6">
-      <header className="max-w-[760px]">
+    <Reveal className="mx-auto max-w-site px-4 py-[clamp(40px,6vw,80px)] sm:px-6">
+      <header data-reveal="" className="max-w-[760px]">
         <div className="flex flex-wrap items-center gap-2">
           <Eyebrow>Sponsor view</Eyebrow>
           {insights.cohort_is_simulated ? <MonoTag tone="clay">simulated cohort</MonoTag> : null}
@@ -89,12 +92,12 @@ export default async function InsightsPage({ params }: Props) {
       </header>
 
       {empty ? (
-        <p className="mt-10 max-w-[620px] rounded-card border border-line bg-surface-alt px-5 py-4 text-[14.5px]">
+        <p data-reveal="" className="mt-10 max-w-[620px] rounded-card border border-line bg-surface-alt px-5 py-4 text-[14.5px]">
           No attempts are recorded for this case yet. The bars fill in as physicians close it.
         </p>
       ) : null}
 
-      <dl className="mt-10 grid divide-y divide-line overflow-hidden rounded-card border border-line bg-white shadow-card md:grid-cols-3 md:divide-x md:divide-y-0">
+      <dl data-reveal="" className="mt-10 grid divide-y divide-line overflow-hidden rounded-card border border-line bg-white shadow-card md:grid-cols-3 md:divide-x md:divide-y-0">
         <Stat
           label="Cohort"
           value={formatInt(insights.cohort_size)}
@@ -109,22 +112,22 @@ export default async function InsightsPage({ params }: Props) {
       </dl>
 
       {(insights.key_tests ?? []).length > 0 ? (
-        <div className="mt-8">
+        <div data-reveal="" className="mt-8">
           <KeyTest tests={insights.key_tests ?? []} />
         </div>
       ) : null}
 
       <section aria-labelledby="forks-title" className="mt-14">
-        <h2 id="forks-title" className="text-[clamp(23px,2.6vw,30px)]">
+        <h2 id="forks-title" data-reveal="" className="text-[clamp(23px,2.6vw,30px)]">
           Decision points
         </h2>
-        <p className="mt-2 max-w-[620px] text-[14.5px]">
+        <p data-reveal="" className="mt-2 max-w-[620px] text-[14.5px]">
           Share of the cohort that picked each option. Correct options carry a ✓ and show how many physicians missed them; harmful options are
           marked in clay.
         </p>
         <div className="mt-6 grid items-start gap-6 md:grid-cols-2">
-          {stages.map((stage, i) => (
-            <DecisionBars key={stage.stage} stage={stage} index={i} />
+          {stages.map((stage) => (
+            <DecisionBars key={stage.stage} stage={stage} />
           ))}
         </div>
       </section>
@@ -134,10 +137,10 @@ export default async function InsightsPage({ params }: Props) {
         <AiBenchmarks items={insights.benchmarks ?? []} />
       </div>
 
-      <Callout className="mt-14" title="Nothing here is attributable to a physician.">
+      <Callout data-reveal="" className="mt-14" title="Nothing here is attributable to a physician.">
         Every figure is a share of the cohort. Individual attempts, names and scores never leave the server, and AI players are listed apart
         from the people.
       </Callout>
-    </div>
+    </Reveal>
   );
 }

@@ -6,17 +6,13 @@ import { DECISION_LABEL } from "@/lib/facts";
 import { NOTABLE_MISS, pct } from "./insights";
 
 /** One decision point: how often the cohort picked each option. Correct = teal ✓, harmful = clay tag, the rest grey. */
-export function DecisionBars({ stage, index }: { stage: InsightStage; index: number }) {
+export function DecisionBars({ stage }: { stage: InsightStage }) {
   const options = stage.options ?? [];
   const missed = new Map((stage.missed_correct ?? []).map((m) => [m.key, m.missed_rate]));
   const correct = options.filter((o) => o.is_correct).length;
 
   return (
-    <section
-      aria-labelledby={`stage-${stage.stage}`}
-      className="animate-rise overflow-hidden rounded-card border border-line bg-white shadow-card"
-      style={{ animationDelay: `${index * 55}ms` }}
-    >
+    <section data-reveal="" aria-labelledby={`stage-${stage.stage}`} className="overflow-hidden rounded-card border border-line bg-white shadow-card">
       <header className="flex flex-wrap items-center gap-2.5 border-b border-line bg-surface-alt px-5 py-[13px]">
         <h3 id={`stage-${stage.stage}`} className="font-mono text-[11px] font-medium uppercase tracking-[.1em] text-primary-hover">
           {DECISION_LABEL[stage.stage] ?? stage.label}
@@ -26,7 +22,7 @@ export function DecisionBars({ stage, index }: { stage: InsightStage; index: num
         </span>
       </header>
       <ul className="space-y-3.5 px-5 py-4">
-        {options.map((o, i) => {
+        {options.map((o) => {
           const miss = missed.get(o.key);
           const notable = miss !== undefined && miss >= NOTABLE_MISS;
           return (
@@ -50,11 +46,9 @@ export function DecisionBars({ stage, index }: { stage: InsightStage; index: num
               </div>
               <span className="ml-[29px] mt-1.5 block h-[7px] overflow-hidden rounded-bar bg-surface-alt" aria-hidden="true">
                 <span
-                  className={cn(
-                    "block h-full origin-left animate-grow-x rounded-bar",
-                    o.is_harmful ? "bg-wrong" : o.is_correct ? "bg-primary" : "bg-line-strong",
-                  )}
-                  style={{ width: `${Math.max(0, Math.min(100, o.pick_rate * 100))}%`, animationDelay: `${index * 55 + i * 40}ms` }}
+                  data-bar=""
+                  className={cn("block h-full rounded-bar", o.is_harmful ? "bg-wrong" : o.is_correct ? "bg-primary" : "bg-line-strong")}
+                  style={{ width: `${Math.max(0, Math.min(100, o.pick_rate * 100))}%` }}
                 />
               </span>
               {miss !== undefined && miss > 0 ? (

@@ -8,7 +8,8 @@ function Bar({ label, value, tone }: { label: string; value: number | null | und
       <span className="text-[13px] text-body">{label}</span>
       <span className="h-[9px] overflow-hidden rounded-bar bg-surface-alt" aria-hidden="true">
         <span
-          className={`block h-full origin-left animate-grow-x rounded-bar ${tone === "primary" ? "bg-primary" : "bg-line-strong"}`}
+          data-bar=""
+          className={`block h-full rounded-bar ${tone === "primary" ? "bg-primary" : "bg-line-strong"}`}
           style={{ width: `${width}%` }}
         />
       </span>

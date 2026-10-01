@@ -9,13 +9,13 @@ import { pct, wrongShare } from "./insights";
 export function WrongDiagnoses({ items, cohortSize, accuracy }: { items: WrongDiagnosis[]; cohortSize: number; accuracy: number | null }) {
   const top = Math.max(1, ...items.map((w) => w.count));
   return (
-    <Card>
+    <Card data-reveal="">
       <CardHeader title="Most common wrong calls" tag={`top ${items.length}`} />
       {items.length === 0 ? (
         <p className="px-5 py-4 text-[14px] text-muted">No wrong diagnoses recorded yet.</p>
       ) : (
         <ol className="space-y-3 px-5 py-4">
-          {items.map((w, i) => {
+          {items.map((w) => {
             const share = wrongShare(w.count, cohortSize, accuracy);
             return (
               <li key={w.text}>
@@ -27,10 +27,7 @@ export function WrongDiagnoses({ items, cohortSize, accuracy }: { items: WrongDi
                   </span>
                 </div>
                 <span className="mt-1.5 block h-[5px] overflow-hidden rounded-bar bg-surface-alt" aria-hidden="true">
-                  <span
-                    className="block h-full origin-left animate-grow-x rounded-bar bg-line-strong"
-                    style={{ width: `${(w.count / top) * 100}%`, animationDelay: `${i * 40}ms` }}
-                  />
+                  <span data-bar="" className="block h-full rounded-bar bg-line-strong" style={{ width: `${(w.count / top) * 100}%` }} />
                 </span>
               </li>
             );
@@ -44,7 +41,7 @@ export function WrongDiagnoses({ items, cohortSize, accuracy }: { items: WrongDi
 /** AI players (★1) on the same case: shown next to the cohort, never inside it. */
 export function AiBenchmarks({ items }: { items: Benchmark[] }) {
   return (
-    <Card>
+    <Card data-reveal="">
       <CardHeader title="AI players on this case" tag="blinded, same scoring" />
       {items.length === 0 ? (
         <p className="px-5 py-4 text-[14px] text-muted">No AI player has played this case yet.</p>
@@ -62,7 +59,7 @@ export function AiBenchmarks({ items }: { items: Benchmark[] }) {
             </thead>
             <tbody>
               {items.map((b) => (
-                <tr key={b.model} className="border-b border-line last:border-0">
+                <tr key={b.model} data-reveal="fade" className="border-b border-line last:border-0">
                   <th scope="row" className="px-5 py-2.5 text-left font-medium text-ink">
                     {/* The API's label is the stored "ai:<model>" tag; show the model's own name. */}
                     {b.model ? modelLabel(b.model) : b.label}

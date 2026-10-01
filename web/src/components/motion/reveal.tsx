@@ -34,13 +34,15 @@ export function Reveal({ children, className, tilt = false }: Props) {
 
         const items = find("[data-reveal]");
         if (items.length > 0) {
+          // Fade back to each element's own CSS opacity (a dimmed table row stays dimmed).
+          const natural = new Map(items.map((item) => [item, Number(getComputedStyle(item).opacity)]));
           gsap.set(items, { opacity: 0, y: (_: number, t: HTMLElement) => (t.dataset.reveal === "fade" ? 0 : small ? 12 : 20) });
           ScrollTrigger.batch(items, {
             start: "top 92%",
             once: true,
             onEnter: (batch) =>
               gsap.to(batch, {
-                opacity: 1,
+                opacity: (_: number, t: HTMLElement) => natural.get(t) ?? 1,
                 y: 0,
                 duration: small ? 0.55 : 0.75,
                 ease: "power3.out",

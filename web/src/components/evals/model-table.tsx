@@ -23,13 +23,13 @@ export function ModelTable({ models, bestKey, productionModel }: Props) {
             </tr>
           </thead>
           <tbody>
-            {models.map((m, i) => {
+            {models.map((m) => {
               const key = modelKey(m);
               return (
                 <tr
                   key={key}
-                  className={cn("animate-rise border-t border-line first:border-0", isSelfCheck(m) && "bg-surface-alt text-muted opacity-70")}
-                  style={{ animationDelay: `${i * 55}ms` }}
+                  data-reveal="fade"
+                  className={cn("border-t border-line first:border-0", isSelfCheck(m) && "bg-surface-alt text-muted opacity-70")}
                 >
                   <th scope="row" className="min-w-[200px] px-4 py-3 text-left align-top font-normal">
                     <span className="flex flex-wrap items-center gap-1.5">
