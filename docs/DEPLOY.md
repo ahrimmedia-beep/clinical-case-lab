@@ -27,7 +27,7 @@ make ai-players            # every approved case x the four models; the model ca
 make prewarm               # runs the Studio samples once so the demo answers from cache
 ```
 
-Later changes: `infra/deploy.sh` again (images that already exist for the current commit are not rebuilt), or `infra/deploy.sh web` to rebuild and redeploy only the web service. `infra/deploy.sh --skeleton` deploys api and web without the `simulate` job; it was used for the first walking-skeleton deploy.
+Later changes: `infra/deploy.sh` again (images that already exist for the current commit are not rebuilt), or `infra/deploy.sh web` to rebuild and redeploy only the web service (Cloud Run service `case-lab`, so the public URL reads `https://case-lab-<project-number>.us-central1.run.app`). `infra/deploy.sh --skeleton` deploys api and web without the `simulate` job; it was used for the first walking-skeleton deploy.
 
 ## What `infra/deploy.sh` does
 
@@ -102,7 +102,7 @@ If a provider cannot be used through Vertex AI, `infra/set-fallback-key.sh anthr
 ## Smoke test
 
 ```bash
-WEB_URL=$(gcloud run services describe web --region=us-central1 --format='value(status.url)')
+WEB_URL=$(gcloud run services describe case-lab --region=us-central1 --format='value(status.url)')
 curl -fsS "$API_URL/healthz"; curl -fsS "$API_URL/readyz"                 # {"status":"ok"} twice
 curl -fsS "$API_URL/api/cases" | jq 'length'                              # 3 after seeding
 SLUG=$(curl -fsS "$API_URL/api/cases" | jq -r '.[0].slug')
