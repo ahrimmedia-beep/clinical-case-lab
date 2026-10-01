@@ -6,7 +6,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path
 
+from app.db.engine import EngineDep
 from app.problems import raise_problem
+from app.repository.insights import case_insights
 from app.schemas.common import ProblemDetail
 from app.schemas.insights import CaseInsights
 from app.security import require_internal_key
@@ -20,5 +22,10 @@ Slug = Annotated[str, Path(pattern=r"^[a-z0-9-]{3,100}$")]
     response_model=CaseInsights,
     responses={401: {"model": ProblemDetail}, 404: {"model": ProblemDetail}},
 )
-async def get_case_insights(slug: Slug) -> CaseInsights:
-    raise_problem(501, "Not implemented yet")
+async def get_case_insights(slug: Slug, engine: EngineDep) -> CaseInsights:
+    # Humans + simulated cohort only; AI players are listed as benchmarks.
+    async with engine.connect() as conn:
+        insights = await case_insights(conn, slug)
+    if insights is None:
+        raise_problem(404, "Case not found", f"No case with slug '{slug}'.")
+    return insights

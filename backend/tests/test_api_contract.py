@@ -64,7 +64,7 @@ def test_internal_endpoints_require_the_key(monkeypatch: pytest.MonkeyPatch) -> 
         assert response.status_code == 401, url
         assert response.headers["content-type"].startswith("application/problem+json")
     ok = client.get("/api/cases/demo-case/insights", headers={"X-Internal-Key": "secret"})
-    assert ok.status_code == 501  # stub until plan 01 implements it
+    assert ok.status_code != 401  # the key passes the guard; the handler is tested in tests/db
 
 
 def test_ingest_key_is_enforced_only_when_configured(
