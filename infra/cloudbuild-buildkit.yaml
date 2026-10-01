@@ -1,0 +1,6 @@
+# Cloud Build config used by infra/deploy.sh when a Dockerfile needs BuildKit (RUN --mount=...).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    env: ["DOCKER_BUILDKIT=1"]
+    args: ["build", "--tag", "${_IMAGE}", "."]
+images: ["${_IMAGE}"]
