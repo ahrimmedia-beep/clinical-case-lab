@@ -9,7 +9,7 @@ type Props = { final: AttemptResult["final_diagnosis"]; diagnosis: AttemptResult
 export function FinalDiagnosis({ final, diagnosis }: Props) {
   const mark: Mark = !diagnosis.answered ? "missed" : diagnosis.correct ? "right" : "wrong";
   return (
-    <Card className="animate-rise">
+    <Card>
       <CardBody className="space-y-3 py-5">
         <Eyebrow>Final diagnosis</Eyebrow>
         <p className="flex flex-wrap items-center gap-2">

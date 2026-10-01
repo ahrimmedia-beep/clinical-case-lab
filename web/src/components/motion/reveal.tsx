@@ -16,6 +16,8 @@ type Props = { children: ReactNode; className?: string; tilt?: boolean };
  *   data-tilt           (with `tilt`) leans toward a fine pointer; a `data-tilt-shadow` child fades in
  *
  * Everything runs once; the server HTML is the final state and reduced motion keeps it as is.
+ * Entrances animate opacity, never visibility, so a link that has not faded in yet can still take
+ * keyboard focus (focus scrolls it into view, which reveals it).
  */
 export function Reveal({ children, className, tilt = false }: Props) {
   const root = useRef<HTMLDivElement>(null);
@@ -32,13 +34,13 @@ export function Reveal({ children, className, tilt = false }: Props) {
 
         const items = find("[data-reveal]");
         if (items.length > 0) {
-          gsap.set(items, { autoAlpha: 0, y: (_: number, t: HTMLElement) => (t.dataset.reveal === "fade" ? 0 : small ? 12 : 20) });
+          gsap.set(items, { opacity: 0, y: (_: number, t: HTMLElement) => (t.dataset.reveal === "fade" ? 0 : small ? 12 : 20) });
           ScrollTrigger.batch(items, {
             start: "top 92%",
             once: true,
             onEnter: (batch) =>
               gsap.to(batch, {
-                autoAlpha: 1,
+                opacity: 1,
                 y: 0,
                 duration: small ? 0.55 : 0.75,
                 ease: "power3.out",

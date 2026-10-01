@@ -1,6 +1,8 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState, type RefObject } from "react";
+import { prepareCountUp } from "@/components/motion/count-up";
+import { gsap, MOTION_OK, useGSAP } from "@/components/motion/gsap";
 import { Card, CardHeader } from "@/components/ui/card";
 import { ChevronIcon } from "@/components/ui/icons";
 import { MonoTag } from "@/components/ui/mono-tag";
@@ -10,7 +12,6 @@ import { StateIcon, type Mark } from "@/components/ui/state-icon";
 import type { AttemptResult, DebriefOption, DebriefStage, StageItem } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatPickRate, pluralize, stageNo } from "@/lib/format";
-import { useCountUp } from "./use-count-up";
 
 const GROUPS: { state: Mark; label: string }[] = [
   { state: "right", label: "right" },
@@ -23,90 +24,123 @@ const ROW = "grid w-full grid-cols-[22px_minmax(0,1fr)_88px_14px] items-center g
 
 type Props = { result: AttemptResult; revealedStages: ReadonlySet<string> };
 
+/** The debrief opens in one sequence: score counts up, the bar fills right → wrong → missed, the stage rows follow. */
+function useDebriefTimeline(scope: RefObject<HTMLDivElement | null>) {
+  useGSAP(
+    () => {
+      const el = scope.current;
+      if (!el) return;
+      const find = (selector: string) => gsap.utils.toArray<HTMLElement>(selector, el);
+      const mm = gsap.matchMedia();
+      mm.add(MOTION_OK, () => {
+        const scoreEl = el.querySelector<HTMLElement>("[data-score]");
+        const score = scoreEl ? prepareCountUp(scoreEl, { paused: false, duration: 0.9 }) : null;
+        const grow = { scaleX: 0, transformOrigin: "left center" };
+        const tl = gsap.timeline({ defaults: { duration: 0.6, ease: "power3.out" } });
+        tl.from(find("[data-d='head']"), { opacity: 0, y: 10, stagger: 0.08 }, 0);
+        if (score) tl.add(score.tween, 0.1);
+        tl.from(find("[data-d='total'] [data-seg]"), { ...grow, duration: 0.45, ease: "power2.inOut", stagger: 0.38 }, 0.35)
+          .from(find("[data-d='pills'] > li"), { opacity: 0, y: 6, duration: 0.45, stagger: 0.08 }, 0.45)
+          .from(find("[data-d='note']"), { opacity: 0, duration: 0.5 }, 0.6);
+        const rows = find("[data-stage-row]");
+        tl.from(rows, { opacity: 0, y: 8, duration: 0.5, stagger: 0.05, clearProps: "opacity,transform" }, 0.6);
+        rows.forEach((row, i) => {
+          const segments = gsap.utils.toArray<HTMLElement>("[data-seg]", row);
+          if (segments.length > 0) tl.from(segments, { ...grow, duration: 0.45, stagger: 0.1, ease: "power2.out" }, 0.78 + i * 0.05);
+        });
+        return () => score?.restore();
+      });
+    },
+    { scope },
+  );
+}
+
 export function DebriefCard({ result, revealedStages }: Props) {
   const titleId = useId();
-  const score = useCountUp(result.points);
+  const scope = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
+  useDebriefTimeline(scope);
 
   return (
-    <Card aria-labelledby={titleId}>
-      <CardHeader as="h3" titleId={titleId} title="Case debrief" tag="Your attempt" />
-      <div className="border-b border-line px-5 pb-[15px] pt-[17px]">
-        <p className="mb-[7px] flex animate-rise flex-wrap items-end gap-x-2.5 gap-y-1">
-          <strong className="text-score text-ink" aria-hidden="true">
-            {score}
-            <span>/</span>
-            {result.max_points}
-          </strong>
-          <span className="sr-only">
-            {result.points} of {result.max_points} points
-          </span>
-          <span className="pb-[5px] text-sm2 text-muted">points — from diagnosis and treatment plan</span>
-        </p>
-        <p className="mb-[11px] max-w-[430px] animate-rise text-[12.5px] leading-[1.45] text-muted [animation-delay:80ms]">
-          Every other stage is marked the same way and carries no points — {pluralize(result.total_decisions, "decision")} in total.
-        </p>
-        <SegmentedBar
-          label={`${result.right} right, ${result.wrong} wrong, ${result.missed} missed`}
-          delayMs={340}
-          segments={[
-            { tone: "right", value: result.right },
-            { tone: "wrong", value: result.wrong },
-            { tone: "missed", value: result.missed },
-          ]}
-        />
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          <li className="flex min-w-0 flex-1">
-            <Pill tone="right" className="w-full"><StateIcon state="right" />{result.right} right</Pill>
-          </li>
-          <li className="flex min-w-0 flex-1">
-            <Pill tone="wrong" className="w-full"><StateIcon state="wrong" />{result.wrong} wrong</Pill>
-          </li>
-          <li className="flex min-w-0 flex-1">
-            <Pill tone="missed" className="w-full"><StateIcon state="missed" />{result.missed} missed</Pill>
-          </li>
-        </ul>
-        <p className="mt-[9px] text-[11.5px] leading-[1.4] text-muted">Missed — correct here, you never chose it.</p>
-        {result.harmful > 0 ? (
-          <p className="mt-3 flex items-center gap-2 rounded-row border border-wrong-border bg-wrong-tint px-3 py-2 text-[13px] text-ink">
-            <StateIcon state="wrong" label="Could harm" />
-            {pluralize(result.harmful, "choice")} you made could harm this patient. The stage rows below show which.
+    <div ref={scope}>
+      <Card aria-labelledby={titleId}>
+        <CardHeader as="h3" titleId={titleId} title="Case debrief" tag="Your attempt" />
+        <div className="border-b border-line px-5 pb-[15px] pt-[17px]">
+          <p data-d="head" className="mb-[7px] flex flex-wrap items-end gap-x-2.5 gap-y-1">
+            <strong className="text-score text-ink" aria-hidden="true">
+              <span data-score="">{result.points}</span>
+              <span>/</span>
+              {result.max_points}
+            </strong>
+            <span className="sr-only">
+              {result.points} of {result.max_points} points
+            </span>
+            <span className="pb-[5px] text-sm2 text-muted">points — from diagnosis and treatment plan</span>
           </p>
-        ) : null}
-        {result.diagnosis.hedged ? (
-          <p className="mt-3 flex items-center gap-2 rounded-row border border-missed-border bg-missed-tint px-3 py-2 text-[13px] text-ink">
-            <StateIcon state="missed" label="Hedged" />
-            You named several diagnoses — hedging earns no points.
+          <p data-d="head" className="mb-[11px] max-w-[430px] text-[12.5px] leading-[1.45] text-muted">
+            Every other stage is marked the same way and carries no points — {pluralize(result.total_decisions, "decision")} in total.
           </p>
-        ) : null}
-      </div>
-      <ol className="px-2.5 pb-1.5 pt-1">
-        {result.stages.map((stage, index) => (
-          <StageRow
-            key={stage.key}
-            stage={stage}
-            index={index}
-            result={result}
-            revealed={revealedStages.has(stage.key)}
-            open={open === stage.key}
-            onToggle={() => setOpen((current) => (current === stage.key ? null : stage.key))}
-          />
-        ))}
-      </ol>
-    </Card>
+          <div data-d="total">
+            <SegmentedBar
+              label={`${result.right} right, ${result.wrong} wrong, ${result.missed} missed`}
+              segments={[
+                { tone: "right", value: result.right },
+                { tone: "wrong", value: result.wrong },
+                { tone: "missed", value: result.missed },
+              ]}
+            />
+          </div>
+          <ul data-d="pills" className="mt-3 flex flex-wrap gap-1.5">
+            <li className="flex min-w-0 flex-1">
+              <Pill tone="right" className="w-full"><StateIcon state="right" />{result.right} right</Pill>
+            </li>
+            <li className="flex min-w-0 flex-1">
+              <Pill tone="wrong" className="w-full"><StateIcon state="wrong" />{result.wrong} wrong</Pill>
+            </li>
+            <li className="flex min-w-0 flex-1">
+              <Pill tone="missed" className="w-full"><StateIcon state="missed" />{result.missed} missed</Pill>
+            </li>
+          </ul>
+          <p data-d="note" className="mt-[9px] text-[11.5px] leading-[1.4] text-muted">Missed — correct here, you never chose it.</p>
+          {result.harmful > 0 ? (
+            <p className="mt-3 flex items-center gap-2 rounded-row border border-wrong-border bg-wrong-tint px-3 py-2 text-[13px] text-ink">
+              <StateIcon state="wrong" label="Could harm" />
+              {pluralize(result.harmful, "choice")} you made could harm this patient. The stage rows below show which.
+            </p>
+          ) : null}
+          {result.diagnosis.hedged ? (
+            <p className="mt-3 flex items-center gap-2 rounded-row border border-missed-border bg-missed-tint px-3 py-2 text-[13px] text-ink">
+              <StateIcon state="missed" label="Hedged" />
+              You named several diagnoses — hedging earns no points.
+            </p>
+          ) : null}
+        </div>
+        <ol className="px-2.5 pb-1.5 pt-1">
+          {result.stages.map((stage) => (
+            <StageRow
+              key={stage.key}
+              stage={stage}
+              result={result}
+              revealed={revealedStages.has(stage.key)}
+              open={open === stage.key}
+              onToggle={() => setOpen((current) => (current === stage.key ? null : stage.key))}
+            />
+          ))}
+        </ol>
+      </Card>
+    </div>
   );
 }
 
 type RowProps = {
   stage: DebriefStage;
-  index: number;
   result: AttemptResult;
   revealed: boolean;
   open: boolean;
   onToggle: () => void;
 };
 
-function StageRow({ stage, index, result, revealed, open, onToggle }: RowProps) {
+function StageRow({ stage, result, revealed, open, onToggle }: RowProps) {
   const panelId = useId();
   const given = stage.kind === "given";
   // A given stage is read-only, unless an item was withheld during play: then the debrief reveals it.
@@ -134,7 +168,6 @@ function StageRow({ stage, index, result, revealed, open, onToggle }: RowProps) 
               <SegmentedBar
                 size="sm"
                 label={`${stage.right} right, ${stage.wrong} wrong, ${stage.missed} missed`}
-                delayMs={700 + index * 55}
                 segments={[
                   { tone: "right", value: stage.right },
                   { tone: "wrong", value: stage.wrong },
@@ -150,7 +183,7 @@ function StageRow({ stage, index, result, revealed, open, onToggle }: RowProps) 
   );
 
   return (
-    <li className={cn("animate-rise rounded-row", open && "bg-surface-alt")} style={{ animationDelay: `${420 + index * 55}ms` }}>
+    <li data-stage-row="" className={cn("rounded-row", open && "bg-surface-alt")}>
       {expandable ? (
         <button type="button" aria-expanded={open} aria-controls={panelId} onClick={onToggle} className={cn(ROW, !open && "hover:bg-surface-alt")}>
           {head}

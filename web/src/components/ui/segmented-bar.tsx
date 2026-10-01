@@ -4,10 +4,13 @@ export type BarSegment = { tone: "right" | "wrong" | "missed"; value: number };
 
 const TONE: Record<BarSegment["tone"], string> = { right: "bg-right", wrong: "bg-wrong", missed: "bg-missed" };
 
-type Props = { segments: readonly BarSegment[]; label: string; size?: "lg" | "sm"; delayMs?: number };
+type Props = { segments: readonly BarSegment[]; label: string; size?: "lg" | "sm" };
 
-/** Teal / clay / amber bar; each segment's width is proportional to its count and grows from the left. */
-export function SegmentedBar({ segments, label, size = "lg", delayMs = 0 }: Props) {
+/**
+ * Teal / clay / amber bar; each segment's width is proportional to its count. Rendered in its final
+ * state; the debrief timeline grows the `data-seg` segments from the left, one after another.
+ */
+export function SegmentedBar({ segments, label, size = "lg" }: Props) {
   const shown = segments.filter((s) => s.value > 0);
   return (
     // A <span>, not a <div>: the bar also sits inside the debrief's row <button>, which only allows phrasing content.
@@ -15,11 +18,12 @@ export function SegmentedBar({ segments, label, size = "lg", delayMs = 0 }: Prop
       {shown.length === 0 ? (
         <i className="block h-full flex-1 rounded-bar bg-line" />
       ) : (
-        shown.map((s, i) => (
+        shown.map((s) => (
           <i
             key={s.tone}
-            className={cn("block h-full origin-left animate-grow-x", size === "lg" ? "rounded-bar" : "rounded-[2px]", TONE[s.tone])}
-            style={{ flex: s.value, animationDelay: `${delayMs + i * 100}ms` }}
+            data-seg=""
+            className={cn("block h-full", size === "lg" ? "rounded-bar" : "rounded-[2px]", TONE[s.tone])}
+            style={{ flex: s.value }}
           />
         ))
       )}

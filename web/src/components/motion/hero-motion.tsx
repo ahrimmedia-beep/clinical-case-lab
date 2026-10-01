@@ -30,18 +30,18 @@ export function HeroMotion({ copy, aside }: Props) {
         const title = el.querySelector<HTMLElement>("[data-split]");
         const split = title ? SplitText.create(title, { type: "words" }) : null;
         const tl = gsap.timeline({ defaults: { duration: 0.8, ease: "power3.out" } });
-        tl.from(find('[data-intro="glow"]'), { autoAlpha: 0, duration: 1.8, ease: "power2.out" }, 0)
-          .from(find('[data-intro="lead"]'), { autoAlpha: 0, y: 10 }, 0.05);
+        tl.from(find('[data-intro="glow"]'), { opacity: 0, duration: 1.8, ease: "power2.out" }, 0)
+          .from(find('[data-intro="lead"]'), { opacity: 0, y: 10 }, 0.05);
         if (split) {
           tl.from(
             split.words,
-            { autoAlpha: 0, yPercent: 42, duration: 0.95, ease: "expo.out", stagger: 0.075, onComplete: () => void split.revert() },
+            { opacity: 0, yPercent: 42, duration: 0.95, ease: "expo.out", stagger: 0.075, onComplete: () => void split.revert() },
             0.14,
           );
         }
-        tl.from(find('[data-intro="copy"]'), { autoAlpha: 0, y: 14, stagger: 0.08 }, 0.42)
-          .from(find('[data-intro="card"]'), { autoAlpha: 0, y: 30, duration: 1.1 }, 0.28)
-          .from(find('[data-intro="ghost"]'), { autoAlpha: 0, y: 26, scale: 0.96, duration: 1.2, stagger: 0.14 }, 0.55);
+        tl.from(find('[data-intro="copy"]'), { opacity: 0, y: 14, stagger: 0.08 }, 0.42)
+          .from(find('[data-intro="card"]'), { opacity: 0, y: 30, duration: 1.1 }, 0.28)
+          .from(find('[data-intro="ghost"]'), { opacity: 0, y: 26, scale: 0.96, duration: 1.2, stagger: 0.14 }, 0.55);
       });
 
       // Scroll parallax: layers drift apart as the hero leaves. Half the travel on phones.

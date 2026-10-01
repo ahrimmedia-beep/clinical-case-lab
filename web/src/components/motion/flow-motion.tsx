@@ -27,11 +27,11 @@ export function FlowMotion({ children, className }: { children: ReactNode; class
         const steps = find("[data-flow-step]");
 
         if (!wide && !narrow) {
-          gsap.set(steps, { autoAlpha: 0, y: 14 });
+          gsap.set(steps, { opacity: 0, y: 14 });
           ScrollTrigger.batch(steps, {
             start: "top 92%",
             once: true,
-            onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08, overwrite: true }),
+            onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08, overwrite: true }),
           });
           return;
         }
@@ -40,7 +40,7 @@ export function FlowMotion({ children, className }: { children: ReactNode; class
         const nodes = find("[data-flow-node]");
         gsap.set(line, wide ? { scaleX: 0, transformOrigin: "left center" } : { scaleY: 0, transformOrigin: "center top" });
         gsap.set(nodes, { scale: 0, transformOrigin: "50% 50%" });
-        gsap.set(steps, { autoAlpha: 0, y: wide ? 16 : 10 });
+        gsap.set(steps, { opacity: 0, y: wide ? 16 : 10 });
 
         // One time unit per gap between steps: node i is reached at time i.
         const gaps = Math.max(1, steps.length - 1);
@@ -53,7 +53,7 @@ export function FlowMotion({ children, className }: { children: ReactNode; class
         tl.to(line, wide ? { scaleX: 1, duration: gaps, ease: "none" } : { scaleY: 1, duration: gaps, ease: "none" }, 0);
         steps.forEach((step, i) => {
           if (nodes[i]) tl.to(nodes[i], { scale: 1, duration: 0.3, ease: "back.out(2.4)" }, i);
-          tl.to(step, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power2.out" }, Math.max(0, i - 0.15));
+          tl.to(step, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, Math.max(0, i - 0.15));
         });
       });
 
