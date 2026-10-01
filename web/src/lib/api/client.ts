@@ -5,8 +5,6 @@ import { networkError, problemToError } from "./errors";
 import * as fixtures from "./fixtures";
 import type { paths } from "./schema";
 import type {
-  AttemptIn,
-  AttemptResult,
   CasePublic,
   CaseSummary,
   ExtractRequest,
@@ -61,15 +59,6 @@ export async function revealOptions(slug: string, body: RevealIn): Promise<Revea
   if (isFixtureMode()) return fixtures.revealsFor(slug, body);
   const { data, error, response } = await guard(() =>
     api().POST("/api/cases/{slug}/reveal", { params: { path: { slug } }, body, ...init() }),
-  );
-  if (data !== undefined) return data;
-  throw problemToError(response.status, error);
-}
-
-export async function createAttempt(slug: string, body: AttemptIn): Promise<AttemptResult> {
-  if (isFixtureMode()) return fixtures.attemptResultFor(slug, body);
-  const { data, error, response } = await guard(() =>
-    api().POST("/api/cases/{slug}/attempts", { params: { path: { slug } }, body, ...init() }),
   );
   if (data !== undefined) return data;
   throw problemToError(response.status, error);

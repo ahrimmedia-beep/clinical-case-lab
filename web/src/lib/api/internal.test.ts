@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { approveCase, internalMessage, recordAttempt } from "./internal";
 import { ApiError } from "./errors";
+import { peCasePublic } from "./fixtures";
 
 const fetchMock = vi.fn<(request: Request) => Promise<Response>>();
 
@@ -50,6 +51,26 @@ describe("recordAttempt", () => {
     await expect(recordAttempt("pe-case-1a2b3c", { choices: {}, diagnosis_text: "PE", confidence: 3, duration_ms: null }, null)).rejects.toMatchObject({
       status: 429,
     });
+  });
+});
+
+describe("recordAttempt (fixture mode)", () => {
+  it("echoes the player's diagnosis in the canned debrief", async () => {
+    vi.stubEnv("API_BASE_URL", "");
+    const result = await recordAttempt(peCasePublic.slug, { choices: {}, diagnosis_text: "Pneumothorax", confidence: 2, duration_ms: null }, null);
+    expect(result.diagnosis).toMatchObject({ your_text: "Pneumothorax", confidence: 2, hedged: false });
+    expect(result.stages).toHaveLength(9);
+    expect(result.benchmarks).toHaveLength(3);
+  });
+
+  it("flags a hedged diagnosis the same way the canned debrief would", async () => {
+    vi.stubEnv("API_BASE_URL", "");
+    const result = await recordAttempt(
+      peCasePublic.slug,
+      { choices: {}, diagnosis_text: "Pulmonary embolism or pneumothorax", confidence: 2, duration_ms: null },
+      null,
+    );
+    expect(result.diagnosis.hedged).toBe(true);
   });
 });
 
