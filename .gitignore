@@ -19,6 +19,8 @@ playwright-report/
 test-results/
 
 # Env and secrets
+secrets.env
+.playwright-mcp/
 .env
 .env.*
 !.env.example
