@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, Depends, Path
 
 from app.case_views import build_case_public, build_reveals
@@ -25,9 +26,10 @@ from app.security import require_internal_key
 from app.stages import Stage
 from pipeline.ai_player import play_case
 from pipeline.factory import UnknownModel, get_provider, resolve_model
-from pipeline.providers.base import ProviderError, ProviderUnavailable
+from pipeline.providers.base import ProviderError, ProviderUnavailable, public_detail
 
 router = APIRouter(tags=["ai-players"], dependencies=[Depends(require_internal_key)])
+log = structlog.get_logger()
 Slug = Annotated[str, Path(pattern=r"^[a-z0-9-]{3,100}$")]
 
 
@@ -67,9 +69,22 @@ async def create_ai_attempt(
         provider = get_provider(body.provider, model, get_settings())
         play = await play_case(public, reveal, provider)
     except ProviderUnavailable as exc:
-        raise_problem(503, "Model provider unavailable", str(exc))
+        # The SDK's text stays in the server log; the client gets a fixed, provider-neutral line.
+        log.warning(
+            "ai_attempt_unavailable",
+            provider=body.provider.value,
+            status=exc.status,
+            error=str(exc),
+        )
+        raise_problem(503, "Model provider unavailable", public_detail(exc))
     except ProviderError as exc:
-        raise_problem(502, "The model's answer could not be used", str(exc))
+        log.warning(
+            "ai_attempt_failed",
+            provider=body.provider.value,
+            error_type=type(exc).__name__,
+            error=str(exc),
+        )
+        raise_problem(502, "The model's answer could not be used", public_detail(exc))
 
     label = f"{AI_LABEL_PREFIX}{model}"
     async with engine.connect() as conn:

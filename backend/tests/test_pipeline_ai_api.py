@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import pytest
+import structlog
 from fastapi.testclient import TestClient
 
 from app.config import get_settings
@@ -22,11 +23,23 @@ from app.schemas.attempt import AttemptIn
 from app.schemas.case import ClinicalCase, ReviewStatus
 from app.scoring import score_attempt
 from pipeline.models import LLMPlayerTurn1, LLMPlayerTurn2
-from pipeline.providers.base import ProviderUnavailable
+from pipeline.providers.base import ProviderError, ProviderUnavailable
 from pipeline.providers.fake import FakeProvider
 
 SLUG = "breathless-after-a-flight-1a2b3c"
 KEY = {"X-Internal-Key": "test-key"}
+
+# Fixed, provider-neutral strings (pipeline/providers/base.py); the raw SDK text never reaches
+# the client and is asserted to land only in the server log.
+NOT_AVAILABLE = "This model is not available on the server right now. Switch to the other model."
+BUSY = (
+    "The model provider is rate-limiting requests right now. "
+    "Try again in a minute, or switch to the other model."
+)
+UNUSABLE = (
+    "The model's answer could not be turned into a valid case. "
+    "Try again, or switch to the other model."
+)
 
 
 class FakeEngine:
@@ -179,18 +192,45 @@ def test_missing_credentials_is_503(
     response = post(client, provider="gemini")
     assert response.status_code == 503
     assert response.json()["title"] == "Model provider unavailable"
+    assert response.json()["detail"] == NOT_AVAILABLE  # no env var names, no vendor names
     assert recorded == []
 
 
 def test_quota_is_503_and_unusable_answers_are_502(
     client: TestClient, monkeypatch: pytest.MonkeyPatch, recorded: list[dict[str, Any]]
 ) -> None:
-    quota = FakeProvider(script=[ProviderUnavailable("429", retryable=True, status=429)])
+    # The SDK's text stays in the server log; the client gets a fixed, provider-neutral line.
+    error = ProviderUnavailable("429 RESOURCE_EXHAUSTED org-7f3 quota", retryable=True, status=429)
+    quota = FakeProvider(script=[error])
     monkeypatch.setattr("app.routers.ai_players.get_provider", lambda *args: quota)
-    assert post(client).status_code == 503
+    with structlog.testing.capture_logs() as logs:
+        response = post(client)
+    assert response.status_code == 503
+    assert response.json()["detail"] == BUSY
+    assert "org-7f3" not in response.text
+    assert any(entry.get("error") == str(error) for entry in logs)
+
     broken = FakeProvider(script=["{", "{"])
     monkeypatch.setattr("app.routers.ai_players.get_provider", lambda *args: broken)
-    response = post(client)
+    with structlog.testing.capture_logs() as logs:
+        response = post(client)
     assert response.status_code == 502
-    assert "failed validation" in response.json()["detail"]
+    assert response.json()["detail"] == UNUSABLE
+    assert "failed validation" not in response.text
+    assert any("failed validation" in entry.get("error", "") for entry in logs)
     assert recorded == []  # nothing is stored when the model could not play
+
+
+def test_a_rejected_request_is_502_without_the_provider_text(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, recorded: list[dict[str, Any]]
+) -> None:
+    raw = "provider rejected the request (400): org org-7f3 has exceeded the context window"
+    rejecting = FakeProvider(script=[ProviderError(raw)])
+    monkeypatch.setattr("app.routers.ai_players.get_provider", lambda *args: rejecting)
+    with structlog.testing.capture_logs() as logs:
+        response = post(client)
+    assert response.status_code == 502
+    assert response.json()["detail"] == UNUSABLE
+    assert "org-7f3" not in response.text
+    assert any(entry.get("error") == raw for entry in logs)
+    assert recorded == []
