@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.13"
+  NODE_VERSION: "24"
+  PNPM_VERSION: "12.8.1"
+
+jobs:
+  backend:
+    name: backend (ruff, mypy, alembic, pytest, offline eval)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: caselab
+          POSTGRES_PASSWORD: caselab
+          POSTGRES_DB: caselab
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U caselab -d caselab"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      ENV: test
+      DATABASE_URL: postgresql+asyncpg://caselab:caselab@localhost:5434/caselab
+      TEST_DATABASE_URL: postgresql+asyncpg://caselab:caselab@localhost:5434/caselab_test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install dependencies (locked)
+        working-directory: backend
+        run: uv sync --locked
+      - name: Lint and type-check (ruff, ruff format, mypy)
+        run: make lint-backend
+      - name: Migrate an empty PostgreSQL 18 to head
+        working-directory: backend
+        run: uv run alembic upgrade head
+      - name: Models and migrations agree (alembic check)
+        working-directory: backend
+        run: uv run alembic check
+      - name: Tests (unit, DB integration, API)
+        run: make test-backend
+      - name: Offline eval on recorded model outputs (metric floor)
+        run: make eval-offline
+
+  web:
+    name: web (typecheck, eslint, vitest, build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          package_json_file: web/package.json
+          cache: true
+          cache_dependency_path: web/pnpm-lock.yaml
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck (tsc --noEmit)
+        run: pnpm run typecheck
+      - name: ESLint
+        run: pnpm exec eslint .
+      - name: Unit tests (vitest)
+        run: pnpm exec vitest run
+      - name: Production build
+        run: pnpm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  contracts:
+    name: contracts (generated types in sync, repo hygiene, doc paths)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          package_json_file: web/package.json
+          cache: true
+          cache_dependency_path: web/pnpm-lock.yaml
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install backend dependencies
+        working-directory: backend
+        run: uv sync --locked
+      - name: Install web dependencies
+        working-directory: web
+        run: pnpm install --frozen-lockfile
+      - name: OpenAPI, JSON Schema and TypeScript types match the code (make gen + git diff)
+        run: make check-gen
+      - name: No secrets, env files or non-English text in the public repo
+        run: python3 scripts/check_hygiene.py
+      - name: Every repo path mentioned in the docs exists
+        run: python3 scripts/check_doc_paths.py
