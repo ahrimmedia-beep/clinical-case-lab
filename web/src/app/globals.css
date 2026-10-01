@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Eximion v3 tokens (docs/research/design/DESIGN-NOTES.md §b). Fonts come from next/font CSS
+   variables, so they are mapped with `inline`. */
+@theme inline {
+  --font-sans: var(--font-poppins), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@theme {
+  /* ---- neutrals ---- */
+  --color-ink: #101413;            /* headings */
+  --color-body: #3A3A3A;           /* body text */
+  --color-muted: #6B7280;          /* captions, mono labels */
+  --color-line: #E2E5E5;           /* borders, dividers */
+  --color-line-strong: #C9CFCE;    /* ghost button / input border */
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F7F8F8;    /* section bg, card header bar, hover */
+
+  /* ---- brand teal ---- */
+  --color-primary: #03A696;
+  --color-primary-hover: #026F63;  /* also teal text on white (eyebrows, links) */
+  --color-primary-deep: #02564C;
+  --color-primary-lit: #5FD6C6;    /* teal on dark grounds */
+  --color-primary-tint: #EEF7F6;
+  --color-primary-border: #BFE3DE;
+  --color-blush: #D8B4C8;          /* brand pair, gradients only */
+
+  /* ---- dark grounds ---- */
+  --color-hero: #03211D;
+  --color-hero-text: #F4FAF9;
+
+  /* ---- decision states (debrief) ---- */
+  --color-right: #03A696;
+  --color-right-tint: #EEF7F6;
+  --color-right-border: #BFE3DE;
+  --color-wrong: #B85C4E;
+  --color-wrong-tint: #FBF1EF;
+  --color-wrong-border: #EFDAD6;
+  --color-missed: #D9A83F;
+  --color-missed-text: #B67B12;
+  --color-missed-tint: #FBF4E6;
+  --color-missed-border: #EBDCBC;
+  --color-error: #B3261E;          /* form validation */
+
+  /* ---- type scale ---- */
+  --text-display: 54px;  --text-display--line-height: 1.04; --text-display--letter-spacing: -0.036em; --text-display--font-weight: 600;
+  --text-h2: 38px;       --text-h2--line-height: 1.16;      --text-h2--letter-spacing: -0.025em;      --text-h2--font-weight: 600;
+  --text-h3: 17px;       --text-h3--line-height: 1.25;      --text-h3--letter-spacing: -0.015em;      --text-h3--font-weight: 600;
+  --text-lead: 16.5px;   --text-lead--line-height: 1.62;
+  /* DESIGN-NOTES names this --text-body; renamed because --color-body already owns the
+     `text-body` class and Tailwind would emit both font-size and colour for it. */
+  --text-copy: 15px;     --text-copy--line-height: 1.62;
+  --text-sm2: 13.5px;    --text-sm2--line-height: 1.5;
+  --text-cap: 12px;      --text-cap--line-height: 1.4;
+  --text-eyebrow: 11px;  --text-eyebrow--line-height: 1.6;  --text-eyebrow--letter-spacing: 0.14em;   --text-eyebrow--font-weight: 500;
+  --text-micro: 10px;    --text-micro--line-height: 1.4;    --text-micro--letter-spacing: 0.1em;
+  --text-score: 38px;    --text-score--line-height: 0.9;    --text-score--letter-spacing: -0.035em;   --text-score--font-weight: 600;
+  --text-stat: 48px;     --text-stat--line-height: 1;       --text-stat--letter-spacing: -0.035em;    --text-stat--font-weight: 600;
+
+  /* ---- radii ---- */
+  --radius-bar: 3px;
+  --radius-badge: 6px;
+  --radius-btn: 9px;
+  --radius-input: 10px;
+  --radius-row: 11px;
+  --radius-tile: 12px;
+  --radius-card: 16px;
+  --radius-hero-card: 20px;
+
+  /* ---- shadows ---- */
+  --shadow-card: 0 1px 2px rgba(16,20,19,.04), 0 12px 40px rgba(16,20,19,.06);
+  --shadow-lift: 0 1px 2px rgba(16,20,19,.05), 0 20px 50px rgba(16,20,19,.10);
+  --shadow-on-dark: 0 1px 2px rgba(16,20,19,.05), 0 26px 60px rgba(2,32,28,.28);
+  --shadow-btn: 0 8px 20px rgba(3,166,150,.22);
+
+  /* ---- layout ---- */
+  --container-site: 1180px;
+  --container-head: 660px;
+
+  /* ---- motion ---- */
+  --ease-soft: cubic-bezier(.2,.75,.3,1);
+  --ease-std: cubic-bezier(.4,0,.2,1);
+  --animate-rise: rise .5s var(--ease-soft) both;
+  --animate-grow-x: grow-x .6s var(--ease-soft) both;
+  --animate-ping-soft: ping-soft 2.8s cubic-bezier(.25,.6,.3,1) infinite;
+
+  @keyframes rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+  @keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes ping-soft { 0% { transform: scale(1); opacity: .6; } 70%, 100% { transform: scale(2.8); opacity: 0; } }
+}
+
+@layer base {
+  html { scroll-padding-top: 88px; }
+  h1, h2, h3, h4 { color: var(--color-ink); font-weight: 600; letter-spacing: -0.025em; line-height: 1.16; }
+  :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
+
+/* brand gradient helpers */
+@utility bg-brand-grad { background-image: linear-gradient(135deg, #D8B4C8 0%, #03A696 100%); }
+@utility bg-hero-grad {
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(3,166,150,.42) 0%, rgba(3,166,150,0) 62%),
+    radial-gradient(90% 80% at 88% 12%, rgba(2,86,76,.72) 0%, rgba(2,86,76,0) 70%),
+    linear-gradient(180deg, #04322C 0%, #03211D 58%, #021512 100%);
+}
+@utility bg-hairline-grid {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(95,214,198,.20) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(90deg, rgba(95,214,198,.16) 0 1px, transparent 1px 72px);
+}
+/* SVG ping marker: scale around its own centre (DESIGN-NOTES "halo"). */
+@utility halo { transform-box: fill-box; transform-origin: center; }
