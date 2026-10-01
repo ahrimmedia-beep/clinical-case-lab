@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import report from "@/data/eval-report.json";
+// A frozen sample keeps these tests independent of each live eval run (src/data is replaced by `make sync-evals`).
+import report from "@/test/fixtures/eval-report.sample.json";
 import { bestModel, compareModels, displayModel, headline, honestyNotes, parseEvalReport, type EvalReport } from "./evals";
 
 function committed(): EvalReport {
@@ -98,5 +99,12 @@ describe("production model vs the next one", () => {
   it("returns null when either model is missing from the run", () => {
     const base = committed();
     expect(compareModels({ ...base, models: base.models.filter((m) => m.model !== "claude-opus-5-5") }, "claude-opus-4-8", "claude-opus-5-5")).toBeNull();
+  });
+});
+
+describe("the live report shipped with the site", () => {
+  it("parses with the same schema", async () => {
+    const live = (await import("@/data/eval-report.json")).default;
+    expect(() => parseEvalReport(live)).not.toThrow();
   });
 });
