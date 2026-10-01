@@ -205,11 +205,15 @@ function debriefStage(stage: PublicStage, options: DebriefOption[] = [], explana
  * player's own result, e.g. "Claude Opus 4.8 · 2/3 · overconfident". Three of the four §15
  * models; the fourth (claude-opus-5-5) is left out of this canned attempt on purpose, the same
  * way a real cohort would not have every model benchmarked on every case yet.
+ *
+ * `label` mirrors the real API: it is the raw `simulated_label` tag (`ai:{model}`, amendments
+ * §C Track A Task 6), not display text — the UI must format it with `modelLabel(b.model)`
+ * instead of rendering `label` directly (found against the live API by track C2).
  */
 const PE_BENCHMARKS: Benchmark[] = [
-  { label: "Claude Opus 4.8", provider: "claude", model: "claude-opus-4-8", points: 2, max_points: 3, diagnosis_correct: true, confidence: 5, calibration: "overconfident" },
-  { label: "Claude Sonnet 5", provider: "claude", model: "claude-sonnet-5", points: 1, max_points: 3, diagnosis_correct: true, confidence: 3, calibration: "calibrated" },
-  { label: "Gemini 3.8 Flash", provider: "gemini", model: "gemini-3.8-flash", points: 0, max_points: 3, diagnosis_correct: false, confidence: 4, calibration: "overconfident" },
+  { label: "ai:claude-opus-4-8", provider: "claude", model: "claude-opus-4-8", points: 2, max_points: 3, diagnosis_correct: true, confidence: 5, calibration: "overconfident" },
+  { label: "ai:claude-sonnet-5", provider: "claude", model: "claude-sonnet-5", points: 1, max_points: 3, diagnosis_correct: true, confidence: 3, calibration: "calibrated" },
+  { label: "ai:gemini-3.8-flash", provider: "gemini", model: "gemini-3.8-flash", points: 0, max_points: 3, diagnosis_correct: false, confidence: 4, calibration: "overconfident" },
 ];
 
 /** C1 delta (amendments §E): the anti-hedging rule from §9, loosely mirrored for the fixture echo only. */

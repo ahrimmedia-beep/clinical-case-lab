@@ -3,7 +3,7 @@
 import { useId } from "react";
 import { useCountUp } from "@/components/debrief/use-count-up";
 import type { AttemptResult } from "@/lib/api/types";
-import { formatPercentile, pluralize } from "@/lib/format";
+import { formatPercentile, modelLabel, pluralize } from "@/lib/format";
 import { benchmarkX, buildCurve, CURVE } from "./curve";
 
 export function PercentileCard({ result }: { result: AttemptResult }) {
@@ -77,7 +77,7 @@ export function PercentileCard({ result }: { result: AttemptResult }) {
           const bx = benchmarkX(result.max_points, b.points);
           const by = CURVE.base - 9 - i * 11; // small stack so same-score models don't overlap
           return (
-            <g key={b.label} aria-label={`${b.label}: ${b.points} of ${b.max_points} points, ${b.calibration}`} role="img">
+            <g key={b.label} aria-label={`${modelLabel(b.model)}: ${b.points} of ${b.max_points} points, ${b.calibration}`} role="img">
               <rect x={bx - 3.5} y={by - 3.5} width={7} height={7} transform={`rotate(45 ${bx} ${by})`} className="fill-missed stroke-white" strokeWidth={1} />
             </g>
           );
@@ -103,7 +103,7 @@ export function PercentileCard({ result }: { result: AttemptResult }) {
               className="inline-flex items-center gap-1.5 rounded-[6px] border border-missed-border bg-missed-tint px-[7px] py-1 font-mono text-[10.5px] text-missed-text"
             >
               <span aria-hidden="true" className="inline-block size-[6px] rotate-45 bg-missed" />
-              {b.label} · {b.points}/{b.max_points} · {b.calibration}
+              {modelLabel(b.model)} · {b.points}/{b.max_points} · {b.calibration}
               {b.diagnosis_correct ? null : <span className="text-wrong"> · missed the diagnosis</span>}
             </li>
           ))}
