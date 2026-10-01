@@ -151,3 +151,17 @@ async def test_list_cases_puts_approved_cases_before_drafts(
         (draft.slug, "draft"),
     ]
     assert summaries[1].source_kind == "llm"
+
+
+async def test_approved_llm_cases_stay_behind_the_curated_showcase(
+    conn: AsyncConnection, case_pe: dict[str, Any]
+) -> None:
+    curated = await insert_case(conn, ClinicalCase.model_validate(case_pe))
+    newer = await insert_case(conn, llm_case({**case_pe, "estimated_minutes": 11}))
+    await conn.execute(
+        text("UPDATE cases SET review_status = 'approved', reviewed_at = now() WHERE id = :id"),
+        {"id": newer.id},
+    )
+    summaries = await list_cases(conn)
+    # A studio case approved later must not push the hand-authored hero off the top.
+    assert [s.slug for s in summaries] == [curated.slug, newer.slug]

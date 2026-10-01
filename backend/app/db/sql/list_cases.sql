@@ -21,4 +21,4 @@ SELECT
         WHERE a.case_id = c.id AND coalesce(a.simulated_label, '') NOT LIKE 'ai:%'
     ) AS attempts_count
 FROM cases AS c
-ORDER BY (c.review_status = 'approved') DESC, c.created_at DESC, c.id DESC
+ORDER BY (c.review_status = 'approved') DESC, (c.source_kind = 'manual') DESC, c.created_at DESC, c.id DESC
