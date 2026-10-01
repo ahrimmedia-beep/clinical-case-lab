@@ -2344,6 +2344,16 @@
               }
             },
             "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Too Many Requests"
           }
         },
         "summary": "Create Case",
@@ -2636,6 +2646,16 @@
               }
             },
             "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            },
+            "description": "Too Many Requests"
           }
         },
         "summary": "Create Attempt",
