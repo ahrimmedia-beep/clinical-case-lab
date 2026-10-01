@@ -1,0 +1,42 @@
+{
+  "case_id": "ptx-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 22, "sex": "male"},
+    "chief_complaint": "Left-sided chest pain and shortness of breath",
+    "findings": [
+      {"category": "symptom", "text": "Sudden sharp left-sided chest pain at rest, 3 hours ago", "evidence": "sudden, sharp left-sided chest pain that started while he was sitting at his desk"},
+      {"category": "symptom", "text": "Chest pain worse on deep breathing", "evidence": "The pain is worse on deep breathing"},
+      {"category": "symptom", "text": "Mild shortness of breath", "evidence": "He has mild shortness of breath"},
+      {"category": "history", "text": "Sprained right ankle playing soccer last month, fully mobile", "evidence": "He sprained his right ankle playing soccer last month"},
+      {"category": "social", "text": "Smokes about 10 cigarettes a day", "evidence": "smokes about 10 cigarettes a day"},
+      {"category": "social", "text": "Uses cannabis at weekends", "evidence": "cannabis at weekends"},
+      {"category": "social", "text": "Computer science student", "evidence": "computer science student"},
+      {"category": "exam", "text": "Tall, thin build", "evidence": "tall, thin young man"},
+      {"category": "exam", "text": "Reduced breath sounds over the left hemithorax", "evidence": "Reduced breath sounds over the left hemithorax"},
+      {"category": "exam", "text": "Left hemithorax hyper-resonant to percussion", "evidence": "which is hyper-resonant to percussion"},
+      {"category": "imaging", "text": "Chest X-ray: large left pneumothorax, 3.5 cm rim of air at the hilum", "evidence": "CXR shows a large left pneumothorax with a 3.5 cm rim of air at the level of the hilum"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "Heart rate", "value": 96, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 96 bpm"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 20, "value_text": null, "unit": "/min", "flag": null, "evidence": "RR 20/min"},
+      {"kind": "vital", "name": "Blood pressure", "value": null, "value_text": "122/70", "unit": "mmHg", "flag": null, "evidence": "BP 122/70 mmHg"},
+      {"kind": "vital", "name": "Temperature", "value": 98.4, "value_text": null, "unit": "°F", "flag": null, "evidence": "T 98.4 °F"},
+      {"kind": "vital", "name": "SpO2", "value": 95, "value_text": null, "unit": "%", "flag": null, "evidence": "sats 95% on air"}
+    ],
+    "final_diagnosis": {"name": "Primary spontaneous pneumothorax", "icd10": "J93.11", "evidence": "left primary spontaneous pneumothorax, first episode"},
+    "differential": [
+      {"name": "Pulmonary embolism", "icd10": "I26.99", "evidence": "Pulmonary embolism was considered because of the recent ankle injury"},
+      {"name": "Pericarditis", "icd10": "I30.9", "evidence": "Pericarditis is unlikely"}
+    ]
+  },
+  "diagnosis_aliases": ["PSP", "Spontaneous pneumothorax", "Left primary spontaneous pneumothorax", "Pneumothorax", "Large left primary spontaneous pneumothorax"],
+  "measurement_aliases": {
+    "Heart rate": ["HR", "Pulse"],
+    "Respiratory rate": ["RR"],
+    "Blood pressure": ["BP"],
+    "Temperature": ["T", "Body temperature"],
+    "SpO2": ["Sats", "Oxygen saturation", "O2 saturation", "SpO2 on air"]
+  },
+  "negated": ["trauma", "hemoptysis", "fever", "previous pneumothorax", "tracheal deviation", "calf swelling", "mediastinal shift", "underlying lung abnormality", "pericardial rub"],
+  "traps": ["phi", "negation", "abbreviation", "unit_variant", "number_in_words", "distractor_history"]
+}

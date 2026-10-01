@@ -1,0 +1,47 @@
+{
+  "case_id": "aatd-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 44, "sex": "female"},
+    "chief_complaint": "Progressive breathlessness over 3 years",
+    "findings": [
+      {"category": "symptom", "text": "Progressive breathlessness over 3 years", "evidence": "progressive breathlessness over 3 years"},
+      {"category": "symptom", "text": "Can walk only about 100 yards on the flat before stopping", "evidence": "She can now walk only about 100 yards on the flat before stopping"},
+      {"category": "symptom", "text": "Morning cough productive of clear sputum", "evidence": "a morning cough productive of clear sputum"},
+      {"category": "medication", "text": "Salbutamol inhaler as needed, little benefit", "evidence": "She uses a salbutamol inhaler as needed"},
+      {"category": "social", "text": "Former smoker, 10 pack-years, quit 8 years ago", "evidence": "a former smoker of ten pack-years who quit 8 years ago"},
+      {"category": "social", "text": "Works as a school administrator", "evidence": "works as a school administrator"},
+      {"category": "history", "text": "Raised liver enzymes on routine blood tests in 2021, not investigated", "evidence": "Raised liver enzymes were noted on routine blood tests in 2021"},
+      {"category": "history", "text": "Right carpal tunnel release in 2020", "evidence": "a right carpal tunnel release in 2020"},
+      {"category": "family", "text": "Brother diagnosed with liver cirrhosis in his forties", "evidence": "her brother was diagnosed with liver cirrhosis in his forties"},
+      {"category": "family", "text": "Father died of emphysema at 52", "evidence": "her father died of emphysema at 52"},
+      {"category": "exam", "text": "Hyperinflated chest", "evidence": "her chest was hyperinflated"},
+      {"category": "exam", "text": "Reduced breath sounds at both bases", "evidence": "reduced breath sounds at both bases"},
+      {"category": "imaging", "text": "CT chest: panlobular emphysema, predominantly in the lower lobes", "evidence": "CT chest shows panlobular emphysema, predominantly in the lower lobes"},
+      {"category": "procedure", "text": "Genotyping: PiZZ", "evidence": "Genotyping confirmed PiZZ"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "SpO2", "value": 95, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 95% on air"},
+      {"kind": "lab", "name": "FEV1", "value": 1.4, "value_text": null, "unit": "L", "flag": null, "evidence": "post-bronchodilator FEV1 1.4 L"},
+      {"kind": "lab", "name": "FEV1/FVC", "value": 0.48, "value_text": null, "unit": null, "flag": null, "evidence": "FEV1/FVC 0.48"},
+      {"kind": "lab", "name": "TLCO", "value": 55, "value_text": null, "unit": "% predicted", "flag": null, "evidence": "TLCO 55% predicted"},
+      {"kind": "lab", "name": "Serum alpha-1 antitrypsin", "value": 25, "value_text": null, "unit": "mg/dL", "flag": "low", "evidence": "Serum alpha-1 antitrypsin 25 mg/dL"},
+      {"kind": "lab", "name": "ALT", "value": 58, "value_text": null, "unit": "U/L", "flag": "high", "evidence": "ALT 58 U/L (raised)"}
+    ],
+    "final_diagnosis": {"name": "Alpha-1 antitrypsin deficiency", "icd10": "E88.01", "evidence": "severe alpha-1 antitrypsin deficiency (PiZZ) with lower-lobe panlobular emphysema"},
+    "differential": [
+      {"name": "Smoking-related COPD", "icd10": "J44.9", "evidence": "Smoking-related COPD alone would be unusual"},
+      {"name": "Asthma", "icd10": "J45.909", "evidence": "Asthma was considered"}
+    ]
+  },
+  "diagnosis_aliases": ["AATD", "A1AT deficiency", "AAT deficiency", "Alpha-1 antitrypsin deficiency with emphysema", "Severe alpha-1 antitrypsin deficiency", "Alpha-1 antitrypsin deficiency, PiZZ", "Alpha-1 antitrypsin deficiency with panlobular emphysema"],
+  "measurement_aliases": {
+    "SpO2": ["Oxygen saturation", "O2 saturation"],
+    "FEV1": ["Post-bronchodilator FEV1", "Forced expiratory volume in 1 second"],
+    "FEV1/FVC": ["FEV1/FVC ratio", "Post-bronchodilator FEV1/FVC"],
+    "TLCO": ["DLCO", "Transfer factor", "Diffusing capacity", "TLCO % predicted"],
+    "Serum alpha-1 antitrypsin": ["Alpha-1 antitrypsin", "AAT", "A1AT", "Serum AAT", "Alpha-1 antitrypsin level"],
+    "ALT": ["Alanine aminotransferase", "Alanine transaminase"]
+  },
+  "negated": ["hemoptysis", "ankle swelling", "atopy"],
+  "traps": ["phi", "negation", "abbreviation", "unit_variant", "number_in_words", "distractor_history"]
+}

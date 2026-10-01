@@ -1,0 +1,16 @@
+RESPIRATORY MEDICINE CONSULTATION
+
+Reason for consultation: progressive breathlessness and an abnormal CT.
+
+History of present illness: A forty-five-year-old man reports gradually worsening shortness of breath over about one year; he now becomes breathless walking uphill or carrying shopping. He has a mild cough productive of small amounts of whitish sputum and increasing fatigue. He has no fever, has not lost weight and denies hemoptysis. Two courses of antibiotics from his primary care physician made no difference.
+
+Past history: hypertension for 6 years, treated with amlodipine 5 mg daily. Laparoscopic appendectomy in 2015. No known immunosuppression.
+Social: ex-smoker, 20 pack-years, quit 2 years ago; works as a logistics manager. No occupational dust exposure.
+
+Examination: SpO2 89% on room air at rest, RR 20/min, HR 92 bpm. Sparse fine inspiratory crackles at both bases. No clubbing. No ankle edema.
+
+Investigations: ABG on room air: PaO2 58 mmHg. LDH 412 U/L (elevated). HIV antigen/antibody test negative. PFTs: FVC 84% predicted, DLCO 52% predicted. HRCT: bilateral geographic ground-glass opacities with superimposed interlobular septal thickening (crazy-paving pattern), sharply demarcated from normal lung. Echocardiography: normal left ventricular size and systolic function. Bronchoscopy with BAL returned milky, opaque fluid; cytology showed abundant PAS-positive, acellular proteinaceous material. Serum anti-GM-CSF autoantibodies 85 µg/mL (elevated).
+
+Impression: autoimmune pulmonary alveolar proteinosis (aPAP). Pneumocystis pneumonia was considered because of the crazy-paving pattern, but the HIV test is negative and he has no immunosuppression. Cardiogenic pulmonary edema is unlikely with a normal echocardiogram and no ankle edema.
+
+Plan: supplemental oxygen; refer for whole-lung lavage at a specialist center; discuss inhaled GM-CSF therapy; reinforce smoking abstinence; repeat lung function in 3 months.

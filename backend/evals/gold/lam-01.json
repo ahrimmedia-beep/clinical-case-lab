@@ -1,0 +1,49 @@
+{
+  "case_id": "lam-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 38, "sex": "female"},
+    "chief_complaint": "Recurrent pneumothorax and progressive breathlessness",
+    "findings": [
+      {"category": "symptom", "text": "Second right spontaneous pneumothorax in 14 months", "evidence": "her second right-sided spontaneous pneumothorax in 14 months"},
+      {"category": "symptom", "text": "Progressive dyspnea on exertion for 2 years", "evidence": "progressive dyspnea on exertion over 2 years"},
+      {"category": "symptom", "text": "Has to stop after one flight of stairs", "evidence": "now has to stop after one flight of stairs"},
+      {"category": "symptom", "text": "Intermittent dry cough", "evidence": "intermittent dry cough"},
+      {"category": "history", "text": "Urinary tract infection last spring treated with nitrofurantoin", "evidence": "urinary tract infection last spring that resolved with a course of nitrofurantoin"},
+      {"category": "history", "text": "Previous right pneumothorax treated with a chest tube", "evidence": "R PTX 14 months ago, treated with a chest tube"},
+      {"category": "history", "text": "Renal angiomyolipoma found on abdominal ultrasound in 2023", "evidence": "Renal angiomyolipoma found incidentally on abdominal ultrasound in 2023"},
+      {"category": "medication", "text": "Combined oral contraceptive pill", "evidence": "combined oral contraceptive pill"},
+      {"category": "social", "text": "Lifelong non-smoker", "evidence": "lifelong non-smoker"},
+      {"category": "social", "text": "Works as a schoolteacher", "evidence": "works as a schoolteacher"},
+      {"category": "exam", "text": "Reduced breath sounds at the right base", "evidence": "Breath sounds are reduced at the right base"},
+      {"category": "imaging", "text": "HRCT: diffuse thin-walled round cysts in both lungs", "evidence": "numerous thin-walled round cysts distributed diffusely throughout both lungs"},
+      {"category": "imaging", "text": "Small residual right apical pneumothorax", "evidence": "a small residual right apical pneumothorax"},
+      {"category": "imaging", "text": "CT abdomen: 2.1 cm left renal angiomyolipoma", "evidence": "CT abdomen confirms a 2.1 cm left renal angiomyolipoma"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "SpO2", "value": 94, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 ninety-four percent on room air"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 18, "value_text": null, "unit": "/min", "flag": null, "evidence": "RR 18/min"},
+      {"kind": "vital", "name": "Heart rate", "value": 88, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 88 bpm"},
+      {"kind": "lab", "name": "FEV1", "value": 1.9, "value_text": null, "unit": "L", "flag": null, "evidence": "FEV1 1.9 L"},
+      {"kind": "lab", "name": "FEV1/FVC", "value": 0.61, "value_text": null, "unit": null, "flag": "low", "evidence": "FEV1/FVC 0.61"},
+      {"kind": "lab", "name": "DLCO", "value": 48, "value_text": null, "unit": "% of predicted", "flag": "low", "evidence": "DLCO 48% of predicted"},
+      {"kind": "lab", "name": "Serum VEGF-D", "value": 1240, "value_text": null, "unit": "pg/mL", "flag": "high", "evidence": "Serum VEGF-D 1,240 pg/mL"}
+    ],
+    "final_diagnosis": {"name": "Lymphangioleiomyomatosis", "icd10": "J84.81", "evidence": "lymphangioleiomyomatosis (LAM), sporadic form"},
+    "differential": [
+      {"name": "Pulmonary Langerhans cell histiocytosis", "icd10": "J84.82", "evidence": "Pulmonary Langerhans cell histiocytosis was considered"},
+      {"name": "Birt-Hogg-Dube syndrome", "icd10": null, "evidence": "Birt-Hogg-Dube syndrome remains in the differential"}
+    ]
+  },
+  "diagnosis_aliases": ["LAM", "Sporadic LAM", "Sporadic lymphangioleiomyomatosis", "Pulmonary lymphangioleiomyomatosis"],
+  "measurement_aliases": {
+    "SpO2": ["Oxygen saturation", "O2 saturation"],
+    "Respiratory rate": ["RR"],
+    "Heart rate": ["HR", "Pulse"],
+    "FEV1": ["Forced expiratory volume in 1 second"],
+    "FEV1/FVC": ["FEV1/FVC ratio"],
+    "DLCO": ["Diffusing capacity", "DLCO % predicted"],
+    "Serum VEGF-D": ["VEGF-D", "Vascular endothelial growth factor D"]
+  },
+  "negated": ["hemoptysis", "fever", "weight loss", "clubbing", "known drug allergies"],
+  "traps": ["number_in_words", "negation", "abbreviation", "unit_variant", "distractor_history"]
+}

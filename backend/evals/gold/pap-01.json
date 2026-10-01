@@ -1,0 +1,54 @@
+{
+  "case_id": "pap-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 45, "sex": "male"},
+    "chief_complaint": "Progressive breathlessness and abnormal CT",
+    "findings": [
+      {"category": "symptom", "text": "Gradually worsening shortness of breath for about 1 year", "evidence": "gradually worsening shortness of breath over about one year"},
+      {"category": "symptom", "text": "Breathless walking uphill or carrying shopping", "evidence": "he now becomes breathless walking uphill or carrying shopping"},
+      {"category": "symptom", "text": "Mild cough with small amounts of whitish sputum", "evidence": "a mild cough productive of small amounts of whitish sputum"},
+      {"category": "symptom", "text": "Increasing fatigue", "evidence": "increasing fatigue"},
+      {"category": "history", "text": "Two courses of antibiotics without improvement", "evidence": "Two courses of antibiotics from his primary care physician made no difference"},
+      {"category": "history", "text": "Hypertension for 6 years", "evidence": "hypertension for 6 years"},
+      {"category": "medication", "text": "Amlodipine 5 mg daily", "evidence": "amlodipine 5 mg daily"},
+      {"category": "history", "text": "Laparoscopic appendectomy in 2015", "evidence": "Laparoscopic appendectomy in 2015"},
+      {"category": "social", "text": "Ex-smoker, 20 pack-years, quit 2 years ago", "evidence": "ex-smoker, 20 pack-years, quit 2 years ago"},
+      {"category": "social", "text": "Works as a logistics manager", "evidence": "works as a logistics manager"},
+      {"category": "exam", "text": "Sparse fine inspiratory crackles at both bases", "evidence": "Sparse fine inspiratory crackles at both bases"},
+      {"category": "imaging", "text": "HRCT: bilateral geographic ground-glass opacities with septal thickening (crazy-paving pattern)", "evidence": "bilateral geographic ground-glass opacities with superimposed interlobular septal thickening (crazy-paving pattern)"},
+      {"category": "imaging", "text": "Echocardiography: normal left ventricular size and systolic function", "evidence": "Echocardiography: normal left ventricular size and systolic function"},
+      {"category": "procedure", "text": "Bronchoalveolar lavage returned milky, opaque fluid", "evidence": "BAL returned milky, opaque fluid"},
+      {"category": "procedure", "text": "Lavage cytology: abundant PAS-positive acellular proteinaceous material", "evidence": "abundant PAS-positive, acellular proteinaceous material"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "SpO2", "value": 89, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 89% on room air at rest"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 20, "value_text": null, "unit": "/min", "flag": null, "evidence": "RR 20/min"},
+      {"kind": "vital", "name": "Heart rate", "value": 92, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 92 bpm"},
+      {"kind": "lab", "name": "PaO2", "value": 58, "value_text": null, "unit": "mmHg", "flag": null, "evidence": "ABG on room air: PaO2 58 mmHg"},
+      {"kind": "lab", "name": "LDH", "value": 412, "value_text": null, "unit": "U/L", "flag": "high", "evidence": "LDH 412 U/L (elevated)"},
+      {"kind": "lab", "name": "HIV antigen/antibody test", "value": null, "value_text": "negative", "unit": null, "flag": null, "evidence": "HIV antigen/antibody test negative"},
+      {"kind": "lab", "name": "FVC", "value": 84, "value_text": null, "unit": "% predicted", "flag": null, "evidence": "FVC 84% predicted"},
+      {"kind": "lab", "name": "DLCO", "value": 52, "value_text": null, "unit": "% predicted", "flag": null, "evidence": "DLCO 52% predicted"},
+      {"kind": "lab", "name": "Serum anti-GM-CSF autoantibodies", "value": 85, "value_text": null, "unit": "µg/mL", "flag": "high", "evidence": "Serum anti-GM-CSF autoantibodies 85 µg/mL (elevated)"}
+    ],
+    "final_diagnosis": {"name": "Pulmonary alveolar proteinosis", "icd10": "J84.01", "evidence": "autoimmune pulmonary alveolar proteinosis (aPAP)"},
+    "differential": [
+      {"name": "Pneumocystis pneumonia", "icd10": "B59", "evidence": "Pneumocystis pneumonia was considered"},
+      {"name": "Cardiogenic pulmonary edema", "icd10": null, "evidence": "Cardiogenic pulmonary edema is unlikely"}
+    ]
+  },
+  "diagnosis_aliases": ["PAP", "aPAP", "Autoimmune pulmonary alveolar proteinosis", "Autoimmune PAP", "Alveolar proteinosis", "Pulmonary alveolar lipoproteinosis"],
+  "measurement_aliases": {
+    "SpO2": ["Oxygen saturation", "O2 saturation", "SpO2 on room air"],
+    "Respiratory rate": ["RR"],
+    "Heart rate": ["HR", "Pulse"],
+    "PaO2": ["Arterial PaO2", "Partial pressure of oxygen", "PaO2 on room air", "ABG PaO2"],
+    "LDH": ["Lactate dehydrogenase", "Serum LDH"],
+    "HIV antigen/antibody test": ["HIV test", "HIV", "HIV serology", "HIV-1/2 antigen/antibody"],
+    "FVC": ["Forced vital capacity", "FVC % predicted"],
+    "DLCO": ["Diffusing capacity", "DLCO % predicted", "TLCO", "Transfer factor"],
+    "Serum anti-GM-CSF autoantibodies": ["Anti-GM-CSF antibodies", "Anti-GM-CSF autoantibodies", "Anti-GM-CSF antibody", "GM-CSF autoantibodies", "Serum anti-GM-CSF antibodies"]
+  },
+  "negated": ["fever", "lost weight", "hemoptysis", "immunosuppression", "occupational dust exposure", "clubbing", "ankle edema"],
+  "traps": ["number_in_words", "negation", "abbreviation", "unit_variant", "distractor_history"]
+}

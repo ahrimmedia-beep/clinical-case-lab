@@ -1,0 +1,13 @@
+# Gold set v1: synthetic case reports written for this repo (no real patients), CC BY 4.0.
+# Eight cases and no dev/test split: the set is too small to hold cases out, so every case is
+# scored and reported. Prompts must not be tuned against individual gold cases.
+version: 1
+cases:
+  - {id: pe-01, diagnosis: Pulmonary embolism}
+  - {id: lam-01, diagnosis: Lymphangioleiomyomatosis}
+  - {id: abpa-01, diagnosis: Allergic bronchopulmonary aspergillosis}
+  - {id: aatd-01, diagnosis: Alpha-1 antitrypsin deficiency}
+  - {id: pap-01, diagnosis: Pulmonary alveolar proteinosis}
+  - {id: sarc-01, diagnosis: Sarcoidosis}
+  - {id: ptx-01, diagnosis: Primary spontaneous pneumothorax}
+  - {id: cap-01, diagnosis: Community-acquired pneumonia}

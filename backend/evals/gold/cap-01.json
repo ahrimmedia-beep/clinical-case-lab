@@ -1,0 +1,53 @@
+{
+  "case_id": "cap-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 67, "sex": "male"},
+    "chief_complaint": "Fever, productive cough and left-sided chest pain",
+    "findings": [
+      {"category": "symptom", "text": "Fever for 3 days", "evidence": "3 days of fever"},
+      {"category": "symptom", "text": "Productive cough with rusty sputum", "evidence": "a productive cough with rusty sputum"},
+      {"category": "symptom", "text": "Sharp left-sided pleuritic chest pain since yesterday", "evidence": "sharp left-sided chest pain that is worse when he breathes in"},
+      {"category": "history", "text": "Type 2 diabetes diagnosed in 2014", "evidence": "type 2 diabetes, diagnosed in 2014"},
+      {"category": "history", "text": "Right total knee replacement in 2019", "evidence": "Right total knee replacement in 2019"},
+      {"category": "medication", "text": "Metformin 1 g twice daily", "evidence": "metformin 1 g twice daily"},
+      {"category": "social", "text": "Retired bus driver", "evidence": "retired bus driver"},
+      {"category": "social", "text": "Ex-smoker, 30 pack-years, quit in 2016", "evidence": "Ex-smoker of 30 pack-years, quit in 2016"},
+      {"category": "exam", "text": "Dull to percussion at the left base", "evidence": "Dull to percussion at the left base"},
+      {"category": "exam", "text": "Bronchial breathing over the left lower zone", "evidence": "Bronchial breathing is heard over the left lower zone"},
+      {"category": "exam", "text": "Coarse crackles at the left base", "evidence": "coarse crackles at the left base"},
+      {"category": "imaging", "text": "Chest X-ray: left lower lobe consolidation with air bronchograms", "evidence": "CXR shows left lower lobe consolidation with air bronchograms"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "Temperature", "value": 38.9, "value_text": null, "unit": "°C", "flag": null, "evidence": "T 38.9 °C"},
+      {"kind": "vital", "name": "Heart rate", "value": 108, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 108 bpm"},
+      {"kind": "vital", "name": "Blood pressure", "value": null, "value_text": "104/62", "unit": "mmHg", "flag": null, "evidence": "BP 104/62 mmHg"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 26, "value_text": null, "unit": "breaths per minute", "flag": null, "evidence": "respiratory rate of twenty-six breaths per minute"},
+      {"kind": "vital", "name": "SpO2", "value": 90, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 90% on RA"},
+      {"kind": "lab", "name": "WBC", "value": 14200, "value_text": null, "unit": "/µL", "flag": "high", "evidence": "WBC 14,200/µL (H)"},
+      {"kind": "lab", "name": "CRP", "value": 186, "value_text": null, "unit": "mg/L", "flag": null, "evidence": "CRP 186 mg/L"},
+      {"kind": "lab", "name": "Procalcitonin", "value": 2.1, "value_text": null, "unit": "ng/mL", "flag": null, "evidence": "Procalcitonin 2.1 ng/mL"},
+      {"kind": "lab", "name": "Urea", "value": 8.4, "value_text": null, "unit": "mmol/L", "flag": "high", "evidence": "Urea 8.4 mmol/L"},
+      {"kind": "lab", "name": "Glucose", "value": 11.2, "value_text": null, "unit": "mmol/L", "flag": null, "evidence": "Glucose 11.2 mmol/L"}
+    ],
+    "final_diagnosis": {"name": "Community-acquired pneumonia", "icd10": "J18.9", "evidence": "community-acquired pneumonia of the left lower lobe"},
+    "differential": [
+      {"name": "Pulmonary embolism", "icd10": "I26.99", "evidence": "Pulmonary embolism is considered unlikely"},
+      {"name": "Lung cancer", "icd10": "C34.90", "evidence": "an underlying lung cancer cannot be excluded"}
+    ]
+  },
+  "diagnosis_aliases": ["CAP", "Pneumonia", "Left lower lobe pneumonia", "Lobar pneumonia", "Community-acquired pneumonia of the left lower lobe"],
+  "measurement_aliases": {
+    "Temperature": ["T", "Body temperature"],
+    "Heart rate": ["HR", "Pulse"],
+    "Blood pressure": ["BP"],
+    "Respiratory rate": ["RR"],
+    "SpO2": ["Oxygen saturation", "O2 saturation", "SpO2 on room air"],
+    "WBC": ["White blood cell count", "White cell count", "Leukocyte count", "WCC"],
+    "CRP": ["C-reactive protein"],
+    "Procalcitonin": ["PCT"],
+    "Urea": ["Serum urea", "Blood urea"],
+    "Glucose": ["Blood glucose", "Plasma glucose", "Serum glucose"]
+  },
+  "negated": ["hemoptysis", "recent travel", "leg swelling", "known drug allergies", "confusion", "calf tenderness", "pleural effusion"],
+  "traps": ["phi", "negation", "abbreviation", "unit_variant", "number_in_words", "distractor_history"]
+}

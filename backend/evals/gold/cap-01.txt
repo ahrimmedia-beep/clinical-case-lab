@@ -1,0 +1,21 @@
+EMERGENCY DEPARTMENT NOTE - 11/02/2026
+Attending: Dr. A. Brennan
+MRN: 5582-1037
+
+CC: fever, productive cough and L-sided chest pain.
+
+HPI: 67 y/o M with 3 days of fever and a productive cough with rusty sputum. Since yesterday he has had sharp left-sided chest pain that is worse when he breathes in. He denies hemoptysis and has had no recent travel. He has no leg swelling.
+
+PMH: type 2 diabetes, diagnosed in 2014. Right total knee replacement in 2019, fully recovered.
+Medications: metformin 1 g twice daily. No known drug allergies.
+Social: retired bus driver. Ex-smoker of 30 pack-years, quit in 2016.
+
+Exam: T 38.9 °C, HR 108 bpm, BP 104/62 mmHg, respiratory rate of twenty-six breaths per minute, SpO2 90% on RA. There is no confusion. Dull to percussion at the left base. Bronchial breathing is heard over the left lower zone, with coarse crackles at the left base. No calf tenderness.
+
+Labs: WBC 14,200/µL (H). CRP 186 mg/L. Procalcitonin 2.1 ng/mL. Urea 8.4 mmol/L. Glucose 11.2 mmol/L.
+
+Imaging: CXR shows left lower lobe consolidation with air bronchograms and no pleural effusion.
+
+Assessment: community-acquired pneumonia of the left lower lobe, moderate severity (age over 65 and raised urea). Pulmonary embolism is considered unlikely given the focal consolidation and no leg swelling. Given his smoking history, an underlying lung cancer cannot be excluded until the consolidation has cleared.
+
+Plan: admit to the medical ward; supplemental oxygen; IV ceftriaxone plus azithromycin; blood and sputum cultures, urinary pneumococcal and Legionella antigens; hold metformin while acutely unwell; repeat chest X-ray in 6 weeks.

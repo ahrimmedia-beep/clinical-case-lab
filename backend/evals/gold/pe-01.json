@@ -1,0 +1,46 @@
+{
+  "case_id": "pe-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 34, "sex": "female"},
+    "chief_complaint": "Sudden shortness of breath and right-sided chest pain",
+    "findings": [
+      {"category": "symptom", "text": "Sudden-onset shortness of breath since this morning", "evidence": "sudden-onset shortness of breath that began this morning"},
+      {"category": "symptom", "text": "Sharp right-sided pleuritic chest pain", "evidence": "sharp right-sided chest pain that is worse on deep inspiration"},
+      {"category": "history", "text": "14-hour flight the day before", "evidence": "returned yesterday from a 14-hour flight"},
+      {"category": "history", "text": "Appendectomy at age 12", "evidence": "Appendectomy at age 12"},
+      {"category": "medication", "text": "Combined oral contraceptive pill", "evidence": "takes a combined oral contraceptive pill"},
+      {"category": "social", "text": "Drinks wine socially", "evidence": "drinks wine socially"},
+      {"category": "social", "text": "Nonsmoker", "evidence": "nonsmoker"},
+      {"category": "exam", "text": "Anxious and mildly tachypneic", "evidence": "Anxious, mildly tachypneic"},
+      {"category": "exam", "text": "Swollen, tender left calf", "evidence": "The left calf is swollen and tender"},
+      {"category": "imaging", "text": "CT pulmonary angiography: filling defect in right lower lobe segmental pulmonary arteries", "evidence": "CTPA shows a filling defect in the right lower lobe segmental pulmonary arteries"},
+      {"category": "imaging", "text": "Compression ultrasound: non-compressible left popliteal vein", "evidence": "Compression ultrasound: non-compressible left popliteal vein"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "Heart rate", "value": 112, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 112 bpm"},
+      {"kind": "vital", "name": "Blood pressure", "value": null, "value_text": "128/76", "unit": "mmHg", "flag": null, "evidence": "BP 128/76 mmHg"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 24, "value_text": null, "unit": "/min", "flag": null, "evidence": "RR 24/min"},
+      {"kind": "vital", "name": "Temperature", "value": 37.1, "value_text": null, "unit": "°C", "flag": null, "evidence": "T 37.1 °C"},
+      {"kind": "vital", "name": "SpO2", "value": 91, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 91% on RA"},
+      {"kind": "lab", "name": "D-dimer", "value": 2400, "value_text": null, "unit": "ng/mL FEU", "flag": "high", "evidence": "D-dimer 2,400 ng/mL FEU"},
+      {"kind": "lab", "name": "Troponin I", "value": null, "value_text": "< 0.01", "unit": "ng/mL", "flag": "normal", "evidence": "Troponin I < 0.01 ng/mL"}
+    ],
+    "final_diagnosis": {"name": "Pulmonary embolism", "icd10": "I26.99", "evidence": "acute pulmonary embolism"},
+    "differential": [
+      {"name": "Pneumothorax", "icd10": "J93.9", "evidence": "Pneumothorax was excluded on chest X-ray"},
+      {"name": "Acute coronary syndrome", "icd10": "I24.9", "evidence": "Acute coronary syndrome felt unlikely"}
+    ]
+  },
+  "diagnosis_aliases": ["PE", "Acute pulmonary embolism", "Pulmonary thromboembolism", "Provoked pulmonary embolism"],
+  "measurement_aliases": {
+    "Heart rate": ["HR", "Pulse"],
+    "Blood pressure": ["BP"],
+    "Respiratory rate": ["RR"],
+    "Temperature": ["T", "Body temperature"],
+    "SpO2": ["Oxygen saturation", "O2 saturation", "SpO2 on room air"],
+    "D-dimer": ["D dimer"],
+    "Troponin I": ["Troponin", "TnI"]
+  },
+  "negated": ["hemoptysis", "fever", "recent trauma", "prior VTE"],
+  "traps": ["phi", "negation", "abbreviation", "unit_variant", "distractor_history"]
+}

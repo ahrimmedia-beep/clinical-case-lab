@@ -1,0 +1,48 @@
+{
+  "case_id": "abpa-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 41, "sex": "male"},
+    "chief_complaint": "Deteriorating asthma control with productive cough",
+    "findings": [
+      {"category": "history", "text": "Asthma since childhood", "evidence": "long-standing asthma, diagnosed in childhood"},
+      {"category": "symptom", "text": "Asthma control deteriorating over 6 months despite high-dose inhaled therapy", "evidence": "control has deteriorated over the last 6 months"},
+      {"category": "medication", "text": "Budesonide/formoterol 400/12 mcg two puffs twice daily", "evidence": "budesonide/formoterol 400/12 mcg, two puffs twice daily"},
+      {"category": "symptom", "text": "Increasing wheeze", "evidence": "increasing wheeze"},
+      {"category": "symptom", "text": "Productive cough with brownish mucus plugs", "evidence": "a productive cough with brownish mucus plugs"},
+      {"category": "history", "text": "Two courses of oral prednisolone since January", "evidence": "two courses of oral prednisolone since January"},
+      {"category": "history", "text": "Fractured left wrist in 2019", "evidence": "He fractured his left wrist in 2019"},
+      {"category": "social", "text": "Works as a greenhouse gardener", "evidence": "works as a greenhouse gardener"},
+      {"category": "social", "text": "Ex-smoker, 5 pack-years, quit 15 years ago", "evidence": "Ex-smoker, 5 pack-years, quit 15 years ago"},
+      {"category": "exam", "text": "Scattered expiratory wheeze", "evidence": "scattered expiratory wheeze"},
+      {"category": "imaging", "text": "HRCT: central bronchiectasis in both upper lobes with high-attenuation mucus plugging", "evidence": "central bronchiectasis in both upper lobes with high-attenuation mucus plugging"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "SpO2", "value": 96, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 96% on air"},
+      {"kind": "vital", "name": "Respiratory rate", "value": 16, "value_text": null, "unit": null, "flag": null, "evidence": "respiratory rate 16"},
+      {"kind": "lab", "name": "Blood eosinophils", "value": 1.2, "value_text": null, "unit": "x10^9/L", "flag": "high", "evidence": "blood eosinophils 1.2 x10^9/L (high)"},
+      {"kind": "lab", "name": "Total serum IgE", "value": 2850, "value_text": null, "unit": "IU/mL", "flag": null, "evidence": "Total serum IgE 2,850 IU/mL"},
+      {"kind": "lab", "name": "Aspergillus fumigatus-specific IgE", "value": 18.4, "value_text": null, "unit": "kUA/L", "flag": null, "evidence": "Aspergillus fumigatus-specific IgE 18.4 kUA/L"},
+      {"kind": "lab", "name": "Aspergillus precipitins (IgG)", "value": null, "value_text": "positive", "unit": null, "flag": "abnormal", "evidence": "Aspergillus precipitins (IgG) positive"},
+      {"kind": "lab", "name": "FEV1", "value": 2.1, "value_text": null, "unit": "L", "flag": null, "evidence": "FEV1 2.1 L"},
+      {"kind": "lab", "name": "FEV1/FVC", "value": 0.58, "value_text": null, "unit": null, "flag": null, "evidence": "FEV1/FVC 0.58"}
+    ],
+    "final_diagnosis": {"name": "Allergic bronchopulmonary aspergillosis", "icd10": "B44.81", "evidence": "allergic bronchopulmonary aspergillosis (ABPA) complicating asthma"},
+    "differential": [
+      {"name": "Eosinophilic granulomatosis with polyangiitis", "icd10": "M30.1", "evidence": "Eosinophilic granulomatosis with polyangiitis was considered"},
+      {"name": "Chronic pulmonary aspergillosis", "icd10": null, "evidence": "Chronic pulmonary aspergillosis is unlikely"}
+    ]
+  },
+  "diagnosis_aliases": ["ABPA", "Allergic bronchopulmonary aspergillosis complicating asthma"],
+  "measurement_aliases": {
+    "SpO2": ["Oxygen saturation", "O2 saturation"],
+    "Respiratory rate": ["RR"],
+    "Blood eosinophils": ["Eosinophils", "Eosinophil count", "Absolute eosinophil count"],
+    "Total serum IgE": ["Total IgE", "Serum IgE", "IgE"],
+    "Aspergillus fumigatus-specific IgE": ["A. fumigatus specific IgE", "Specific IgE to Aspergillus fumigatus", "Aspergillus-specific IgE"],
+    "Aspergillus precipitins (IgG)": ["Aspergillus precipitins", "Aspergillus IgG"],
+    "FEV1": ["Forced expiratory volume in 1 second"],
+    "FEV1/FVC": ["FEV1/FVC ratio"]
+  },
+  "negated": ["hemoptysis", "night sweats", "vasculitic rash", "neuropathy", "renal involvement", "cavities"],
+  "traps": ["phi", "negation", "abbreviation", "unit_variant", "distractor_history"]
+}

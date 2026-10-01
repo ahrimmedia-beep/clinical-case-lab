@@ -1,0 +1,17 @@
+EMERGENCY DEPARTMENT NOTE - 09/18/2026
+Patient: Ethan Brooks
+MRN: 7720-4418
+
+CC: L chest pain and SOB.
+
+HPI: A twenty-two-year-old man presents 3 hours after sudden, sharp left-sided chest pain that started while he was sitting at his desk. The pain is worse on deep breathing. He has mild shortness of breath. He denies trauma, hemoptysis or fever. No previous pneumothorax. He sprained his right ankle playing soccer last month; it was strapped and he has remained fully mobile.
+
+Social: smokes about 10 cigarettes a day and cannabis at weekends; computer science student.
+
+Exam: tall, thin young man. HR 96 bpm, RR 20/min, BP 122/70 mmHg, T 98.4 °F, sats 95% on air. Reduced breath sounds over the left hemithorax, which is hyper-resonant to percussion. No tracheal deviation. No calf swelling or tenderness.
+
+Imaging: CXR shows a large left pneumothorax with a 3.5 cm rim of air at the level of the hilum, without mediastinal shift. No underlying lung abnormality is seen.
+
+Assessment: left primary spontaneous pneumothorax, first episode, symptomatic but hemodynamically stable. A rim of more than 2 cm at the hilum makes it large by size criteria, but management is guided mainly by his symptoms. Pulmonary embolism was considered because of the recent ankle injury, but the chest X-ray explains his symptoms. Pericarditis is unlikely as the pain is not positional and there is no pericardial rub.
+
+Plan: needle aspiration with analgesia, then repeat chest X-ray after 4 hours; if unsuccessful, small-bore chest drain and admission. Smoking cessation advice; no air travel until at least 1 week after radiological resolution; avoid diving for life unless he has definitive surgery.

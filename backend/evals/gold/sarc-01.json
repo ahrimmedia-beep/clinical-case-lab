@@ -1,0 +1,49 @@
+{
+  "case_id": "sarc-01",
+  "facts": {
+    "patient": {"display_name": null, "age_years": 36, "sex": "female"},
+    "chief_complaint": "Persistent cough and abnormal chest CT",
+    "findings": [
+      {"category": "symptom", "text": "Dry cough for 4 months", "evidence": "a dry cough for 4 months"},
+      {"category": "symptom", "text": "Exertional dyspnea, stops on the second flight of stairs", "evidence": "exertional dyspnea that now stops her on the second flight of stairs"},
+      {"category": "symptom", "text": "Painful red lumps on both shins for 3 weeks", "evidence": "she noticed painful red lumps on both shins"},
+      {"category": "symptom", "text": "Pain in both ankles, walking difficult in the morning", "evidence": "pain in both ankles that makes walking difficult in the morning"},
+      {"category": "history", "text": "Hypothyroidism (Hashimoto thyroiditis) diagnosed in 2018", "evidence": "hypothyroidism (Hashimoto thyroiditis) diagnosed in 2018"},
+      {"category": "medication", "text": "Levothyroxine 75 mcg daily", "evidence": "levothyroxine 75 mcg daily"},
+      {"category": "history", "text": "Tonsillectomy in childhood", "evidence": "Tonsillectomy in childhood"},
+      {"category": "social", "text": "Lifelong never-smoker", "evidence": "lifelong never-smoker"},
+      {"category": "social", "text": "Works as a librarian", "evidence": "works as a librarian"},
+      {"category": "exam", "text": "Tender erythematous nodules on the front of both shins", "evidence": "Tender erythematous nodules on the anterior aspect of both shins"},
+      {"category": "exam", "text": "Periarticular swelling and tenderness of both ankles", "evidence": "Periarticular swelling and tenderness of both ankles"},
+      {"category": "imaging", "text": "CT chest: bilateral hilar and mediastinal lymphadenopathy", "evidence": "CT chest: bilateral hilar and mediastinal lymphadenopathy"},
+      {"category": "imaging", "text": "CT chest: perilymphatic nodules along bronchovascular bundles in both upper lobes", "evidence": "perilymphatic nodules along the bronchovascular bundles in both upper lobes"},
+      {"category": "procedure", "text": "EBUS-TBNA of subcarinal and right hilar nodes: non-caseating epithelioid granulomas", "evidence": "EBUS-TBNA of the subcarinal and right hilar nodes showed non-caseating epithelioid granulomas"}
+    ],
+    "measurements": [
+      {"kind": "vital", "name": "SpO2", "value": 97, "value_text": null, "unit": "%", "flag": null, "evidence": "SpO2 97% on room air"},
+      {"kind": "vital", "name": "Heart rate", "value": 76, "value_text": null, "unit": "bpm", "flag": null, "evidence": "HR 76 bpm"},
+      {"kind": "lab", "name": "Serum ACE", "value": 98, "value_text": null, "unit": "U/L", "flag": "high", "evidence": "Serum ACE 98 U/L (raised)"},
+      {"kind": "lab", "name": "Adjusted calcium", "value": 2.71, "value_text": null, "unit": "mmol/L", "flag": "high", "evidence": "Adjusted calcium 2.71 mmol/L (high)"},
+      {"kind": "lab", "name": "FVC", "value": 78, "value_text": null, "unit": "% predicted", "flag": null, "evidence": "FVC 78% predicted"},
+      {"kind": "lab", "name": "DLCO", "value": 69, "value_text": null, "unit": "% predicted", "flag": null, "evidence": "DLCO 69% predicted"},
+      {"kind": "lab", "name": "IGRA", "value": null, "value_text": "negative", "unit": null, "flag": null, "evidence": "IGRA negative"}
+    ],
+    "final_diagnosis": {"name": "Sarcoidosis", "icd10": "D86.2", "evidence": "sarcoidosis, Scadding stage II, presenting as Löfgren syndrome"},
+    "differential": [
+      {"name": "Tuberculosis", "icd10": "A15.9", "evidence": "Tuberculosis is unlikely with a negative IGRA"},
+      {"name": "Lymphoma", "icd10": null, "evidence": "Lymphoma was considered because of the nodal enlargement"}
+    ]
+  },
+  "diagnosis_aliases": ["Pulmonary sarcoidosis", "Löfgren syndrome", "Sarcoid", "Stage II sarcoidosis", "Sarcoidosis of lung with sarcoidosis of lymph nodes", "Sarcoidosis presenting as Löfgren syndrome"],
+  "measurement_aliases": {
+    "SpO2": ["Oxygen saturation", "O2 saturation"],
+    "Heart rate": ["HR", "Pulse"],
+    "Serum ACE": ["ACE", "Angiotensin-converting enzyme", "Serum angiotensin-converting enzyme"],
+    "Adjusted calcium": ["Calcium", "Serum calcium", "Corrected calcium"],
+    "FVC": ["Forced vital capacity", "FVC % predicted"],
+    "DLCO": ["Diffusing capacity", "DLCO % predicted", "TLCO", "Transfer factor"],
+    "IGRA": ["Interferon-gamma release assay", "QuantiFERON", "QuantiFERON-TB Gold"]
+  },
+  "negated": ["night sweats", "weight loss", "fever", "visual symptoms", "palpitations", "TB contacts", "exposure to birds", "crackles", "peripheral lymphadenopathy", "malignant cells"],
+  "traps": ["negation", "abbreviation", "unit_variant", "distractor_history"]
+}

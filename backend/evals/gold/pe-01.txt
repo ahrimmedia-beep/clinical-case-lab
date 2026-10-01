@@ -1,0 +1,18 @@
+EMERGENCY DEPARTMENT NOTE - 03/14/2026
+Patient: Dana Whitfield    MRN: 4471-2290    Contact: (617) 555-0142
+
+CC: sudden SOB and right-sided chest pain.
+
+HPI: 34 y/o F presenting with sudden-onset shortness of breath that began this morning, with sharp right-sided chest pain that is worse on deep inspiration. She returned yesterday from a 14-hour flight from Singapore. She takes a combined oral contraceptive pill. She denies hemoptysis, fever or recent trauma. No prior VTE. Appendectomy at age 12.
+
+Social: drinks wine socially; nonsmoker.
+
+Exam: HR 112 bpm, BP 128/76 mmHg, RR 24/min, T 37.1 °C, SpO2 91% on RA. Anxious, mildly tachypneic. The left calf is swollen and tender.
+
+Labs: D-dimer 2,400 ng/mL FEU (ref < 500). Troponin I < 0.01 ng/mL.
+
+Imaging: CTPA shows a filling defect in the right lower lobe segmental pulmonary arteries. Compression ultrasound: non-compressible left popliteal vein.
+
+Assessment: acute pulmonary embolism, hemodynamically stable, provoked by long-haul travel and estrogen. Pneumothorax was excluded on chest X-ray. Acute coronary syndrome felt unlikely given the normal troponin.
+
+Plan: apixaban; stop the combined oral contraceptive pill.

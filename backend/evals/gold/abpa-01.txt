@@ -1,0 +1,16 @@
+Respiratory clinic letter
+
+Dear Dr. Okafor,
+
+Thank you for referring this 41-year-old man with long-standing asthma, diagnosed in childhood, whose control has deteriorated over the last 6 months despite high-dose ICS/LABA (budesonide/formoterol 400/12 mcg, two puffs twice daily). He describes increasing wheeze and a productive cough with brownish mucus plugs, and he has needed two courses of oral prednisolone since January. He has had no hemoptysis and no night sweats. He fractured his left wrist in 2019. He works as a greenhouse gardener. Ex-smoker, 5 pack-years, quit 15 years ago.
+
+On examination there was scattered expiratory wheeze. SpO2 96% on air, respiratory rate 16.
+
+Investigations: blood eosinophils 1.2 x10^9/L (high). Total serum IgE 2,850 IU/mL. Aspergillus fumigatus-specific IgE 18.4 kUA/L. Aspergillus precipitins (IgG) positive. Spirometry: FEV1 2.1 L, FEV1/FVC 0.58. HRCT: central bronchiectasis in both upper lobes with high-attenuation mucus plugging.
+
+Impression: allergic bronchopulmonary aspergillosis (ABPA) complicating asthma. Eosinophilic granulomatosis with polyangiitis was considered, but there is no vasculitic rash, neuropathy or renal involvement. Chronic pulmonary aspergillosis is unlikely without cavities on CT.
+
+Plan: oral prednisolone 0.5 mg/kg for two weeks, then taper; itraconazole if he relapses; repeat total IgE in 8 weeks.
+
+Kind regards,
+Dr. M. Lindqvist, Consultant Respiratory Physician

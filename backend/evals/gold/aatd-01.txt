@@ -1,0 +1,21 @@
+Respiratory clinic letter
+
+Date: 09/24/2026
+Re: Mrs. Helen Marsh, DOB 07/22/1982, MRN 3390-1184
+
+Dear Dr. Patel,
+
+Thank you for referring this 44-year-old woman with progressive breathlessness over 3 years. She can now walk only about 100 yards on the flat before stopping. She has a morning cough productive of clear sputum. She denies hemoptysis and ankle swelling. She uses a salbutamol inhaler as needed, with little benefit.
+
+She is a former smoker of ten pack-years who quit 8 years ago, and she works as a school administrator. Raised liver enzymes were noted on routine blood tests in 2021 and were not investigated further. Her only other history is a right carpal tunnel release in 2020. The family history is striking: her brother was diagnosed with liver cirrhosis in his forties despite drinking very little, and her father died of emphysema at 52.
+
+On examination her chest was hyperinflated, with reduced breath sounds at both bases. SpO2 95% on air.
+
+Investigations: post-bronchodilator FEV1 1.4 L, FEV1/FVC 0.48, TLCO 55% predicted. CT chest shows panlobular emphysema, predominantly in the lower lobes. Serum alpha-1 antitrypsin 25 mg/dL (low; reference 90-200). Genotyping confirmed PiZZ. ALT 58 U/L (raised).
+
+Impression: severe alpha-1 antitrypsin deficiency (PiZZ) with lower-lobe panlobular emphysema. Smoking-related COPD alone would be unusual with only ten pack-years and this distribution. Asthma was considered, but she has no history of atopy and the obstruction persists after bronchodilator.
+
+Plan: refer to the regional AATD centre to discuss augmentation therapy; start a LAMA/LABA inhaler; influenza and pneumococcal vaccination; liver ultrasound and elastography; offer testing to her siblings and children.
+
+Yours sincerely,
+Dr. R. Castellanos, Consultant Respiratory Physician
