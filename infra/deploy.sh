@@ -253,7 +253,7 @@ deploy_api() {
     --service-account="$API_SA" --add-cloudsql-instances="$SQL_CONNECTION" \
     --env-vars-file="$TMP_DIR/api.env.yaml" --set-secrets="$secrets" \
     --allow-unauthenticated --port=8080 --cpu=1 --memory=1Gi --concurrency=80 \
-    --min-instances="$MIN_INSTANCES" --max-instances=3 --cpu-boost --timeout=300 \
+    --min-instances="$MIN_INSTANCES" --max-instances=1 --cpu-boost --timeout=300 \
     --startup-probe="httpGet.path=/readyz,httpGet.port=8080,initialDelaySeconds=0,periodSeconds=5,timeoutSeconds=4,failureThreshold=24" \
     --liveness-probe="httpGet.path=/healthz,httpGet.port=8080,periodSeconds=30,timeoutSeconds=5,failureThreshold=3"
   ensure_public "$API_SERVICE" /healthz
