@@ -13,10 +13,18 @@ export const metadata: Metadata = {
   description: "Clinical cases end to end: LLM extraction with verbatim evidence, a case player with server-side scoring, debrief and percentile.",
 };
 
+/* Runs before first paint: arms the motion gate in globals.css, and disarms it after 2.5 s whatever
+   happens, so a failed bundle can never leave content hidden. */
+const MOTION_GATE = `(function(d){d.setAttribute("data-motion-pending","");setTimeout(function(){d.removeAttribute("data-motion-pending")},2500)})(document.documentElement)`;
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   await connection(); // env is read per request, never baked in at build time
   return (
-    <html lang="en" className={`${poppins.variable} ${plexMono.variable}`}>
+    // suppressHydrationWarning: the inline gate script adds an attribute to <html> before hydration.
+    <html lang="en" className={`${poppins.variable} ${plexMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: MOTION_GATE }} />
+      </head>
       <body className="flex min-h-dvh flex-col bg-surface font-sans text-copy text-body antialiased">
         <a
           href="#main"

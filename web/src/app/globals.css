@@ -99,6 +99,22 @@
   }
 }
 
+/* Motion gate (components/motion/gsap.ts). While JS is running and a motion root has not set its
+   GSAP start states yet, its animated parts stay hidden, so they never flash visible → hidden →
+   animated. `data-motion-pending` is set by an inline script in the root layout and removed by a
+   2.5 s failsafe, so without JS, or if the bundle fails, everything simply shows. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion-pending] [data-motion]:not([data-motion-ready])
+    :is([data-reveal], [data-intro], [data-bar], [data-count], [data-flow-step], [data-flow-node], [data-flow-line]) {
+    visibility: hidden;
+  }
+}
+@media print {
+  :is([data-reveal], [data-intro], [data-bar], [data-count], [data-flow-step], [data-flow-node], [data-flow-line]) {
+    opacity: 1 !important; visibility: visible !important; transform: none !important;
+  }
+}
+
 /* brand gradient helpers */
 @utility bg-brand-grad { background-image: linear-gradient(135deg, #D8B4C8 0%, #03A696 100%); }
 @utility bg-hero-grad {
