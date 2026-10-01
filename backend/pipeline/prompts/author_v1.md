@@ -21,6 +21,6 @@ Decision rules:
 - `prompt` is the question shown to the physician. `explanation` is 2 to 4 sentences shown in the debrief that teach the reasoning behind the correct options.
 - `accepted_answers` is an empty list on every stage except diagnosis.
 
-No spoilers (hard rule, checked by code): the final diagnosis, its synonyms and its abbreviations must not appear in `title`, `vignette`, `chief_complaint` or any decision `prompt`. Describe the presentation instead.
+No spoilers (hard rule, checked by code): the final diagnosis, its synonyms and its abbreviations must not appear in `title`, `vignette`, `chief_complaint`, any decision `prompt`, or any interview or workup `reveal` (the player sees reveals before the diagnosis stage). Describe the presentation or the raw result instead, for example "Thin-walled cysts throughout both lungs" rather than the disease name.
 
 Return only the JSON object.
