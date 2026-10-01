@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import copy
 import json
 import re
+import string
 from pathlib import Path
+from typing import Any
 
 import httpx
 import pytest
@@ -17,6 +20,7 @@ from seeds import load as seed_load
 from seeds.simulate_cohort import case_rng, seed_slugs, simulate_attempt
 
 SEED_FILES = seed_load.seed_files()
+KEYS = string.ascii_uppercase
 
 
 def load(path: Path) -> ClinicalCase:
@@ -28,9 +32,33 @@ def test_three_seed_cases_exist_and_the_hero_loads_last() -> None:
     assert [p.name for p in SEED_FILES] == ["01-pe.json", "02-aatd.json", "03-lam.json"]
 
 
-def test_pe_seed_is_the_foundation_fixture() -> None:
-    fixture = Path(__file__).parent / "fixtures" / "case_pe.json"
-    assert json.loads(SEED_FILES[0].read_text()) == json.loads(fixture.read_text())
+def _options_unordered(data: dict[str, Any]) -> dict[str, Any]:
+    """The case with each decision's options as an order-free list (keys dropped)."""
+    out = copy.deepcopy(data)
+    for decision in out["decisions"]:
+        unkeyed = ({k: v for k, v in o.items() if k != "key"} for o in decision["options"])
+        decision["options"] = sorted(unkeyed, key=lambda o: o["text"])
+    return out
+
+
+def test_pe_seed_is_the_foundation_fixture_with_shuffled_options() -> None:
+    # The tests pin the fixture's keys; the seed carries the same content in shuffled order.
+    fixture = json.loads((Path(__file__).parent / "fixtures" / "case_pe.json").read_text())
+    seed = json.loads(SEED_FILES[0].read_text())
+    assert _options_unordered(seed) == _options_unordered(fixture)
+    assert seed != fixture
+
+
+@pytest.mark.parametrize("path", SEED_FILES, ids=lambda p: p.name)
+def test_no_seed_decision_lists_its_correct_options_first(path: Path) -> None:
+    # Spec §6.2: option order must not give the key away (review C1: it did in all 12).
+    for decision in load(path).decisions:
+        if not decision.options:
+            continue
+        correct = [o.is_correct for o in decision.options]
+        leading = [True] * sum(correct) + [False] * (len(correct) - sum(correct))
+        assert correct != leading, f"{path.name} {decision.stage}: correct options come first"
+        assert [o.key for o in decision.options] == list(KEYS[: len(correct)])  # re-lettered
 
 
 @pytest.mark.parametrize("path", SEED_FILES, ids=lambda p: p.name)

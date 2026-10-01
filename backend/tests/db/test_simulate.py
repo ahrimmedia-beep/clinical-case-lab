@@ -49,6 +49,24 @@ async def test_seed_slugs_match_what_the_api_assigns(client: httpx.AsyncClient) 
     assert slugs == seed_slugs()
 
 
+async def test_loaded_seeds_serve_the_shuffled_order_and_score(client: httpx.AsyncClient) -> None:
+    # The loader's output end to end: the browser gets the file's (shuffled) option order, and
+    # a perfect play on the new keys still scores full marks.
+    for path in seed_files():
+        case = ClinicalCase.model_validate(json.loads(path.read_text()))
+        slug = (await client.post("/api/cases", json=json.loads(path.read_text()))).json()["slug"]
+        public = (await client.get(f"/api/cases/{slug}")).json()
+        served = {s["key"]: [o["key"] + o["text"] for o in s["options"]] for s in public["stages"]}
+        choices: dict[str, list[str]] = {}
+        for decision in case.decisions:
+            if decision.options:
+                assert served[decision.stage] == [o.key + o.text for o in decision.options]
+                choices[decision.stage] = [o.key for o in decision.options if o.is_correct]
+        body = {"choices": choices, "diagnosis_text": case.final_diagnosis.name, "confidence": 5}
+        result = (await client.post(f"/api/cases/{slug}/attempts", json=body)).json()
+        assert (result["points"], result["wrong"], result["missed"]) == (result["max_points"], 0, 0)
+
+
 async def test_real_attempt_lands_in_the_simulated_cohort(
     client: httpx.AsyncClient, conn: AsyncConnection
 ) -> None:

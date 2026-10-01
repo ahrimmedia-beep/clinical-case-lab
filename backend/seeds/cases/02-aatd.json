@@ -43,12 +43,12 @@
       "prompt": "What else do you want to know?",
       "explanation": "Fixed airflow obstruction at 41 after light smoking is out of proportion to the exposure: ask about the dose, the family, the liver and occupational exposure.",
       "options": [
-        {"key": "A", "text": "How much did he smoke, and when did he stop?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "10 a day from 17 to 36; none since."},
+        {"key": "A", "text": "Has he travelled abroad recently?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain two years of progressive breathlessness.", "reveal": "No."},
         {"key": "B", "text": "Any lung or liver disease in the family?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "His father died of emphysema at 52; an aunt had liver trouble."},
-        {"key": "C", "text": "Any liver problems or jaundice, even as a baby?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "His mother says he was jaundiced as a newborn and needed light treatment."},
-        {"key": "D", "text": "Any occupational dust or fume exposure?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Sawdust at work; he wears a mask most of the time."},
+        {"key": "C", "text": "Any occupational dust or fume exposure?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Sawdust at work; he wears a mask most of the time."},
+        {"key": "D", "text": "How much did he smoke, and when did he stop?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "10 a day from 17 to 36; none since."},
         {"key": "E", "text": "Does he keep pets at home?", "is_correct": false, "is_harmful": false, "feedback": "Not relevant to fixed airflow obstruction at this age.", "reveal": "A cat."},
-        {"key": "F", "text": "Has he travelled abroad recently?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain two years of progressive breathlessness.", "reveal": "No."}
+        {"key": "F", "text": "Any liver problems or jaundice, even as a baby?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "His mother says he was jaundiced as a newborn and needed light treatment."}
       ],
       "accepted_answers": []
     },
@@ -57,10 +57,10 @@
       "prompt": "Which diagnoses do you keep open?",
       "explanation": "Early basal emphysema after light smoking is the classic picture of alpha-1 antitrypsin deficiency; smoking-related COPD stays open until the serum level is back.",
       "options": [
-        {"key": "A", "text": "Alpha-1 antitrypsin deficiency", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "B", "text": "COPD from smoking alone", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "C", "text": "Asthma", "is_correct": false, "is_harmful": false, "feedback": "No reversibility and no response to inhaled treatment.", "reveal": null},
-        {"key": "D", "text": "Bronchiectasis", "is_correct": false, "is_harmful": false, "feedback": "Scant sputum and no crackles make it unlikely; the CT settles it.", "reveal": null},
+        {"key": "A", "text": "Bronchiectasis", "is_correct": false, "is_harmful": false, "feedback": "Scant sputum and no crackles make it unlikely; the CT settles it.", "reveal": null},
+        {"key": "B", "text": "Alpha-1 antitrypsin deficiency", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "COPD from smoking alone", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "D", "text": "Asthma", "is_correct": false, "is_harmful": false, "feedback": "No reversibility and no response to inhaled treatment.", "reveal": null},
         {"key": "E", "text": "Congestive heart failure", "is_correct": false, "is_harmful": false, "feedback": "No orthopnoea, oedema or cardiomegaly.", "reveal": null}
       ],
       "accepted_answers": []
@@ -70,12 +70,12 @@
       "prompt": "Which tests do you order?",
       "explanation": "Spirometry confirms fixed obstruction, CT shows the basal panlobular pattern, and a low serum level followed by phenotyping or genotyping makes the diagnosis; the liver is checked because the same protein accumulates there.",
       "options": [
-        {"key": "A", "text": "Spirometry with bronchodilator reversibility", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1/FVC 0.52, FEV1 48 % predicted, no significant reversibility."},
-        {"key": "B", "text": "Serum alpha-1 antitrypsin level", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "0.3 g/L (low)."},
-        {"key": "C", "text": "CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Panlobular emphysema, worst in both lower lobes."},
-        {"key": "D", "text": "Liver function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "ALT 62 U/L (raised); bilirubin normal."},
-        {"key": "E", "text": "Sweat chloride test", "is_correct": false, "is_harmful": false, "feedback": "Cystic fibrosis is unlikely with this history and imaging.", "reveal": "Normal."},
-        {"key": "F", "text": "Allergen skin-prick testing", "is_correct": false, "is_harmful": false, "feedback": "Atopy does not explain fixed airflow obstruction.", "reveal": "Negative."}
+        {"key": "A", "text": "CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Panlobular emphysema, worst in both lower lobes."},
+        {"key": "B", "text": "Sweat chloride test", "is_correct": false, "is_harmful": false, "feedback": "Cystic fibrosis is unlikely with this history and imaging.", "reveal": "Normal."},
+        {"key": "C", "text": "Allergen skin-prick testing", "is_correct": false, "is_harmful": false, "feedback": "Atopy does not explain fixed airflow obstruction.", "reveal": "Negative."},
+        {"key": "D", "text": "Serum alpha-1 antitrypsin level", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "0.3 g/L (low)."},
+        {"key": "E", "text": "Liver function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "ALT 62 U/L (raised); bilirubin normal."},
+        {"key": "F", "text": "Spirometry with bronchodilator reversibility", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1/FVC 0.52, FEV1 48 % predicted, no significant reversibility."}
       ],
       "accepted_answers": []
     },
@@ -91,12 +91,12 @@
       "prompt": "What is your plan?",
       "explanation": "Treat the COPD component, discuss augmentation therapy at a specialist centre, offer cascade testing to relatives and protect the lungs and liver. Maintenance oral steroids and montelukast add harm or nothing.",
       "options": [
-        {"key": "A", "text": "Long-acting bronchodilators (LAMA plus LABA) and pulmonary rehabilitation", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "B", "text": "Refer to a specialist centre to discuss intravenous augmentation therapy", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "C", "text": "Offer testing to his siblings and children", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "D", "text": "Pneumococcal and annual influenza vaccination; keep alcohol low and monitor the liver", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "E", "text": "Long-term oral prednisolone", "is_correct": false, "is_harmful": true, "feedback": "Maintenance oral corticosteroids add osteoporosis, diabetes and infection risk without slowing emphysema.", "reveal": null},
-        {"key": "F", "text": "Montelukast for presumed asthma", "is_correct": false, "is_harmful": false, "feedback": "There is no asthma here; it adds nothing.", "reveal": null}
+        {"key": "A", "text": "Pneumococcal and annual influenza vaccination; keep alcohol low and monitor the liver", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "B", "text": "Montelukast for presumed asthma", "is_correct": false, "is_harmful": false, "feedback": "There is no asthma here; it adds nothing.", "reveal": null},
+        {"key": "C", "text": "Long-term oral prednisolone", "is_correct": false, "is_harmful": true, "feedback": "Maintenance oral corticosteroids add osteoporosis, diabetes and infection risk without slowing emphysema.", "reveal": null},
+        {"key": "D", "text": "Offer testing to his siblings and children", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "E", "text": "Long-acting bronchodilators (LAMA plus LABA) and pulmonary rehabilitation", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "F", "text": "Refer to a specialist centre to discuss intravenous augmentation therapy", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null}
       ],
       "accepted_answers": []
     }

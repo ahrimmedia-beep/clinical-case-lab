@@ -27,9 +27,9 @@
       "prompt": "What do you ask her first?",
       "explanation": "Recent long-haul travel and oestrogen exposure are the key venous thromboembolism risk factors here.",
       "options": [
-        {"key": "A", "text": "Any recent long travel or immobility?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Yes, a 14-hour flight yesterday."},
+        {"key": "A", "text": "Did she have asthma as a child?", "is_correct": false, "is_harmful": false, "feedback": "Low yield for an acute presentation like this one.", "reveal": "No."},
         {"key": "B", "text": "Does she take any hormonal medication?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A combined oral contraceptive pill."},
-        {"key": "C", "text": "Did she have asthma as a child?", "is_correct": false, "is_harmful": false, "feedback": "Low yield for an acute presentation like this one.", "reveal": "No."}
+        {"key": "C", "text": "Any recent long travel or immobility?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Yes, a 14-hour flight yesterday."}
       ],
       "accepted_answers": []
     },
@@ -38,9 +38,9 @@
       "prompt": "Which diagnoses do you keep open?",
       "explanation": "Sudden pleuritic pain with hypoxia needs pulmonary embolism and pneumothorax ruled in or out first.",
       "options": [
-        {"key": "A", "text": "Pulmonary embolism", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "A", "text": "Gastro-oesophageal reflux", "is_correct": false, "is_harmful": false, "feedback": "Does not explain hypoxia or tachycardia.", "reveal": null},
         {"key": "B", "text": "Pneumothorax", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "C", "text": "Gastro-oesophageal reflux", "is_correct": false, "is_harmful": false, "feedback": "Does not explain hypoxia or tachycardia.", "reveal": null}
+        {"key": "C", "text": "Pulmonary embolism", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null}
       ],
       "accepted_answers": []
     },
@@ -49,9 +49,9 @@
       "prompt": "Which tests do you order first?",
       "explanation": "With a high clinical probability, go straight to CT pulmonary angiography; D-dimer supports but cannot exclude.",
       "options": [
-        {"key": "A", "text": "CT pulmonary angiography", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Filling defect in the right lower lobe pulmonary artery."},
-        {"key": "B", "text": "D-dimer", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "2.4 mg/L FEU (raised)."},
-        {"key": "C", "text": "Spirometry", "is_correct": false, "is_harmful": false, "feedback": "Not useful in the acute setting.", "reveal": "Not performed."}
+        {"key": "A", "text": "D-dimer", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "2.4 mg/L FEU (raised)."},
+        {"key": "B", "text": "Spirometry", "is_correct": false, "is_harmful": false, "feedback": "Not useful in the acute setting.", "reveal": "Not performed."},
+        {"key": "C", "text": "CT pulmonary angiography", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Filling defect in the right lower lobe pulmonary artery."}
       ],
       "accepted_answers": []
     },
@@ -67,9 +67,9 @@
       "prompt": "What is your initial plan?",
       "explanation": "Haemodynamically stable PE: anticoagulate and remove the provoking factor.",
       "options": [
-        {"key": "A", "text": "Start anticoagulation (apixaban or LMWH)", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "A", "text": "Systemic thrombolysis", "is_correct": false, "is_harmful": true, "feedback": "Thrombolysis is reserved for high-risk (massive) PE; in a stable patient the bleeding risk outweighs the benefit.", "reveal": null},
         {"key": "B", "text": "Stop the combined oral contraceptive", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "C", "text": "Systemic thrombolysis", "is_correct": false, "is_harmful": true, "feedback": "Thrombolysis is reserved for high-risk (massive) PE; in a stable patient the bleeding risk outweighs the benefit.", "reveal": null}
+        {"key": "C", "text": "Start anticoagulation (apixaban or LMWH)", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null}
       ],
       "accepted_answers": []
     }

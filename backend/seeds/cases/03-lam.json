@@ -46,10 +46,10 @@
       "options": [
         {"key": "A", "text": "Has she ever smoked?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Never."},
         {"key": "B", "text": "Does she take any hormonal medication?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A combined oestrogen-progestogen pill for six years."},
-        {"key": "C", "text": "Has she ever had kidney problems or flank pain?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Two years ago an ultrasound found a fatty lump in her left kidney; nobody followed it up."},
-        {"key": "D", "text": "Has she or anyone in her family had seizures or unusual skin lesions?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "No."},
-        {"key": "E", "text": "Any recent foreign travel?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain a recurrent pneumothorax with progressive breathlessness.", "reveal": "A beach holiday in Spain last summer."},
-        {"key": "F", "text": "Did she have eczema as a child?", "is_correct": false, "is_harmful": false, "feedback": "Atopy is low yield here.", "reveal": "Mild eczema that cleared by age ten."}
+        {"key": "C", "text": "Did she have eczema as a child?", "is_correct": false, "is_harmful": false, "feedback": "Atopy is low yield here.", "reveal": "Mild eczema that cleared by age ten."},
+        {"key": "D", "text": "Any recent foreign travel?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain a recurrent pneumothorax with progressive breathlessness.", "reveal": "A beach holiday in Spain last summer."},
+        {"key": "E", "text": "Has she or anyone in her family had seizures or unusual skin lesions?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "No."},
+        {"key": "F", "text": "Has she ever had kidney problems or flank pain?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Two years ago an ultrasound found a fatty lump in her left kidney; nobody followed it up."}
       ],
       "accepted_answers": []
     },
@@ -58,11 +58,11 @@
       "prompt": "Which diagnoses do you keep open?",
       "explanation": "Recurrent pneumothorax in a young never-smoker points to a diffuse cystic lung disease. Lymphangioleiomyomatosis and Birt-Hogg-Dube syndrome lead; Langerhans cell histiocytosis is almost confined to smokers.",
       "options": [
-        {"key": "A", "text": "Lymphangioleiomyomatosis", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "B", "text": "Birt-Hogg-Dube syndrome", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "A", "text": "Pulmonary embolism", "is_correct": false, "is_harmful": false, "feedback": "Does not explain a recurrent pneumothorax.", "reveal": null},
+        {"key": "B", "text": "Lymphangioleiomyomatosis", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
         {"key": "C", "text": "Pulmonary Langerhans cell histiocytosis", "is_correct": false, "is_harmful": false, "feedback": "Almost exclusively seen in smokers; she has never smoked.", "reveal": null},
-        {"key": "D", "text": "Primary spontaneous pneumothorax with otherwise normal lungs", "is_correct": false, "is_harmful": false, "feedback": "A second episode plus progressive breathlessness makes an underlying lung disease likely.", "reveal": null},
-        {"key": "E", "text": "Pulmonary embolism", "is_correct": false, "is_harmful": false, "feedback": "Does not explain a recurrent pneumothorax.", "reveal": null}
+        {"key": "D", "text": "Birt-Hogg-Dube syndrome", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "E", "text": "Primary spontaneous pneumothorax with otherwise normal lungs", "is_correct": false, "is_harmful": false, "feedback": "A second episode plus progressive breathlessness makes an underlying lung disease likely.", "reveal": null}
       ],
       "accepted_answers": []
     },
@@ -71,12 +71,12 @@
       "prompt": "Which tests do you order?",
       "explanation": "High-resolution CT shows the cysts; a serum VEGF-D above 800 pg/mL with typical cysts is diagnostic, so a biopsy can be avoided. Abdominal imaging looks for angiomyolipoma; lung function sets the baseline for treatment decisions.",
       "options": [
-        {"key": "A", "text": "High-resolution CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Numerous thin-walled round cysts evenly distributed through both lungs."},
-        {"key": "B", "text": "Serum VEGF-D", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "1450 pg/mL (raised)."},
-        {"key": "C", "text": "CT or MRI of the abdomen", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A 2.5 cm fat-containing lesion in the left kidney."},
-        {"key": "D", "text": "Full lung function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1 68 % predicted, DLCO 55 % predicted."},
-        {"key": "E", "text": "Serum ACE level", "is_correct": false, "is_harmful": false, "feedback": "Points towards sarcoidosis, which does not cause thin-walled cysts and recurrent pneumothorax.", "reveal": "Normal."},
-        {"key": "F", "text": "Surgical lung biopsy as the first test", "is_correct": false, "is_harmful": true, "feedback": "Typical CT cysts with a raised VEGF-D are diagnostic; surgical biopsy adds risk without benefit.", "reveal": null}
+        {"key": "A", "text": "CT or MRI of the abdomen", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A 2.5 cm fat-containing lesion in the left kidney."},
+        {"key": "B", "text": "Surgical lung biopsy as the first test", "is_correct": false, "is_harmful": true, "feedback": "Typical CT cysts with a raised VEGF-D are diagnostic; surgical biopsy adds risk without benefit.", "reveal": null},
+        {"key": "C", "text": "Serum VEGF-D", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "1450 pg/mL (raised)."},
+        {"key": "D", "text": "Serum ACE level", "is_correct": false, "is_harmful": false, "feedback": "Points towards sarcoidosis, which does not cause thin-walled cysts and recurrent pneumothorax.", "reveal": "Normal."},
+        {"key": "E", "text": "High-resolution CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Numerous thin-walled round cysts evenly distributed through both lungs."},
+        {"key": "F", "text": "Full lung function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1 68 % predicted, DLCO 55 % predicted."}
       ],
       "accepted_answers": []
     },
@@ -92,11 +92,11 @@
       "prompt": "What is your plan for her?",
       "explanation": "Treat the pneumothorax and offer pleurodesis after a second episode, start sirolimus because lung function is declining, remove exogenous oestrogen and vaccinate. Corticosteroids do not help, and more oestrogen may speed progression.",
       "options": [
-        {"key": "A", "text": "Drain the pneumothorax and refer for pleurodesis after this recurrence", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "B", "text": "Start sirolimus (an mTOR inhibitor) because lung function is declining", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "C", "text": "Stop the oestrogen-containing pill and switch to non-hormonal contraception", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "A", "text": "High-dose oral prednisolone", "is_correct": false, "is_harmful": false, "feedback": "Corticosteroids have no role in this disease.", "reveal": null},
+        {"key": "B", "text": "Stop the oestrogen-containing pill and switch to non-hormonal contraception", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "Start sirolimus (an mTOR inhibitor) because lung function is declining", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
         {"key": "D", "text": "Pneumococcal and annual influenza vaccination", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
-        {"key": "E", "text": "High-dose oral prednisolone", "is_correct": false, "is_harmful": false, "feedback": "Corticosteroids have no role in this disease.", "reveal": null},
+        {"key": "E", "text": "Drain the pneumothorax and refer for pleurodesis after this recurrence", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
         {"key": "F", "text": "Switch to a higher-dose oestrogen pill to regulate her cycle", "is_correct": false, "is_harmful": true, "feedback": "Oestrogen may accelerate disease progression; it should be stopped, not increased.", "reveal": null}
       ],
       "accepted_answers": []
