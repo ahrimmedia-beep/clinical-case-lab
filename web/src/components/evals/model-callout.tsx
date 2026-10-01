@@ -45,6 +45,7 @@ function rows(c: ModelComparison): Row[] {
 export function ModelCallout({ comparison, sample }: { comparison: ModelComparison | null; sample: boolean }) {
   return (
     <section
+      id="migration"
       aria-labelledby="upgrade-title"
       className="relative overflow-hidden rounded-card border border-line bg-white shadow-card before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-brand-grad"
     >
