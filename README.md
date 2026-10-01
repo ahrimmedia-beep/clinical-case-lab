@@ -128,7 +128,9 @@ Extraction accuracy on 8 synthetic pulmonology case reports with deliberate trap
 
 <!-- The table between the markers is generated: python3 scripts/update_eval_tables.py copies the first table of backend/evals/reports/latest.md. -->
 <!-- eval-table:start -->
-_The live comparison table is added here after the eval run._
+| Model | Valid (1st try) | Macro-F1 | Findings F1 | Measurements F1 | Diagnosis | Grounded | Hallucinated | Negation errors | p50 / p95 ms | $ / case |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fake/fake-gold | 100% (100%) | 0.991 | 0.945 | 1.000 | 100% | 98% | 1.9% | 0 | 40 / 40 | 0.0000 |
 <!-- eval-table:end -->
 
 Method, metrics and caveats: [docs/EVALS.md](docs/EVALS.md). Reproduce without keys: `make eval-offline` re-scores the committed recordings; `make eval` runs the models live.
