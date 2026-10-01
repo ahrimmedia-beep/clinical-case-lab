@@ -38,6 +38,15 @@ describe("approveCase", () => {
     expect(redirect).toHaveBeenCalledWith("/cases/lam-draft-1a2b3c");
   });
 
+  it("stays on the review with the API's reason when a check fails (409 from the server-side gate)", async () => {
+    approve.mockResolvedValue({ status: "blocked", message: "Approval is blocked while a check fails: No identifiers in the source text." });
+    expect(await approveCase("lam-draft-1a2b3c", IDLE_APPROVE, confirmed())).toEqual({
+      status: "error",
+      message: "Approval is blocked while a check fails: No identifiers in the source text.",
+    });
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   it("needs the explicit sign-off and a valid slug before calling the API", async () => {
     expect(await approveCase("lam-draft-1a2b3c", IDLE_APPROVE, new FormData())).toEqual({
       status: "error",

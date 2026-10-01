@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 import type { ExtractState, PublishState } from "@/lib/action-states";
 import * as api from "@/lib/api/client";
 import { friendlyMessage } from "@/lib/api/errors";
-import { internalMessage, publishDraft } from "@/lib/api/internal";
-import type { ClinicalCase } from "@/lib/api/types";
-import { clientIp, parseExtractForm } from "@/lib/forms";
+import { internalMessage, limitMessage, publishDraft } from "@/lib/api/internal";
+import type { ClinicalCase, ExtractRequest, ExtractResponse } from "@/lib/api/types";
+import { clientIp, parseExtractForm, parsePublishInput } from "@/lib/forms";
 
-const MAX_CASE_JSON_CHARS = 256 * 1024; // the API's body limit for POST /api/cases
+const SOURCE_TEXT_MAX = 20_000; // CaseSource.text max_length on the API
 
 /** Raw text → de-identify → extract → ground → author → validate, all on the API. Never throws. */
 export async function extractCase(_prev: ExtractState, formData: FormData): Promise<ExtractState> {
@@ -20,40 +20,44 @@ export async function extractCase(_prev: ExtractState, formData: FormData): Prom
     return { status: "done", result: await api.extractCase(parsed.value, ip) };
   } catch (error) {
     console.error("extractCase failed", { provider: parsed.value.provider, error: String(error) });
-    return { status: "error", message: friendlyMessage(error), fieldErrors: {} };
+    return { status: "error", message: limitMessage(error) ?? friendlyMessage(error), fieldErrors: {} };
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
- * Whatever arrives from the browser is stored as an AI draft: `source.kind` is forced to "llm", so the
- * API sets review_status = draft and the case needs a physician's approval before it counts.
+ * The API's extraction, stored as an AI draft: `source.kind` is forced to "llm", so the API sets
+ * review_status = draft and the case needs a physician's approval before it counts. The de-identified text
+ * travels with it: the review checklist re-checks every quote against it.
  */
-function asDraft(raw: Record<string, unknown>): ClinicalCase {
-  const source = isRecord(raw.source) ? raw.source : {};
-  const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : null);
+function asDraft(extraction: ExtractResponse): ClinicalCase {
+  const source = extraction.case.source;
+  const fallback = extraction.source_text.length <= SOURCE_TEXT_MAX ? extraction.source_text : null;
   return {
-    ...(raw as unknown as ClinicalCase),
-    source: { kind: "llm", provider: str(source.provider), model: str(source.model), prompt_version: str(source.prompt_version), text: str(source.text) },
+    ...extraction.case,
+    source: {
+      kind: "llm",
+      provider: source?.provider ?? extraction.provider,
+      model: source?.model ?? extraction.model,
+      prompt_version: source?.prompt_version ?? extraction.prompt_version,
+      text: source?.text ?? fallback,
+    },
   };
 }
 
-/** Publishes the studio's extracted case as a draft and opens its physician review. The API re-validates everything. */
-export async function publishCase(caseJson: string): Promise<PublishState> {
-  if (typeof caseJson !== "string" || caseJson.length > MAX_CASE_JSON_CHARS) {
-    return { status: "error", message: "The extracted case is too large to publish." };
-  }
+/**
+ * Publishes by reference, never by content: the browser sends back only what it asked to extract (text,
+ * provider, model). This server re-runs that extraction on the API (a cache hit: instant, free, outside the
+ * rate limit), publishes the API's own result as a draft, and opens its physician review.
+ */
+export async function publishCase(request: ExtractRequest): Promise<PublishState> {
+  const parsed = parsePublishInput(request);
+  if (!parsed.ok) return { status: "error", message: "This draft can't be published. Extract it again." };
   let slug: string;
   try {
-    const parsed: unknown = JSON.parse(caseJson);
-    if (!isRecord(parsed)) return { status: "error", message: "The extracted case is malformed." };
-    slug = (await publishDraft(asDraft(parsed))).slug;
+    const extraction = await api.extractCase(parsed.value, clientIp(await headers()));
+    slug = (await publishDraft(asDraft(extraction))).slug;
   } catch (error) {
-    if (error instanceof SyntaxError) return { status: "error", message: "The extracted case is malformed." };
-    console.error("publishCase failed", { error: String(error) });
+    console.error("publishCase failed", { provider: parsed.value.provider, error: String(error) });
     return { status: "error", message: internalMessage(error) };
   }
   redirect(`/cases/${slug}/review`); // outside try: redirect() works by throwing

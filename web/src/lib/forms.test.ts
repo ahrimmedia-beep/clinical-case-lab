@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clientIp, isValidSlug, parseAttemptForm, parseExtractForm, parseRevealInput } from "./forms";
+import { clientIp, isValidSlug, parseAttemptForm, parseExtractForm, parsePublishInput, parseRevealInput } from "./forms";
 
 function form(fields: Record<string, string>): FormData {
   const fd = new FormData();
@@ -81,10 +81,33 @@ describe("reveals and slugs", () => {
     expect(isValidSlug("../etc/passwd")).toBe(false);
   });
 
-  it("takes the end user's IP from the first X-Forwarded-For entry", () => {
-    expect(clientIp(new Headers({ "x-forwarded-for": "203.0.113.7, 10.0.0.1" }))).toBe("203.0.113.7");
+  it("takes the end user's IP from the last X-Forwarded-For entry (Cloud Run appends the real peer)", () => {
+    expect(clientIp(new Headers({ "x-forwarded-for": "10.9.8.7, 203.0.113.7" }))).toBe("203.0.113.7");
+    expect(clientIp(new Headers({ "x-forwarded-for": "203.0.113.7" }))).toBe("203.0.113.7");
+    expect(clientIp(new Headers({ "x-forwarded-for": "spoofed, 203.0.113.7 " }))).toBe("203.0.113.7");
     expect(clientIp(new Headers({ "x-real-ip": "2001:db8::1" }))).toBe("2001:db8::1");
     expect(clientIp(new Headers({ "x-forwarded-for": "<script>" }))).toBeNull();
     expect(clientIp(new Headers())).toBeNull();
+  });
+});
+
+describe("parsePublishInput", () => {
+  const text = "x".repeat(60);
+
+  it("accepts what the studio extracted: text, provider and the model that ran", () => {
+    expect(parsePublishInput({ text: `  ${text} `, provider: "claude", model: "claude-sonnet-5" })).toEqual({
+      ok: true,
+      value: { text, provider: "claude", model: "claude-sonnet-5" },
+    });
+    expect(parsePublishInput({ text, provider: "gemini", model: null })).toEqual({ ok: true, value: { text, provider: "gemini", model: null } });
+  });
+
+  it("refuses anything else, including a whole case sent in place of the text", () => {
+    expect(parsePublishInput(null).ok).toBe(false);
+    expect(parsePublishInput("{}").ok).toBe(false);
+    expect(parsePublishInput({ text: "short", provider: "gemini", model: null }).ok).toBe(false);
+    expect(parsePublishInput({ text, provider: "openai", model: null }).ok).toBe(false);
+    expect(parsePublishInput({ text, provider: "gemini", model: "bad model!" }).ok).toBe(false);
+    expect(parsePublishInput({ text, provider: "gemini", model: null, case: { title: "x" } }).ok).toBe(false);
   });
 });

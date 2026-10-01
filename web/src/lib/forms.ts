@@ -13,9 +13,12 @@ export function isValidSlug(slug: string): boolean {
   return SLUG.test(slug);
 }
 
-/** The end user's IP as Cloud Run's front end reports it (first X-Forwarded-For entry). */
+/**
+ * The end user's IP as Cloud Run's front end reports it: the LAST X-Forwarded-For entry. The front end
+ * appends the peer it saw, so earlier entries are whatever the browser sent and cannot key a rate limit.
+ */
 export function clientIp(headers: { get(name: string): string | null }): string | null {
-  const candidate = (headers.get("x-forwarded-for")?.split(",")[0] ?? headers.get("x-real-ip") ?? "").trim();
+  const candidate = (headers.get("x-forwarded-for")?.split(",").at(-1) ?? headers.get("x-real-ip") ?? "").trim();
   return /^[0-9a-fA-F:.]{2,45}$/.test(candidate) ? candidate : null;
 }
 
@@ -73,14 +76,14 @@ export function parseAttemptForm(formData: FormData): ParseResult<AttemptIn> {
   };
 }
 
-const extractForm = z.object({
-  text: z
-    .string()
-    .trim()
-    .min(50, "Paste at least 50 characters of clinical text.")
-    .max(20_000, "Keep the text under 20,000 characters."),
-  provider: z.enum(["gemini", "claude"], { error: "Choose Gemini or Claude." }),
-});
+const extractText = z
+  .string()
+  .trim()
+  .min(50, "Paste at least 50 characters of clinical text.")
+  .max(20_000, "Keep the text under 20,000 characters.");
+const extractProvider = z.enum(["gemini", "claude"], { error: "Choose Gemini or Claude." });
+
+const extractForm = z.object({ text: extractText, provider: extractProvider });
 
 export function parseExtractForm(formData: FormData): ParseResult<ExtractRequest> {
   const parsed = extractForm.safeParse({
@@ -89,6 +92,25 @@ export function parseExtractForm(formData: FormData): ParseResult<ExtractRequest
   });
   if (!parsed.success) return { ok: false, fieldErrors: z.flattenError(parsed.error).fieldErrors };
   return { ok: true, value: { text: parsed.data.text, provider: parsed.data.provider, model: null } };
+}
+
+/**
+ * Publish is by reference: the studio sends back only what it asked the API to extract. The server re-runs
+ * that extraction (a cache hit) and publishes the API's own result, so the browser never supplies a case.
+ */
+const publishInput = z.strictObject({
+  text: extractText,
+  provider: extractProvider,
+  model: z
+    .string()
+    .regex(/^[A-Za-z0-9][A-Za-z0-9._@/-]{0,79}$/)
+    .nullable(),
+});
+
+export function parsePublishInput(input: unknown): ParseResult<ExtractRequest> {
+  const parsed = publishInput.safeParse(input);
+  if (!parsed.success) return { ok: false, fieldErrors: z.flattenError(parsed.error).fieldErrors };
+  return { ok: true, value: parsed.data };
 }
 
 const revealInput = z.object({

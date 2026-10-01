@@ -1,10 +1,12 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import type { RevealResult, SubmitState } from "@/lib/action-states";
 import * as api from "@/lib/api/client";
-import { friendlyMessage } from "@/lib/api/errors";
-import { isValidSlug, parseAttemptForm, parseRevealInput } from "@/lib/forms";
+import { ApiError, friendlyMessage } from "@/lib/api/errors";
+import { recordAttempt } from "@/lib/api/internal";
+import { closedCookieValue } from "@/lib/closed-cookie";
+import { clientIp, isValidSlug, parseAttemptForm, parseRevealInput } from "@/lib/forms";
 
 // Note on scope (amendments §E, track split): `extractCase` and `publishCase` are studio-only
 // Server Actions and live in `app/studio/actions.ts` (track C2), which owns `app/studio/**`.
@@ -18,12 +20,14 @@ export async function submitAttempt(slug: string, _prev: SubmitState, formData: 
   const parsed = parseAttemptForm(formData);
   if (!parsed.ok) return { status: "error", message: "Some answers need another look.", fieldErrors: parsed.fieldErrors };
   try {
-    const result = await api.createAttempt(slug, parsed.value);
-    // C1 delta (amendments §E): httpOnly marker that this browser closed this case, so the
-    // sponsor-only insights page (/cases/{slug}/insights, track C2) can gate on having played it.
+    // The browser's address goes along so the API's per-IP attempt throttle sees people, not this server.
+    const result = await recordAttempt(slug, parsed.value, clientIp(await headers()));
+    // Signed marker (attempt id + HMAC, lib/closed-cookie.ts) that this browser closed this case, so the
+    // sponsor-only insights page (/cases/{slug}/insights) can gate on having played it.
     const jar = await cookies();
-    jar.set(`closed_${slug}`, "1", {
+    jar.set(`closed_${slug}`, closedCookieValue(slug, result.attempt_id), {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: CLOSED_COOKIE_MAX_AGE_S,
@@ -32,7 +36,9 @@ export async function submitAttempt(slug: string, _prev: SubmitState, formData: 
   } catch (error) {
     // Log the failure class only: never the answers.
     console.error("submitAttempt failed", { slug, error: String(error) });
-    return { status: "error", message: friendlyMessage(error), fieldErrors: {} };
+    const throttled = error instanceof ApiError && error.status === 429;
+    const message = throttled ? "Too many cases closed from this network in a minute. Try again shortly." : friendlyMessage(error);
+    return { status: "error", message, fieldErrors: {} };
   }
 }
 

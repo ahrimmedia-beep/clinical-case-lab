@@ -15,6 +15,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { ArrowIcon } from "@/components/ui/icons";
 import { MonoTag } from "@/components/ui/mono-tag";
 import { getCaseInsights, internalMessage, type CaseInsights } from "@/lib/api/internal";
+import { verifyClosedCookie } from "@/lib/closed-cookie";
 import { isValidSlug } from "@/lib/forms";
 import { formatInt } from "@/lib/format";
 
@@ -56,8 +57,10 @@ export default async function InsightsPage({ params }: Props) {
   await connection();
   const { slug } = await params;
   if (!isValidSlug(slug)) notFound();
-  // Gate: the httpOnly cookie set by the player's submitAttempt. Answers are shown below, so no cookie, no data.
-  if (!(await cookies()).has(closedCookieName(slug))) return <ClosedFirst slug={slug} />;
+  // Gate: the signed httpOnly cookie set by the player's submitAttempt. Answers are shown below, so no valid
+  // cookie (missing, hand-made, or copied from another case), no data.
+  const closed = (await cookies()).get(closedCookieName(slug))?.value;
+  if (!verifyClosedCookie(slug, closed)) return <ClosedFirst slug={slug} />;
 
   let insights: CaseInsights | null;
   try {

@@ -17,6 +17,7 @@ export async function approveCase(slug: string, _prev: ApproveState, formData: F
   try {
     const outcome = await approve(slug);
     if (outcome.status === "not_found") return { status: "error", message: "This case doesn't exist, or it was removed." };
+    if (outcome.status === "blocked") return { status: "error", message: outcome.message }; // the API re-ran the checklist
   } catch (error) {
     console.error("approveCase failed", { slug, error: String(error) });
     return { status: "error", message: internalMessage(error) };

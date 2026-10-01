@@ -22,14 +22,13 @@ const GROUNDING: Record<Grounding, { label: string; tone: "teal" | "clay" | "neu
   none: { label: "no quote", tone: "neutral" },
 };
 
-/** Split view: the source with highlighted evidence on the left, what the model built on the right. Author view: shows the key. */
-export function ExtractionView({ result }: { result: ExtractResponse }) {
+/**
+ * Split view: the source with highlighted evidence on the left, what the model built on the right. Author view: shows the key.
+ * `text` is the note exactly as submitted: "Publish" sends it back (with provider and model) instead of the case, so the
+ * server republishes its own cached extraction and the browser never supplies case content.
+ */
+export function ExtractionView({ result, text }: { result: ExtractResponse; text: string }) {
   const [active, setActive] = useState<string | null>(null);
-  // The de-identified text travels with the draft: the review checklist re-checks every quote against it.
-  const caseJson = useMemo(
-    () => JSON.stringify({ ...result.case, source: { ...result.case.source, kind: "llm", text: result.case.source?.text ?? result.source_text } }),
-    [result],
-  );
   const rows = useMemo(() => factRows(result.case), [result.case]);
   const stages = useMemo<KeyStage[]>(
     () =>
@@ -42,7 +41,10 @@ export function ExtractionView({ result }: { result: ExtractResponse }) {
       })),
     [result.case.decisions],
   );
-  const [publishState, publish, publishing] = useActionState<PublishState>(async () => (await publishCase(caseJson)) ?? IDLE_PUBLISH, IDLE_PUBLISH);
+  const [publishState, publish, publishing] = useActionState<PublishState>(
+    async () => (await publishCase({ text, provider: result.provider, model: result.model })) ?? IDLE_PUBLISH,
+    IDLE_PUBLISH,
+  );
   const eco = economics(result);
 
   const publishButton = (

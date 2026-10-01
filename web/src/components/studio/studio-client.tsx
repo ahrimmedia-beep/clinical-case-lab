@@ -20,6 +20,7 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
   const [text, setText] = useState(samples[0]?.text ?? "");
   const [provider, setProvider] = useState<Provider>("gemini");
   const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [submittedText, setSubmittedText] = useState(""); // what the shown draft was extracted from: publish sends it back
   const [state, formAction, pending] = useActionState(extractCase, IDLE_EXTRACT);
   const textId = useId();
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
@@ -33,7 +34,12 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
 
   return (
     <div className="space-y-10">
-      <form action={formAction} onSubmit={() => setStartedAt(Date.now())} className="rounded-card border border-line bg-white p-5 shadow-card sm:p-6">
+      <form
+        action={formAction}
+        onSubmit={() => {
+          setStartedAt(Date.now());
+          setSubmittedText(text);
+        }} className="rounded-card border border-line bg-white p-5 shadow-card sm:p-6">
         <fieldset>
           <legend className="mb-2 font-mono text-[11px] uppercase tracking-[.1em] text-muted">Samples · synthetic notes</legend>
           <div className="flex flex-wrap gap-2">
@@ -116,7 +122,9 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
         {status}
       </p>
       {pending || result ? <StepProgress pending={pending} startedAt={startedAt} result={result} /> : null}
-      {result && !pending ? <ExtractionView key={`${result.model}:${result.case.title}:${result.usage.input_tokens}`} result={result} /> : null}
+      {result && !pending ? (
+        <ExtractionView key={`${result.model}:${result.case.title}:${result.usage.input_tokens}`} result={result} text={submittedText} />
+      ) : null}
     </div>
   );
 }
