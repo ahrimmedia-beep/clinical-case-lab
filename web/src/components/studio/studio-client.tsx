@@ -44,7 +44,7 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
                 aria-pressed={text === sample.text}
                 onClick={() => setText(sample.text)}
                 className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-[13px] transition-colors",
+                  "rounded-full border px-3.5 py-2.5 text-[13px] transition-colors",
                   text === sample.text ? "border-primary-border bg-primary-tint text-primary-deep" : "border-line text-body hover:bg-surface-alt",
                 )}
               >
@@ -66,7 +66,7 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
           maxLength={20_000}
           aria-invalid={Boolean(fieldErrors.text)}
           aria-describedby={`${textId}-hint`}
-          className="w-full rounded-input border border-line bg-surface-alt px-[13px] py-3 font-mono text-[13px] leading-[1.6] text-ink outline-none transition focus:border-primary focus:bg-white aria-[invalid=true]:border-error"
+          className="w-full rounded-input border border-line bg-surface-alt px-[13px] py-3 font-mono text-[16px] leading-[1.6] text-ink outline-none transition focus:border-primary focus:bg-white sm:text-[13px] aria-[invalid=true]:border-error"
         />
         <div id={`${textId}-hint`} className="mt-1 flex justify-between gap-3 font-mono text-[11px] text-muted">
           <span className={fieldErrors.text ? "text-error" : undefined}>
@@ -83,7 +83,7 @@ export function StudioClient({ samples }: { samples: StudioSample[] }) {
                 <label
                   key={p.value}
                   className={cn(
-                    "cursor-pointer rounded-[7px] px-3.5 py-1.5 text-[13.5px] font-medium transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary",
+                    "cursor-pointer rounded-[7px] px-3.5 py-2.5 text-[13.5px] font-medium transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary",
                     provider === p.value ? "bg-primary-tint text-primary-deep" : "text-body hover:bg-surface-alt",
                   )}
                 >

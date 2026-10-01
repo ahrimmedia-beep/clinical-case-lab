@@ -42,18 +42,23 @@ export function FlowMotion({ children, className }: { children: ReactNode; class
         gsap.set(nodes, { scale: 0, transformOrigin: "50% 50%" });
         gsap.set(steps, { opacity: 0, y: wide ? 16 : 10 });
 
-        // One time unit per gap between steps: node i is reached at time i.
+        // One time unit per gap between steps: node i is reached at time i (desktop). Phones compress
+        // the same sequence into a short one-shot unit so it still finishes quickly.
         const gaps = Math.max(1, steps.length - 1);
+        const unit = wide ? 1 : 1 / 2.4;
         const tl = gsap.timeline({
-          // Desktop: one row, so the whole draw fits while it travels from 85 % to 48 % of the
-          // viewport and every step is shown before the row reaches the middle. Phones: a column,
-          // each step lights up as it enters the lower part of the screen.
-          scrollTrigger: { trigger: el, start: wide ? "top 85%" : "top 88%", end: wide ? "top 48%" : "bottom 72%", scrub: 0.6 },
+          // Desktop: scrubbed to the scroll position, one row, the draw fits while it travels from
+          // 85 % to 48 % of the viewport. Phones: plays forward once when the column enters the
+          // lower part of the screen, then stays — scrubbing it read as the steps flickering back
+          // out on scroll-up, so phones get a single forward play instead of a scrub.
+          scrollTrigger: wide
+            ? { trigger: el, start: "top 85%", end: "top 48%", scrub: 0.6 }
+            : { trigger: el, start: "top 88%", once: true },
         });
-        tl.to(line, wide ? { scaleX: 1, duration: gaps, ease: "none" } : { scaleY: 1, duration: gaps, ease: "none" }, 0);
+        tl.to(line, wide ? { scaleX: 1, duration: gaps, ease: "none" } : { scaleY: 1, duration: gaps * unit, ease: "none" }, 0);
         steps.forEach((step, i) => {
-          if (nodes[i]) tl.to(nodes[i], { scale: 1, duration: 0.3, ease: "back.out(2.4)" }, i);
-          tl.to(step, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, Math.max(0, i - 0.15));
+          if (nodes[i]) tl.to(nodes[i], { scale: 1, duration: 0.3, ease: "back.out(2.4)" }, i * unit);
+          tl.to(step, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, Math.max(0, i * unit - 0.15));
         });
       });
 

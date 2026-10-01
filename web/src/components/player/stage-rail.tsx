@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { CheckIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 import { stageNo } from "@/lib/format";
@@ -7,16 +8,26 @@ import { stageStatus, type PlayerState } from "./state";
 
 const STATUS_TEXT = { current: ", current stage", done: ", done", open: "", upcoming: ", not reached yet" } as const;
 
-/** Nine numbered stages: a left rail from 1024 px, a compact top stepper below. Only visited stages are clickable. */
+/** Nine numbered stages: a left rail from 1024 px, a compact top stepper below. Only visited stages are clickable.
+ * The top stepper scrolls sideways rather than squeezing nine buttons under 40px: each stays a full tap target,
+ * and the current one scrolls into view as it changes. */
 export function StageRail({ state, onGo }: { state: PlayerState; onGo: (index: number) => void }) {
   const frozen = state.phase !== "playing";
+  const currentRef = useRef<HTMLLIElement>(null);
+  const currentIndex = state.current; // local, non-".current" name so exhaustive-deps doesn't mistake it for a ref
+  useEffect(() => {
+    currentRef.current?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [currentIndex]);
+  // min-w-0 on <nav>: a grid/flex item's implicit min-width is its content's intrinsic size, so without
+  // it the nine-button stepper (392px of buttons+gaps) forces the whole grid item — and the page —
+  // wider than the viewport on phones instead of scrolling inside its own overflow-x-auto.
   return (
-    <nav aria-label="Case stages">
-      <ol className="flex gap-1 lg:hidden">
+    <nav aria-label="Case stages" className="min-w-0">
+      <ol className="flex gap-1 overflow-x-auto lg:hidden">
         {state.stages.map((stage, index) => {
           const status = stageStatus(state, index);
           return (
-            <li key={stage.key} className="min-w-0 flex-1">
+            <li key={stage.key} ref={status === "current" ? currentRef : undefined} className="flex-none">
               <button
                 type="button"
                 disabled={frozen || index > state.visited}
@@ -24,7 +35,7 @@ export function StageRail({ state, onGo }: { state: PlayerState; onGo: (index: n
                 aria-current={status === "current" ? "step" : undefined}
                 aria-label={`${stageNo(stage.number)} ${stage.label}${STATUS_TEXT[status]}`}
                 className={cn(
-                  "flex h-8 w-full items-center justify-center rounded-[7px] font-mono text-[10.5px] transition-colors",
+                  "flex size-10 items-center justify-center rounded-[7px] font-mono text-[10.5px] transition-colors",
                   status === "current" && "bg-white text-ink ring-2 ring-primary",
                   status === "done" && "bg-primary-tint text-primary-hover",
                   status === "open" && "bg-white text-ink ring-1 ring-line-strong",

@@ -48,7 +48,7 @@ export function CaseFileCard({ number, specialty, minutes, title, patient, diffi
             <p className="mt-1 text-[12.5px] text-muted">
               {formatPatient(patient)} · {difficulty}
             </p>
-            <p className="mt-2 text-[13.5px] leading-normal text-body">{chiefComplaint}</p>
+            <p className="mt-2 text-[14px] leading-normal text-body">{chiefComplaint}</p>
           </div>
         </div>
         {hints.length > 0 ? (
@@ -56,7 +56,7 @@ export function CaseFileCard({ number, specialty, minutes, title, patient, diffi
             {hints.map((h, i) => (
               <li key={h.label} className={cn("flex items-center gap-3 py-[11px]", i > 0 && "border-t border-line")}>
                 <span aria-hidden="true" className="size-[9px] flex-none rounded-full border-2 border-primary" />
-                <span className="text-[13.5px] font-medium text-body">{h.label}</span>
+                <span className="text-[14px] font-medium text-body">{h.label}</span>
                 <span className="ml-auto text-end text-[11.5px] text-muted">{h.hint}</span>
               </li>
             ))}

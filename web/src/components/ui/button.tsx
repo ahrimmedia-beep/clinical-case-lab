@@ -9,11 +9,11 @@ const VARIANTS: Record<ButtonVariant, string> = {
   primary:
     "rounded-btn bg-primary px-[26px] py-3.5 text-[14.5px] font-medium text-white transition duration-200 hover:-translate-y-px hover:bg-primary-hover hover:shadow-btn",
   "primary-sm":
-    "rounded-[8px] bg-primary px-[18px] py-[9px] text-[13.5px] font-medium text-white transition duration-200 hover:-translate-y-px hover:bg-primary-hover hover:shadow-btn",
+    "rounded-[8px] bg-primary px-[18px] py-[10.5px] text-[13.5px] font-medium text-white transition duration-200 hover:-translate-y-px hover:bg-primary-hover hover:shadow-btn",
   ghost:
     "rounded-btn border border-line-strong bg-transparent px-[26px] py-3.5 text-[14.5px] font-medium text-ink transition duration-200 hover:border-ink hover:bg-surface-alt",
   "ghost-sm":
-    "rounded-[8px] border border-line-strong bg-transparent px-[18px] py-[9px] text-[13.5px] font-medium text-ink transition duration-200 hover:border-ink hover:bg-surface-alt",
+    "rounded-[8px] border border-line-strong bg-transparent px-[18px] py-[10.5px] text-[13.5px] font-medium text-ink transition duration-200 hover:border-ink hover:bg-surface-alt",
   "on-dark":
     "rounded-[11px] bg-white px-6 py-[15px] text-[15.5px] font-semibold text-primary-deep shadow-[0_14px_34px_rgba(2,32,28,.34)] transition duration-200 hover:-translate-y-px",
   "on-dark-ghost":

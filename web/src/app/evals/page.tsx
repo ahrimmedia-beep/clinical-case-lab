@@ -79,13 +79,13 @@ export default function EvalsPage() {
           <MonoTag>labels LLM-drafted, hand-checked</MonoTag>
         </p>
         {sample ? (
-          <p className="mt-3 text-[13.5px] text-muted">
+          <p className="mt-3 text-[14px] text-muted">
             These numbers are placeholders with the right shape, committed before the live run on Vertex AI. The page reads the real report the
             moment it replaces this file.
           </p>
         ) : null}
         {report.models.some(isSelfCheck) ? (
-          <p className="mt-3 text-[13.5px] text-muted">
+          <p className="mt-3 text-[14px] text-muted">
             The grey row is a self-check: a deterministic fake provider that proves the harness scores correctly. It never ranks.
           </p>
         ) : null}

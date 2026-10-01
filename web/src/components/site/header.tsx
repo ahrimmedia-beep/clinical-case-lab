@@ -8,8 +8,11 @@ const NAV = [
   { href: "/evals", label: "Evals" },
 ] as const;
 
+// `before` pads the tap target to 40px tall without changing the visible text/underline: it sits
+// outside the link's own box (negative inset), so hover/focus styling and the `after` underline
+// stay anchored to the text.
 const NAV_LINK =
-  "relative py-1 hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:w-0 after:bg-primary after:transition-[width] hover:after:w-full";
+  "relative py-1 hover:text-ink before:absolute before:inset-x-0 before:-top-[11px] before:-bottom-[11px] before:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:w-0 after:bg-primary after:transition-[width] hover:after:w-full";
 
 export function SiteHeader() {
   return (
