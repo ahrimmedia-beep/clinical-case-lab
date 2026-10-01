@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from app.schemas.attempt import AttemptIn, Calibration, OptionState
 from app.schemas.case import ClinicalCase
@@ -194,6 +195,16 @@ def test_case_without_treatment_has_one_max_point(case_pe: dict[str, Any]) -> No
 )
 def test_calibration(confidence: int, correct: bool, expected: Calibration) -> None:
     assert calibrate(confidence, correct) is expected
+
+
+def test_attempt_input_is_capped() -> None:
+    # Review Minor 2: at most 12 keys per stage (the A..L alphabet), 200 diagnosis characters.
+    full = list("ABCDEFGHIJKL")
+    assert AttemptIn.model_validate({"choices": {"workup": full}, "confidence": 3})
+    with pytest.raises(ValidationError):
+        AttemptIn.model_validate({"choices": {"workup": [*full, "A"]}, "confidence": 3})
+    with pytest.raises(ValidationError):
+        AttemptIn.model_validate({"diagnosis_text": "x" * 201, "confidence": 3})
 
 
 def test_unknown_choices_names_the_bad_key_and_stage(case_pe: dict[str, Any]) -> None:

@@ -232,6 +232,7 @@
                 "pattern": "^[A-L]$",
                 "type": "string"
               },
+              "maxItems": 12,
               "type": "array"
             },
             "propertyNames": {

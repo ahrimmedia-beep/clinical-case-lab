@@ -21,8 +21,12 @@ class MultiSelectStage(StrEnum):
     TREATMENT = "treatment"
 
 
+# One stage's picks: at most one per option key (A..L); duplicates count once in scoring.
+StageChoices = Annotated[list[OptionKey], Field(max_length=12)]
+
+
 class AttemptIn(StrictModel):
-    choices: dict[MultiSelectStage, list[OptionKey]] = Field(default_factory=dict)
+    choices: dict[MultiSelectStage, StageChoices] = Field(default_factory=dict)
     diagnosis_text: str = Field(default="", max_length=200)
     confidence: int = Field(ge=1, le=5)
     duration_ms: int | None = Field(default=None, ge=0, le=3_600_000)
