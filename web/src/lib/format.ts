@@ -60,12 +60,13 @@ export function formatPickRate(r: number | null | undefined): string | null {
   return `${Math.round(r * 100)}% of peers chose this`;
 }
 
-export function formatPatient(p: { age_years: number | null; sex: string }): string {
-  const child = p.age_years !== null && p.age_years < 18;
+export function formatPatient(p: { age_years?: number | null; sex: string }): string {
+  const age = p.age_years ?? null; // generated Patient.age_years is optional *and* nullable
+  const child = age !== null && age < 18;
   const noun =
     p.sex === "female" ? (child ? "girl" : "woman") : p.sex === "male" ? (child ? "boy" : "man") : child ? "child" : "patient";
-  if (p.age_years === null) return `${noun[0].toUpperCase()}${noun.slice(1)}, age not given`;
-  return `${p.age_years}-year-old ${noun}`;
+  if (age === null) return `${noun[0].toUpperCase()}${noun.slice(1)}, age not given`;
+  return `${age}-year-old ${noun}`;
 }
 
 export function initials(name: string | null | undefined): string {

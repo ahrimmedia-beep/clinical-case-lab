@@ -122,7 +122,7 @@ function StageRow({ stage, index, result, revealed, open, onToggle }: RowProps) 
         </b>
         {given ? null : <span className="mt-px block text-[11.5px] leading-[1.35] text-muted">{stage.hint}</span>}
       </span>
-      <span className="text-right">
+      <span className="text-end">
         {given ? (
           <span className="font-mono text-[9.5px] uppercase tracking-[.09em] text-muted">{revealed ? "Revealed now" : "Given to you"}</span>
         ) : (
