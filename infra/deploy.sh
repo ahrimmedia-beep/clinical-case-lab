@@ -208,7 +208,7 @@ deploy_jobs() {
     return 0
   fi
 
-  log "Cloud Run Job evals (python -m evals.run; executed by infra/run-evals.sh)"
+  log "Cloud Run Job evals (python -m evals.run; optional, see docs/EVALS.md)"
   llm_env > "$TMP_DIR/llm.env.yaml"
   gc run jobs deploy evals --image="$API_IMAGE" --region="$REGION" --service-account="$API_SA" \
     --env-vars-file="$TMP_DIR/llm.env.yaml" "$(secrets_flag "$(fallback_secret_list)")" \
