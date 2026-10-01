@@ -1,0 +1,17 @@
+# Local environments and caches never enter the image (a host .venv would overwrite the built one)
+.venv
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+evals/.cache
+# Tests stay out of the runtime image
+tests
+# Secrets and build files
+.env
+.env.*
+Dockerfile
+.dockerignore
