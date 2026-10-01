@@ -18,6 +18,7 @@ import { OptionChips } from "./option-chips";
 import { RevealList } from "./reveal-list";
 import { clearSavedResult, saveResult, useSavedResult } from "./saved-result";
 import { StageRail } from "./stage-rail";
+import { useLockPulse, useStageTransition } from "./use-stage-motion";
 import {
   attemptToFormData,
   canAdvance,
@@ -88,6 +89,8 @@ function PlayerRound({ caseData, given, onPlayAgain }: Props & { onPlayAgain: ()
   const headingId = useId();
   const revealedStages = useMemo(() => withheldStageKeys(caseData.stages), [caseData.stages]);
   const isDraft = caseData.review_status === "draft";
+  const stageBody = useRef<HTMLDivElement>(null);
+  useStageTransition(stageBody, state.phase === "intro" ? -1 : state.current);
 
   const [submitState, submit, pending] = useActionState(async (_prev: SubmitState, formData: FormData): Promise<SubmitState> => {
     const next = await submitAttempt(slug, IDLE_SUBMIT, formData); // don't ship the previous state back to the server
@@ -193,7 +196,7 @@ function PlayerRound({ caseData, given, onPlayAgain }: Props & { onPlayAgain: ()
               </span>
               <MonoTag className="ml-auto">{stage.kind === "given" ? "given to you" : stage.hint}</MonoTag>
             </header>
-            <div key={stage.key} className="animate-rise px-5 py-5 sm:px-6">
+            <div key={stage.key} ref={stageBody} data-stage-body="" className="px-5 py-5 sm:px-6">
               {stage.kind === "given" ? (
                 <>
                   <h2 id={headingId} className="sr-only">
@@ -258,20 +261,28 @@ function DecisionStage({ stage, state, dispatch, headingId, revealPending, revea
   const locked = Boolean(state.locked[stage.key]);
   const frozen = locked || state.phase !== "playing";
   const options = stage.options ?? [];
+  const scope = useRef<HTMLDivElement>(null);
+  useLockPulse(scope, locked);
   return (
-    <div>
+    <div ref={scope}>
       <h2 id={headingId} className="text-h3 [overflow-wrap:anywhere]">
         {stage.prompt ?? stage.label}
       </h2>
       {stage.input === "free_text" ? (
-        <div className="mt-5 space-y-6">
+        <div data-lock-pulse="" className="mt-5 space-y-6">
           <DiagnosisInput value={state.diagnosisText} disabled={frozen} onChange={(text) => dispatch({ type: "setDiagnosis", text })} />
           <ConfidenceSelector value={state.confidence} disabled={frozen} onChange={(value) => dispatch({ type: "setConfidence", value })} />
-          {locked ? <p className="font-mono text-[11px] text-muted">Locked in.</p> : null}
+          {locked ? (
+            <p data-locked-note="" className="font-mono text-[11px] text-muted">
+              Locked in.
+            </p>
+          ) : null}
         </div>
       ) : (
         <>
-          <p className="mt-1.5 text-[13px] text-muted">{locked ? "Locked in." : "Choose all that apply, then lock in."}</p>
+          <p data-locked-note="" className="mt-1.5 text-[13px] text-muted">
+            {locked ? "Locked in." : "Choose all that apply, then lock in."}
+          </p>
           <OptionChips
             label={stage.prompt ?? stage.label}
             options={options}
