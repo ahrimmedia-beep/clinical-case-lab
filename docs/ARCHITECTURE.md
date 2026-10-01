@@ -15,21 +15,23 @@ flowchart LR
       simulate[["job: simulate<br/>seeded cohort"]]
     end
     sql[("Cloud SQL<br/>PostgreSQL 18")]
-    vertex{{"Vertex AI<br/>Gemini · Claude"}}
-    secrets["Secret Manager<br/>db-password · internal-api-key"]
+    vertex{{"Vertex AI<br/>Gemini"}}
+    secrets["Secret Manager<br/>db-password · internal-api-key · anthropic-api-key"]
   end
+  anthropic{{"Anthropic API<br/>Claude"}}
   browser -->|"HTML, Server Action posts"| web
   web -->|"typed client, server to server<br/>X-Internal-Key on privileged routes"| api
   api -->|"Cloud SQL unix socket"| sql
   migrate --> sql
   simulate --> sql
   api -->|"service account, aiplatform.user"| vertex
+  api -->|"ANTHROPIC_API_KEY from Secret Manager"| anthropic
   secrets -.->|"env at startup"| api
   secrets -.-> web
 ```
 
 - **web** renders every page on the server. Server Components fetch from the API, Server Actions submit attempts, reveals and Studio requests. The API client (`web/src/lib/api/client.ts`) is a `server-only` module, so the browser never calls the API and never sees the internal key.
-- **api** owns the data, the scoring and the LLM pipeline. It reaches Cloud SQL through Cloud Run's built-in Cloud SQL connection (a unix socket) and Vertex AI with its own service account, so no API keys are needed in production.
+- **api** owns the data, the scoring and the LLM pipeline. It reaches Cloud SQL through Cloud Run's built-in Cloud SQL connection (a unix socket) and Gemini through Vertex AI with its own service account, so no API key is needed for Gemini. Claude runs on the direct Anthropic API instead of Vertex AI: this project's Vertex AI quota request for Claude was auto-denied (`NOT_ENOUGH_USAGE_HISTORY`), so `make_claude_client` falls back to an API key held in Secret Manager. The Vertex path for Claude (`AnthropicVertex`) is implemented and tested, just not what production calls today. Why both providers sit behind one small adapter protocol, and the full routing story, are in [DEPLOY.md](DEPLOY.md#models-gemini-on-vertex-ai-claude-on-the-anthropic-api).
 - **migrate** runs `alembic upgrade head` with the api image and is awaited before every api deploy. **simulate** writes the labelled simulated cohort. Details: [DEPLOY.md](DEPLOY.md).
 
 | Path | Responsibility |
