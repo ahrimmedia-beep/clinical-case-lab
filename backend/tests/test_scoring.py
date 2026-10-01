@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -11,13 +13,21 @@ from app.scoring import (
     calibrate,
     diagnosis_candidates,
     diagnosis_matches,
+    diagnosis_vocabulary,
+    judge_diagnosis,
     normalize_diagnosis,
     score_attempt,
     unknown_choices,
 )
 from app.stages import Stage
+from app.textnorm import normalize
 
 PE_TERMS = ["Pulmonary embolism", "PE", "Pulmonary thromboembolism"]
+SEED_CASES = Path(__file__).resolve().parents[1] / "seeds" / "cases"
+
+
+def seed_case(name: str) -> ClinicalCase:
+    return ClinicalCase.model_validate(json.loads((SEED_CASES / name).read_text()))
 
 
 def attempt(
@@ -259,11 +269,21 @@ def test_harmful_picks_outside_treatment_are_reported_but_cost_no_points(
         "pulmonary embolism vs pneumothorax",
         "Pulmonary embolism versus pneumonia",
         "PE vs. pneumonia",
-        "pulmonary embolism, pneumonia",
+        "pulmonary embolism, pneumothorax",
         "PE/pneumonia",
         "PE; pneumothorax",
+        "PE; pneumonia",
         "PE and/or pneumonia",
         "pneumonia OR pulmonary embolism",
+        "PE vs pneumothorax",
+        "PE?",
+        "Pulmonary embolism?",
+        "pulmonary embolism or",
+        # An explicit marker is a hedge even between two names of the same diagnosis.
+        "PE / pulmonary embolism",
+        # Lists of two diagnoses the case names.
+        "PE, pneumothorax",
+        "PE and pneumothorax",
     ],
 )
 def test_hedged_diagnosis_is_wrong(case: ClinicalCase, answer: str) -> None:
@@ -282,7 +302,7 @@ def test_hedged_diagnosis_is_wrong(case: ClinicalCase, answer: str) -> None:
         "pulmonary emboli",
         "P.E.",
         "Pulmonary-embolism.",
-        "PE / pulmonary embolism",
+        "Pulmonary embolism, PE",  # a comma between two names of the same diagnosis
     ],
 )
 def test_single_candidate_is_not_hedged(case: ClinicalCase, answer: str) -> None:
@@ -294,6 +314,7 @@ def test_single_candidate_is_not_hedged(case: ClinicalCase, answer: str) -> None
 def test_diagnosis_candidates_splits_on_every_hedge_separator() -> None:
     assert diagnosis_candidates("PE or pneumonia") == ["PE", "pneumonia"]
     assert diagnosis_candidates("a vs. b versus c, d/e; f and/or g") == list("abcdefg")
+    assert diagnosis_candidates("PE?") == ["PE"]
     assert diagnosis_candidates("Lymphangioleiomyomatosis") == ["Lymphangioleiomyomatosis"]
     assert diagnosis_candidates("pulmonary embolism or") == ["pulmonary embolism"]
     assert diagnosis_candidates("") == []
@@ -310,3 +331,157 @@ def test_matching_uses_token_sort_not_token_set() -> None:
 def test_bracketed_abbreviation_still_matches() -> None:
     assert diagnosis_matches("Pulmonary embolism (PE)", PE_TERMS)
     assert diagnosis_matches("Lymphangioleiomyomatosis (LAM)", ["Lymphangioleiomyomatosis"])
+
+
+# ---------- specific diagnoses vs hedges, on the real seed cases (spec §9) ----------
+
+
+def judged(case: ClinicalCase, answer: str) -> tuple[bool, bool]:
+    """`(correct, hedged)` through `score_attempt`, the path every attempt takes."""
+    score = score_attempt(case, attempt(dx=answer))
+    return score.diagnosis.correct, score.diagnosis.hedged
+
+
+@pytest.mark.parametrize(
+    ("seed", "answer"),
+    [
+        # Marked wrong on the live site before the fix.
+        (
+            "03-lam.json",
+            "Sporadic lymphangioleiomyomatosis (LAM) with recurrent pneumothorax and renal "
+            "angiomyolipoma",
+        ),
+        ("02-aatd.json", "Alpha-1 antitrypsin deficiency-related panlobular emphysema"),
+        (
+            "02-aatd.json",
+            "Alpha-1 antitrypsin deficiency (likely PiZZ) with early-onset panlobular basal "
+            "emphysema",
+        ),
+        (
+            "01-pe.json",
+            "Acute pulmonary embolism secondary to deep vein thrombosis (provoked by long-haul "
+            "flight and combined oral contraceptive)",
+        ),
+        ("03-lam.json", "sporadic LAM with recurrent pneumothorax"),
+        ("02-aatd.json", "AATD-related panlobular emphysema"),
+        ("01-pe.json", "acute PE secondary to DVT"),
+        # More specific answers the four eval models gave.
+        (
+            "02-aatd.json",
+            "Severe alpha-1 antitrypsin deficiency (PiZZ) with lower-lobe panlobular emphysema",
+        ),
+        ("03-lam.json", "Lymphangioleiomyomatosis, sporadic form"),
+        # A comma followed by qualifiers, or by a clause that starts with a connector.
+        ("01-pe.json", "Acute PE, provoked"),
+        ("01-pe.json", "Acute PE, secondary to DVT"),
+        ("01-pe.json", "Pulmonary embolism, complicated by pneumothorax"),
+        ("02-aatd.json", "AATD, emphysema"),
+        ("02-aatd.json", "AATD, chronic"),
+        ("03-lam.json", "LAM, sporadic"),
+        # The accepted name inflected inside a longer answer.
+        ("01-pe.json", "Bilateral pulmonary emboli with right heart strain"),
+        # A negation that follows the diagnosis is about something else.
+        ("01-pe.json", "PE without right heart strain"),
+        ("01-pe.json", "PE, not pneumothorax"),
+        # "and" joins a co-diagnosis the case does not list as an alternative.
+        ("01-pe.json", "Acute PE and DVT"),
+    ],
+)
+def test_a_more_specific_diagnosis_is_right(seed: str, answer: str) -> None:
+    assert judged(seed_case(seed), answer) == (True, False), answer
+
+
+def test_a_comma_followed_by_qualifiers_is_not_a_hedge() -> None:
+    assert judge_diagnosis("Sarcoidosis, Scadding stage II", ["Sarcoidosis"]) == (True, False)
+    vocabulary = ["Löfgren syndrome", "Tuberculosis", "Lymphoma"]
+    answer = "Sarcoidosis, Scadding stage II, presenting as Löfgren syndrome"
+    assert judge_diagnosis(answer, ["Sarcoidosis"], vocabulary) == (True, False)
+
+
+@pytest.mark.parametrize(
+    ("seed", "answer"),
+    [
+        ("01-pe.json", "Acute PE, pneumothorax"),
+        ("01-pe.json", "Pneumothorax, pulmonary emboli"),
+        ("01-pe.json", "PE and pneumothorax"),
+        ("01-pe.json", "PE & pneumothorax"),
+        ("01-pe.json", "PE, GERD"),  # the case's "Gastro-oesophageal reflux" option
+        ("01-pe.json", "Pneumothorax with tachycardia, pulmonary embolism"),
+        ("02-aatd.json", "AATD, asthma"),
+        ("02-aatd.json", "Bronchiectasis, alpha-1 antitrypsin deficiency"),
+        ("02-aatd.json", "AATD, COPD"),
+        ("03-lam.json", "LAM, Birt-Hogg-Dube syndrome"),
+        ("03-lam.json", "Lymphangioleiomyomatosis, pulmonary Langerhans cell histiocytosis"),
+        ("03-lam.json", "LAM, pneumothorax"),
+        ("03-lam.json", "LAM or pneumothorax"),
+        ("01-pe.json", "PE, likely pneumothorax"),  # a softener does not hide the second one
+        ("01-pe.json", "Pneumothorax, PE unlikely"),
+    ],
+)
+def test_a_comma_list_of_diagnoses_is_a_hedge(seed: str, answer: str) -> None:
+    assert judged(seed_case(seed), answer) == (False, True), answer
+
+
+def test_a_comma_list_names_the_case_vocabulary(case_pe: dict[str, Any]) -> None:
+    data = copy.deepcopy(case_pe)
+    data["differential"] += [{"name": "Pneumonia"}, {"name": "COPD exacerbation"}]
+    case = ClinicalCase.model_validate(data)
+    assert judged(case, "PE, pneumonia, COPD exacerbation") == (False, True)
+    assert judged(case, "pulmonary embolism, pneumonia") == (False, True)
+    assert judged(case, "Acute PE, provoked") == (True, False)
+
+
+@pytest.mark.parametrize(
+    ("seed", "answer"),
+    [
+        ("02-aatd.json", "Emphysema"),
+        ("02-aatd.json", "Chronic obstructive pulmonary disease"),
+        ("03-lam.json", "Pneumothorax"),
+        ("03-lam.json", "Primary spontaneous pneumothorax"),
+        ("01-pe.json", "Pneumothorax"),
+        ("01-pe.json", "Deep vein thrombosis"),
+        ("01-pe.json", "Pulmonary"),
+    ],
+)
+def test_a_less_specific_or_other_diagnosis_is_wrong(seed: str, answer: str) -> None:
+    assert judged(seed_case(seed), answer) == (False, False), answer
+
+
+def test_less_specific_than_the_accepted_answer_is_wrong() -> None:
+    assert judge_diagnosis("Pneumothorax", ["Tension pneumothorax"]) == (False, False)
+    assert judge_diagnosis("Left tension pneumothorax", ["Tension pneumothorax"]) == (True, False)
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        "Not PE",
+        "not pulmonary embolism",
+        "No evidence of pulmonary embolism",
+        "Pneumothorax with PE ruled out",
+        "Pneumothorax, PE unlikely",
+    ],
+)
+def test_a_negated_diagnosis_is_wrong(answer: str) -> None:
+    correct, _ = judged(seed_case("01-pe.json"), answer)
+    assert correct is False, answer
+
+
+def test_judge_diagnosis_without_a_vocabulary_still_works() -> None:
+    assert judge_diagnosis("PE or pneumonia", PE_TERMS) == (False, True)
+    assert judge_diagnosis("acute PE secondary to DVT", PE_TERMS) == (True, False)
+    assert judge_diagnosis("", PE_TERMS) == (False, False)
+    assert judge_diagnosis("?", PE_TERMS) == (False, False)  # blank: missed, not a hedge
+
+
+def test_diagnosis_vocabulary_lists_every_diagnosis_the_case_names() -> None:
+    vocabulary = diagnosis_vocabulary(seed_case("02-aatd.json"))
+    for term in (
+        "Alpha-1 antitrypsin deficiency",  # final diagnosis
+        "AATD",  # accepted answer
+        "Asthma",  # differential
+        "COPD from smoking alone",  # differential decision option
+        "Congestive heart failure",
+    ):
+        assert term in vocabulary, term
+    assert len(vocabulary) == len({normalize(t) for t in vocabulary})  # no duplicates

@@ -6,7 +6,9 @@ right / wrong / missed without points, like Eximion's debrief. Two anti-gaming r
 
 * treatment points = max(0, right - wrong), and any harmful treatment pick zeroes them, so
   ticking every option scores nothing;
-* a diagnosis that names several candidates ("PE or pneumonia") is wrong (`hedged`).
+* a diagnosis that names several candidates ("PE or pneumonia", "PE, pneumothorax") is wrong
+  (`hedged`), while one diagnosis named more specifically ("sporadic LAM with recurrent
+  pneumothorax", "Acute PE, provoked") is right.
 """
 
 from __future__ import annotations
@@ -40,6 +42,8 @@ ABBREVIATIONS: dict[str, str] = {
     "tb": "tuberculosis",
     "mi": "myocardial infarction",
     "chf": "congestive heart failure",
+    "gerd": "gastro oesophageal reflux disease",
+    "gord": "gastro oesophageal reflux disease",
 }
 
 # Severity / course words that do not change the diagnosis ("acute PE" is PE). They are dropped
@@ -48,8 +52,51 @@ QUALIFIERS: frozenset[str] = frozenset(
     {"acute", "subacute", "chronic", "massive", "submassive", "bilateral", "sporadic"}
 )
 
-# Hedging separators (spec §9): " or ", " vs ", " versus ", ",", "/", ";", "and/or".
-_HEDGE_SPLIT = re.compile(r"\band/or\b|\bor\b|\bversus\b|\bvs\b\.?|[,/;]", re.IGNORECASE)
+# Explicit hedge markers (spec §9): " or ", " vs ", " vs. ", " versus ", "/", ";", "and/or",
+# "?". Any of them in the raw text makes the answer a hedge.
+_EXPLICIT_HEDGE = re.compile(r"\bor\b|\bvs\b|\bversus\b|[/;?]", re.IGNORECASE)
+# Every separator, commas included: the candidate parts of an answer.
+_HEDGE_SPLIT = re.compile(r"\band/or\b|\bor\b|\bversus\b|\bvs\b\.?|[,/;?]", re.IGNORECASE)
+
+# From one of these words on, a part qualifies the diagnosis before it ("Acute PE, secondary to
+# DVT", "LAM with recurrent pneumothorax and renal angiomyolipoma"); it names no new candidate.
+_CONNECTORS: frozenset[str] = frozenset(
+    {
+        "with",
+        "without",
+        "no",
+        "not",
+        "secondary",
+        "due",
+        "caused",
+        "complicated",
+        "complicating",
+        "associated",
+        "presenting",
+        "provoked",
+        "triggered",
+        "related",
+        "following",
+        "after",
+        "from",
+        "in",
+        "on",
+    }
+)
+# Softeners are ignored in a list item: "PE, likely pneumothorax" still lists two candidates.
+_SOFTENERS: frozenset[str] = frozenset(
+    {"likely", "probable", "probably", "possible", "possibly", "suspected", "presumed"}
+)
+
+# A negation before the diagnosis ("not PE", "no evidence of PE") or right after it ("PE ruled
+# out") means the answer does not name it. "PE without right heart strain" still names PE.
+_NEGATION_BEFORE = re.compile(
+    r"\b(?:no|not|without|exclud\w*|rule[ds]? out|negative for|absence of|free of)\b"
+)
+_NEGATION_AFTER = re.compile(r"^(?:\w+ ){0,2}(?:excluded|unlikely|ruled out)\b")
+
+# Key shared by every accepted name of the case's own diagnosis.
+_ANSWER = ""
 
 
 @dataclass(frozen=True)
@@ -111,14 +158,18 @@ def _collapse_initials(tokens: list[str]) -> list[str]:
     return out
 
 
+def _diagnosis_tokens(text: str) -> list[str]:
+    """Normalized words with dotted initials collapsed and abbreviations expanded."""
+    tokens = _collapse_initials(normalize(text).split())
+    return " ".join(ABBREVIATIONS.get(token, token) for token in tokens).split()
+
+
 def normalize_diagnosis(text: str) -> str:
     """Normalize, collapse dotted initials, expand abbreviations, drop repeated tokens.
 
     "Pulmonary embolism (PE)" and "pulmonary embolism" both become "pulmonary embolism".
     """
-    tokens = _collapse_initials(normalize(text).split())
-    expanded = " ".join(ABBREVIATIONS.get(token, token) for token in tokens).split()
-    return " ".join(dict.fromkeys(expanded))
+    return " ".join(dict.fromkeys(_diagnosis_tokens(text)))
 
 
 def _without_qualifiers(normalized: str) -> str:
@@ -127,7 +178,8 @@ def _without_qualifiers(normalized: str) -> str:
 
 
 def diagnosis_candidates(text: str) -> list[str]:
-    """Split free text on the hedging separators; blank parts are dropped."""
+    """Split free text on every separator (the explicit hedge markers and commas); blank
+    parts are dropped."""
     return [part.strip() for part in _HEDGE_SPLIT.split(text) if normalize(part)]
 
 
@@ -149,21 +201,149 @@ def diagnosis_matches(answer: str, accepted: Sequence[str]) -> bool:
     return False
 
 
-def judge_diagnosis(text: str, accepted: Sequence[str]) -> tuple[bool, bool]:
-    """Return `(correct, hedged)` for a free-text diagnosis.
+def _phrase_spans(tokens: list[str], phrase: list[str], *, fuzzy: bool) -> list[tuple[int, int]]:
+    """Where `phrase` occurs in `tokens` as whole words. With `fuzzy`, a window of the same
+    length with `ratio >= 90` also counts ("pulmonary emboli" for "pulmonary embolism")."""
+    n = len(phrase)
+    if not n:
+        return []
+    target = " ".join(phrase)
+    spans: list[tuple[int, int]] = []
+    for start in range(len(tokens) - n + 1):
+        window = tokens[start : start + n]
+        if window == phrase or (fuzzy and fuzz.ratio(" ".join(window), target) >= FUZZY_THRESHOLD):
+            spans.append((start, start + n))
+    return spans
 
-    An exact accepted answer always counts (even if it contains a comma). Otherwise the text is
-    split on the hedging separators; more than one distinct candidate is a hedge and is wrong.
+
+def _negated(tokens: list[str], start: int, end: int) -> bool:
+    before = " ".join(tokens[:start])
+    after = " ".join(tokens[end:])
+    return bool(_NEGATION_BEFORE.search(before) or _NEGATION_AFTER.match(after))
+
+
+def names_accepted_answer(text: str, accepted: Sequence[str]) -> bool:
+    """True if the text names an accepted answer: near-equal to it (`diagnosis_matches`), or
+    containing it as a whole phrase with extra qualifiers ("AATD-related panlobular emphysema",
+    "acute PE secondary to DVT"). A negated mention ("not PE", "PE ruled out") does not count.
+    """
+    tokens = _diagnosis_tokens(text)
+    # A trailing cue ("PE excluded") never passes the near-equal check, so only leading ones.
+    if diagnosis_matches(text, accepted) and not _NEGATION_BEFORE.search(" ".join(tokens)):
+        return True
+    for answer in accepted:
+        for start, end in _phrase_spans(tokens, _diagnosis_tokens(answer), fuzzy=True):
+            if not _negated(tokens, start, end):
+                return True
+    return False
+
+
+def diagnosis_vocabulary(case: ClinicalCase) -> list[str]:
+    """Every diagnosis the case names: its accepted answers and final diagnosis, the
+    differential, and the options of the differential decision (duplicates dropped)."""
+    terms = [*case.diagnosis_terms(), *(d.name for d in case.differential)]
+    for decision in case.decisions:
+        if decision.stage == DecisionStage.DIFFERENTIAL:
+            terms.extend(o.text for o in decision.options)
+    seen: set[str] = set()
+    unique: list[str] = []
+    for term in terms:
+        key = normalize(term)
+        if key and key not in seen:
+            seen.add(key)
+            unique.append(term)
+    return unique
+
+
+def _list_items(text: str) -> list[list[str]]:
+    """The candidate items of an answer, as diagnosis tokens: each comma part up to its first
+    connector word, split on "and" / "&" / "+". A part that opens with a connector yields none.
+    """
+    items: list[list[str]] = []
+    for part in diagnosis_candidates(text):
+        spaced = part.replace("&", " and ").replace("+", " and ")
+        tokens = [t for t in _diagnosis_tokens(spaced) if t not in _SOFTENERS]
+        item: list[str] = []
+        for token in [*tokens, "and"]:
+            if token in _CONNECTORS:
+                break
+            if token == "and":
+                if item:
+                    items.append(item)
+                item = []
+            else:
+                item.append(token)
+        if item:
+            items.append(item)
+    return items
+
+
+def _named_diagnoses(
+    tokens: list[str], vocabulary: Sequence[tuple[str, list[str], str]]
+) -> set[str]:
+    """Keys of the vocabulary diagnoses one list item names; empty if it only qualifies.
+
+    An item names a term if it contains the term (whole phrase, or a near-equal window) or the
+    term contains the item (whole phrase, item >= 4 characters). Every accepted name of the
+    case's diagnosis shares one key.
+    """
+    if all(t in QUALIFIERS for t in tokens):
+        return set()
+    text = " ".join(tokens)
+    return {
+        key
+        for term, term_tokens, key in vocabulary
+        if _phrase_spans(tokens, term_tokens, fuzzy=True)
+        or diagnosis_matches(text, [term])
+        or (len(text) >= 4 and _phrase_spans(term_tokens, tokens, fuzzy=False))
+    }
+
+
+def _is_listed_hedge(text: str, accepted: Sequence[str], vocabulary: Sequence[str]) -> bool:
+    """Two or more list items that each name a diagnosis of the case vocabulary, with no
+    diagnosis that all of them name ("PE, pneumothorax", "LAM and Birt-Hogg-Dube syndrome")."""
+    accepted_keys = {normalize_diagnosis(a) for a in accepted}
+    entries: list[tuple[str, list[str], str]] = []
+    for term in (*accepted, *vocabulary):
+        tokens = _diagnosis_tokens(term)
+        if tokens:
+            key = normalize_diagnosis(term)
+            entries.append((term, tokens, _ANSWER if key in accepted_keys else key))
+    named = [keys for item in _list_items(text) if (keys := _named_diagnoses(item, entries))]
+    return len(named) >= 2 and not set.intersection(*named)
+
+
+def _squash(text: str) -> str:
+    return " ".join(text.casefold().split())
+
+
+def judge_diagnosis(
+    text: str, accepted: Sequence[str], vocabulary: Sequence[str] = ()
+) -> tuple[bool, bool]:
+    """Return `(correct, hedged)` for a free-text diagnosis (spec §9).
+
+    1. Blank -> `(False, False)` (missed).
+    2. An explicit hedge marker (or / vs / versus / "/" / ";" / "?") -> hedged, unless the
+       text is an accepted answer as written.
+    3. A list (commas, or "and" before any connector word such as "with") whose items name
+       different diagnoses of the case vocabulary ("PE, pneumonia, COPD exacerbation") ->
+       hedged. `vocabulary` is `diagnosis_vocabulary(case)`; a comma followed by qualifiers
+       ("Sarcoidosis, Scadding stage II", "Acute PE, provoked") is not a list.
+    4. Otherwise correct if it names an accepted answer (`names_accepted_answer`); a less
+       specific answer ("Pneumothorax" for "Tension pneumothorax") is wrong.
     """
     given = normalize_diagnosis(text)
     if not given:
         return False, False
+    if _squash(text) in {_squash(a) for a in accepted}:
+        return True, False
+    if _EXPLICIT_HEDGE.search(text):
+        return False, True
     if any(given == normalize_diagnosis(a) for a in accepted):
         return True, False
-    distinct = {normalize_diagnosis(c) for c in diagnosis_candidates(text)}
-    if len(distinct) > 1:
+    if _is_listed_hedge(text, accepted, vocabulary):
         return False, True
-    return diagnosis_matches(text, accepted), False
+    return names_accepted_answer(text, accepted), False
 
 
 def calibrate(confidence: int, correct: bool) -> Calibration:
@@ -235,7 +415,9 @@ def score_attempt(case: ClinicalCase, attempt: AttemptIn) -> AttemptScore:
             scores[stage] = score_multi_select(decision, chosen.get(stage, []))
 
     answered = bool(normalize(attempt.diagnosis_text))
-    correct, hedged = judge_diagnosis(attempt.diagnosis_text, case.diagnosis_terms())
+    correct, hedged = judge_diagnosis(
+        attempt.diagnosis_text, case.diagnosis_terms(), diagnosis_vocabulary(case)
+    )
     diagnosis = DiagnosisScore(
         text=attempt.diagnosis_text,
         answered=answered,
