@@ -4,7 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Path
 
-from app.problems import raise_problem
+from app.db.engine import EngineDep
+from app.repository.attempts import attempt_result, record_attempt
 from app.schemas.attempt import AttemptIn, AttemptResult
 from app.schemas.common import ProblemDetail
 
@@ -18,5 +19,9 @@ Slug = Annotated[str, Path(pattern=r"^[a-z0-9-]{3,100}$")]
     response_model=AttemptResult,
     responses={404: {"model": ProblemDetail}, 422: {"model": ProblemDetail}},
 )
-async def create_attempt(slug: Slug, body: AttemptIn) -> AttemptResult:
-    raise_problem(501, "Not implemented yet")
+async def create_attempt(slug: Slug, body: AttemptIn, engine: EngineDep) -> AttemptResult:
+    async with engine.connect() as conn:
+        # Answer key read + scoring + attempt and choices insert: one transaction (404 / 422
+        # roll back). Cohort analytics run after the commit, so this attempt is in its cohort.
+        recorded = await record_attempt(conn, slug, body)
+        return await attempt_result(conn, recorded)
