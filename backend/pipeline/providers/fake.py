@@ -13,7 +13,7 @@ from pathlib import Path
 from pydantic import BaseModel, ValidationError
 
 from app.schemas.extract import Usage
-from pipeline.models import LLMAuthoredCase, LLMExtractedFacts
+from pipeline.models import LLMAuthoredCase, LLMExtractedFacts, LLMPlayerTurn1, LLMPlayerTurn2
 from pipeline.providers.base import (
     InvalidOutput,
     LLMResult,
@@ -60,7 +60,8 @@ class FakeProvider:
 
     @classmethod
     def default(cls, *, name: str = "gemini", model: str = "fake-model") -> FakeProvider:
-        """Answers with the pulmonary-embolism fixtures that match `fake_source.txt`."""
+        """Answers with the pulmonary-embolism fixtures that match `fake_source.txt`; as an AI
+        player it always picks A and B and names pulmonary embolism (key-less demos only)."""
         extract = (FIXTURES / "fake_extract.json").read_text(encoding="utf-8")
         author = (FIXTURES / "fake_author.json").read_text(encoding="utf-8")
         return cls(
@@ -69,6 +70,12 @@ class FakeProvider:
             by_schema={
                 LLMExtractedFacts: LLMExtractedFacts.model_validate_json(extract),
                 LLMAuthoredCase: LLMAuthoredCase.model_validate_json(author),
+                LLMPlayerTurn1: LLMPlayerTurn1(
+                    interview=["A", "B"], differential=["A", "B"], workup=["A", "B"]
+                ),
+                LLMPlayerTurn2: LLMPlayerTurn2(
+                    diagnosis="Pulmonary embolism", confidence=4, treatment=["A", "B"]
+                ),
             },
         )
 

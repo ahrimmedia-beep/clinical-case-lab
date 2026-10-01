@@ -124,6 +124,28 @@ class LLMAuthoredCase(LLMModel):
     decisions: list[LLMDecision]
 
 
+class LLMPlayerTurn1(LLMModel):
+    """AI player, turn 1 (spec §10.7): option keys for interview, differential and workup."""
+
+    interview: list[str] = Field(
+        description="Keys of the questions you ask, e.g. ['A', 'C']; [] if the stage is absent."
+    )
+    differential: list[str] = Field(
+        description="Keys of the diagnoses you keep open; [] if the stage is absent."
+    )
+    workup: list[str] = Field(description="Keys of the tests you order; [] if the stage is absent.")
+
+
+class LLMPlayerTurn2(LLMModel):
+    """AI player, turn 2: one diagnosis, a confidence and the treatment option keys."""
+
+    diagnosis: str = Field(description="Your single final diagnosis, written out in full.")
+    confidence: int = Field(description="1 = a guess, 3 = more likely than not, 5 = certain.")
+    treatment: list[str] = Field(
+        description="Keys of the treatment options you choose; [] if the stage is absent."
+    )
+
+
 # ---------- converters ----------
 
 _ICD10 = re.compile(r"^[A-Z][0-9][0-9A-Z](\.[0-9A-Z]{1,4})?$")

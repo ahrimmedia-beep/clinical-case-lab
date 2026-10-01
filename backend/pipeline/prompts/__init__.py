@@ -10,7 +10,7 @@ PROMPT_VERSION = "v1"
 _DIR = Path(__file__).parent
 
 
-def load_prompt(name: Literal["extract", "author"], version: str = PROMPT_VERSION) -> str:
+def load_prompt(name: Literal["extract", "author", "player"], version: str = PROMPT_VERSION) -> str:
     return (_DIR / f"{name}_{version}.md").read_text(encoding="utf-8")
 
 
