@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "title": "Worsening breathlessness at 41 despite quitting smoking",
+  "specialty": "pulmonology",
+  "difficulty": "medium",
+  "estimated_minutes": 7,
+  "patient": {"display_name": "Mr. D.", "age_years": 41, "sex": "male"},
+  "chief_complaint": "Breathlessness on exertion that has been getting worse for two years",
+  "vignette": "A 41-year-old carpenter sees his GP because he now has to stop for breath after one flight of stairs. He smoked 10 cigarettes a day from age 17 and stopped five years ago. Two courses of inhalers for presumed asthma did not help. His father died of 'emphysema' at 52 without ever having smoked heavily.",
+  "findings": [
+    {"category": "symptom", "text": "Progressive exertional breathlessness over two years", "evidence": "he now has to stop for breath after one flight of stairs"},
+    {"category": "symptom", "text": "Morning cough with scant clear sputum", "evidence": null},
+    {"category": "history", "text": "Two courses of inhaled treatment for presumed asthma without benefit", "evidence": "Two courses of inhalers for presumed asthma did not help"},
+    {"category": "history", "text": "Neonatal jaundice that needed phototherapy, according to his mother", "evidence": null},
+    {"category": "social", "text": "Ex-smoker: 10 cigarettes a day from age 17 to 36 (about 10 pack-years)", "evidence": "He smoked 10 cigarettes a day from age 17 and stopped five years ago"},
+    {"category": "social", "text": "Carpenter; drinks about 10 units of alcohol a week", "evidence": null},
+    {"category": "family", "text": "Father died of emphysema at 52 despite light smoking", "evidence": "His father died of 'emphysema' at 52"},
+    {"category": "exam", "text": "Hyperinflated chest with reduced breath sounds at both bases", "evidence": null},
+    {"category": "exam", "text": "Prolonged expiration; no wheeze and no clubbing", "evidence": null},
+    {"category": "imaging", "text": "Chest X-ray: hyperinflated lungs with lucent lower zones", "evidence": null},
+    {"category": "imaging", "text": "CT chest: panlobular emphysema, worst in both lower lobes", "evidence": null},
+    {"category": "procedure", "text": "Spirometry: FEV1/FVC 0.52 with no significant bronchodilator reversibility", "evidence": null},
+    {"category": "procedure", "text": "Genotyping: PiZZ, confirming severe alpha-1 antitrypsin deficiency", "evidence": null}
+  ],
+  "measurements": [
+    {"kind": "vital", "name": "Heart rate", "value": 88, "value_text": null, "unit": "bpm", "flag": "normal", "evidence": null},
+    {"kind": "vital", "name": "Respiratory rate", "value": 20, "value_text": null, "unit": "/min", "flag": "normal", "evidence": null},
+    {"kind": "vital", "name": "SpO2", "value": 94, "value_text": null, "unit": "%", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "FEV1", "value": 48, "value_text": null, "unit": "% predicted", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "DLCO", "value": 51, "value_text": null, "unit": "% predicted", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "Serum alpha-1 antitrypsin", "value": 0.3, "value_text": null, "unit": "g/L", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "ALT", "value": 62, "value_text": null, "unit": "U/L", "flag": "high", "evidence": null}
+  ],
+  "final_diagnosis": {"name": "Alpha-1 antitrypsin deficiency", "icd10": "E88.01", "evidence": null},
+  "differential": [
+    {"name": "Chronic obstructive pulmonary disease", "icd10": "J44.9", "evidence": null},
+    {"name": "Asthma", "icd10": "J45.909", "evidence": null},
+    {"name": "Bronchiectasis", "icd10": "J47.9", "evidence": null}
+  ],
+  "decisions": [
+    {
+      "stage": "interview",
+      "prompt": "What else do you want to know?",
+      "explanation": "Fixed airflow obstruction at 41 after light smoking is out of proportion to the exposure: ask about the dose, the family, the liver and occupational exposure.",
+      "options": [
+        {"key": "A", "text": "How much did he smoke, and when did he stop?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "10 a day from 17 to 36; none since."},
+        {"key": "B", "text": "Any lung or liver disease in the family?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "His father died of emphysema at 52; an aunt had liver trouble."},
+        {"key": "C", "text": "Any liver problems or jaundice, even as a baby?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "His mother says he was jaundiced as a newborn and needed light treatment."},
+        {"key": "D", "text": "Any occupational dust or fume exposure?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Sawdust at work; he wears a mask most of the time."},
+        {"key": "E", "text": "Does he keep pets at home?", "is_correct": false, "is_harmful": false, "feedback": "Not relevant to fixed airflow obstruction at this age.", "reveal": "A cat."},
+        {"key": "F", "text": "Has he travelled abroad recently?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain two years of progressive breathlessness.", "reveal": "No."}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "differential",
+      "prompt": "Which diagnoses do you keep open?",
+      "explanation": "Early basal emphysema after light smoking is the classic picture of alpha-1 antitrypsin deficiency; smoking-related COPD stays open until the serum level is back.",
+      "options": [
+        {"key": "A", "text": "Alpha-1 antitrypsin deficiency", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "B", "text": "COPD from smoking alone", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "Asthma", "is_correct": false, "is_harmful": false, "feedback": "No reversibility and no response to inhaled treatment.", "reveal": null},
+        {"key": "D", "text": "Bronchiectasis", "is_correct": false, "is_harmful": false, "feedback": "Scant sputum and no crackles make it unlikely; the CT settles it.", "reveal": null},
+        {"key": "E", "text": "Congestive heart failure", "is_correct": false, "is_harmful": false, "feedback": "No orthopnoea, oedema or cardiomegaly.", "reveal": null}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "workup",
+      "prompt": "Which tests do you order?",
+      "explanation": "Spirometry confirms fixed obstruction, CT shows the basal panlobular pattern, and a low serum level followed by phenotyping or genotyping makes the diagnosis; the liver is checked because the same protein accumulates there.",
+      "options": [
+        {"key": "A", "text": "Spirometry with bronchodilator reversibility", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1/FVC 0.52, FEV1 48 % predicted, no significant reversibility."},
+        {"key": "B", "text": "Serum alpha-1 antitrypsin level", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "0.3 g/L (low)."},
+        {"key": "C", "text": "CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Panlobular emphysema, worst in both lower lobes."},
+        {"key": "D", "text": "Liver function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "ALT 62 U/L (raised); bilirubin normal."},
+        {"key": "E", "text": "Sweat chloride test", "is_correct": false, "is_harmful": false, "feedback": "Cystic fibrosis is unlikely with this history and imaging.", "reveal": "Normal."},
+        {"key": "F", "text": "Allergen skin-prick testing", "is_correct": false, "is_harmful": false, "feedback": "Atopy does not explain fixed airflow obstruction.", "reveal": "Negative."}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "diagnosis",
+      "prompt": "What is your diagnosis?",
+      "explanation": "Basal panlobular emphysema in a light ex-smoker of 41, a father with early emphysema, neonatal jaundice, a raised ALT and a serum level of 0.3 g/L point to severe alpha-1 antitrypsin deficiency (PiZZ).",
+      "options": [],
+      "accepted_answers": ["Alpha-1 antitrypsin deficiency", "AATD", "A1AT deficiency", "Alpha-1 antitrypsin deficiency emphysema", "Emphysema due to alpha-1 antitrypsin deficiency"]
+    },
+    {
+      "stage": "treatment",
+      "prompt": "What is your plan?",
+      "explanation": "Treat the COPD component, discuss augmentation therapy at a specialist centre, offer cascade testing to relatives and protect the lungs and liver. Maintenance oral steroids and montelukast add harm or nothing.",
+      "options": [
+        {"key": "A", "text": "Long-acting bronchodilators (LAMA plus LABA) and pulmonary rehabilitation", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "B", "text": "Refer to a specialist centre to discuss intravenous augmentation therapy", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "Offer testing to his siblings and children", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "D", "text": "Pneumococcal and annual influenza vaccination; keep alcohol low and monitor the liver", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "E", "text": "Long-term oral prednisolone", "is_correct": false, "is_harmful": true, "feedback": "Maintenance oral corticosteroids add osteoporosis, diabetes and infection risk without slowing emphysema.", "reveal": null},
+        {"key": "F", "text": "Montelukast for presumed asthma", "is_correct": false, "is_harmful": false, "feedback": "There is no asthma here; it adds nothing.", "reveal": null}
+      ],
+      "accepted_answers": []
+    }
+  ],
+  "source": {"kind": "manual", "provider": null, "model": null, "prompt_version": null}
+}

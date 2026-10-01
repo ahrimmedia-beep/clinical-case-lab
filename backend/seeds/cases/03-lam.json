@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "title": "A second collapsed lung in a young non-smoker",
+  "specialty": "pulmonology",
+  "difficulty": "hard",
+  "estimated_minutes": 8,
+  "patient": {"display_name": "Ms. K.", "age_years": 32, "sex": "female"},
+  "chief_complaint": "Sudden left-sided chest pain and breathlessness",
+  "vignette": "A 32-year-old woman who has never smoked comes to the emergency department with sudden, sharp left-sided chest pain and breathlessness that began while she was carrying shopping upstairs. Eighteen months ago she had a right-sided spontaneous pneumothorax treated with a chest drain. Since then she has noticed that she gets breathless on hills sooner than her friends.",
+  "findings": [
+    {"category": "symptom", "text": "Sudden sharp left-sided chest pain with breathlessness", "evidence": "sudden, sharp left-sided chest pain and breathlessness"},
+    {"category": "symptom", "text": "Exertional breathlessness slowly worsening over 18 months", "evidence": "she gets breathless on hills sooner than her friends"},
+    {"category": "history", "text": "Right-sided spontaneous pneumothorax 18 months ago, treated with a chest drain", "evidence": "Eighteen months ago she had a right-sided spontaneous pneumothorax treated with a chest drain"},
+    {"category": "history", "text": "Left flank pain two years ago; an ultrasound showed a fatty kidney lesion that was never followed up", "evidence": null},
+    {"category": "medication", "text": "Combined oestrogen-progestogen contraceptive pill for six years", "evidence": null},
+    {"category": "social", "text": "Never smoker; primary-school teacher", "evidence": "has never smoked"},
+    {"category": "family", "text": "No family history of lung disease, epilepsy or kidney tumours", "evidence": null},
+    {"category": "exam", "text": "Reduced breath sounds and hyper-resonance over the left hemithorax", "evidence": null},
+    {"category": "exam", "text": "Mild tachypnoea at rest; speaks in full sentences", "evidence": null},
+    {"category": "imaging", "text": "Chest X-ray: moderate left pneumothorax with a 3 cm rim", "evidence": null},
+    {"category": "imaging", "text": "High-resolution CT: numerous thin-walled round cysts evenly distributed through both lungs", "evidence": null},
+    {"category": "imaging", "text": "Abdominal CT: 2.5 cm fat-containing lesion in the left kidney, typical of an angiomyolipoma", "evidence": null},
+    {"category": "imaging", "text": "Radiology impression: diffuse cystic lung disease in keeping with lymphangioleiomyomatosis", "evidence": null}
+  ],
+  "measurements": [
+    {"kind": "vital", "name": "Heart rate", "value": 104, "value_text": null, "unit": "bpm", "flag": "high", "evidence": null},
+    {"kind": "vital", "name": "Respiratory rate", "value": 24, "value_text": null, "unit": "/min", "flag": "high", "evidence": null},
+    {"kind": "vital", "name": "SpO2", "value": 93, "value_text": null, "unit": "%", "flag": "low", "evidence": null},
+    {"kind": "vital", "name": "Blood pressure", "value": null, "value_text": "118/76", "unit": "mmHg", "flag": "normal", "evidence": null},
+    {"kind": "lab", "name": "Serum VEGF-D", "value": 1450, "value_text": null, "unit": "pg/mL", "flag": "high", "evidence": null},
+    {"kind": "lab", "name": "FEV1", "value": 68, "value_text": null, "unit": "% predicted", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "DLCO", "value": 55, "value_text": null, "unit": "% predicted", "flag": "low", "evidence": null},
+    {"kind": "lab", "name": "Serum alpha-1 antitrypsin", "value": 1.4, "value_text": null, "unit": "g/L", "flag": "normal", "evidence": null}
+  ],
+  "final_diagnosis": {"name": "Lymphangioleiomyomatosis", "icd10": "J84.81", "evidence": null},
+  "differential": [
+    {"name": "Birt-Hogg-Dube syndrome", "icd10": null, "evidence": null},
+    {"name": "Pulmonary Langerhans cell histiocytosis", "icd10": "J84.82", "evidence": null},
+    {"name": "Primary spontaneous pneumothorax", "icd10": "J93.11", "evidence": null}
+  ],
+  "decisions": [
+    {
+      "stage": "interview",
+      "prompt": "What else do you ask her?",
+      "explanation": "A second pneumothorax with slowly progressive breathlessness in a young woman calls for a cystic lung disease history: smoking, hormones, kidney lesions and features of tuberous sclerosis.",
+      "options": [
+        {"key": "A", "text": "Has she ever smoked?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Never."},
+        {"key": "B", "text": "Does she take any hormonal medication?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A combined oestrogen-progestogen pill for six years."},
+        {"key": "C", "text": "Has she ever had kidney problems or flank pain?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Two years ago an ultrasound found a fatty lump in her left kidney; nobody followed it up."},
+        {"key": "D", "text": "Has she or anyone in her family had seizures or unusual skin lesions?", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "No."},
+        {"key": "E", "text": "Any recent foreign travel?", "is_correct": false, "is_harmful": false, "feedback": "Travel does not explain a recurrent pneumothorax with progressive breathlessness.", "reveal": "A beach holiday in Spain last summer."},
+        {"key": "F", "text": "Did she have eczema as a child?", "is_correct": false, "is_harmful": false, "feedback": "Atopy is low yield here.", "reveal": "Mild eczema that cleared by age ten."}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "differential",
+      "prompt": "Which diagnoses do you keep open?",
+      "explanation": "Recurrent pneumothorax in a young never-smoker points to a diffuse cystic lung disease. Lymphangioleiomyomatosis and Birt-Hogg-Dube syndrome lead; Langerhans cell histiocytosis is almost confined to smokers.",
+      "options": [
+        {"key": "A", "text": "Lymphangioleiomyomatosis", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "B", "text": "Birt-Hogg-Dube syndrome", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "Pulmonary Langerhans cell histiocytosis", "is_correct": false, "is_harmful": false, "feedback": "Almost exclusively seen in smokers; she has never smoked.", "reveal": null},
+        {"key": "D", "text": "Primary spontaneous pneumothorax with otherwise normal lungs", "is_correct": false, "is_harmful": false, "feedback": "A second episode plus progressive breathlessness makes an underlying lung disease likely.", "reveal": null},
+        {"key": "E", "text": "Pulmonary embolism", "is_correct": false, "is_harmful": false, "feedback": "Does not explain a recurrent pneumothorax.", "reveal": null}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "workup",
+      "prompt": "Which tests do you order?",
+      "explanation": "High-resolution CT shows the cysts; a serum VEGF-D above 800 pg/mL with typical cysts is diagnostic, so a biopsy can be avoided. Abdominal imaging looks for angiomyolipoma; lung function sets the baseline for treatment decisions.",
+      "options": [
+        {"key": "A", "text": "High-resolution CT of the chest", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "Numerous thin-walled round cysts evenly distributed through both lungs."},
+        {"key": "B", "text": "Serum VEGF-D", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "1450 pg/mL (raised)."},
+        {"key": "C", "text": "CT or MRI of the abdomen", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "A 2.5 cm fat-containing lesion in the left kidney."},
+        {"key": "D", "text": "Full lung function tests", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": "FEV1 68 % predicted, DLCO 55 % predicted."},
+        {"key": "E", "text": "Serum ACE level", "is_correct": false, "is_harmful": false, "feedback": "Points towards sarcoidosis, which does not cause thin-walled cysts and recurrent pneumothorax.", "reveal": "Normal."},
+        {"key": "F", "text": "Surgical lung biopsy as the first test", "is_correct": false, "is_harmful": true, "feedback": "Typical CT cysts with a raised VEGF-D are diagnostic; surgical biopsy adds risk without benefit.", "reveal": null}
+      ],
+      "accepted_answers": []
+    },
+    {
+      "stage": "diagnosis",
+      "prompt": "What is your diagnosis?",
+      "explanation": "Recurrent pneumothorax, diffuse thin-walled cysts, a renal angiomyolipoma and a VEGF-D above 800 pg/mL in a young woman establish lymphangioleiomyomatosis without a biopsy. Oestrogen exposure can accelerate it.",
+      "options": [],
+      "accepted_answers": ["Lymphangioleiomyomatosis", "LAM", "Pulmonary lymphangioleiomyomatosis", "Sporadic lymphangioleiomyomatosis"]
+    },
+    {
+      "stage": "treatment",
+      "prompt": "What is your plan for her?",
+      "explanation": "Treat the pneumothorax and offer pleurodesis after a second episode, start sirolimus because lung function is declining, remove exogenous oestrogen and vaccinate. Corticosteroids do not help, and more oestrogen may speed progression.",
+      "options": [
+        {"key": "A", "text": "Drain the pneumothorax and refer for pleurodesis after this recurrence", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "B", "text": "Start sirolimus (an mTOR inhibitor) because lung function is declining", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "C", "text": "Stop the oestrogen-containing pill and switch to non-hormonal contraception", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "D", "text": "Pneumococcal and annual influenza vaccination", "is_correct": true, "is_harmful": false, "feedback": null, "reveal": null},
+        {"key": "E", "text": "High-dose oral prednisolone", "is_correct": false, "is_harmful": false, "feedback": "Corticosteroids have no role in this disease.", "reveal": null},
+        {"key": "F", "text": "Switch to a higher-dose oestrogen pill to regulate her cycle", "is_correct": false, "is_harmful": true, "feedback": "Oestrogen may accelerate disease progression; it should be stopped, not increased.", "reveal": null}
+      ],
+      "accepted_answers": []
+    }
+  ],
+  "source": {"kind": "manual", "provider": null, "model": null, "prompt_version": null}
+}

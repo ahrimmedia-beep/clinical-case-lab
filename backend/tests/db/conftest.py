@@ -36,6 +36,12 @@ async def _ensure_database() -> None:
         await admin.dispose()
 
 
+# Several test runs can share one test database (parallel work in one checkout, CI retries).
+# Each run holds this advisory lock for its whole DB session, so runs take turns instead of
+# truncating or migrating under each other.
+SESSION_LOCK_KEY = 4_200_917
+
+
 @pytest.fixture(scope="session")
 async def db_engine() -> AsyncIterator[AsyncEngine]:
     try:
@@ -46,9 +52,17 @@ async def db_engine() -> AsyncIterator[AsyncEngine]:
             f"Postgres not reachable at {safe} ({type(exc).__name__}); "
             "start it with `make db` or set TEST_DATABASE_URL"
         )
-    run_alembic("upgrade", "head")
     engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
-    yield engine
+    async with engine.connect() as lock_conn:
+        await lock_conn.execute(text("SET lock_timeout = '300s'"))
+        await lock_conn.execute(text("SELECT pg_advisory_lock(:k)"), {"k": SESSION_LOCK_KEY})
+        await lock_conn.commit()
+        try:
+            run_alembic("upgrade", "head")
+            yield engine
+        finally:
+            await lock_conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": SESSION_LOCK_KEY})
+            await lock_conn.commit()
     await engine.dispose()
 
 

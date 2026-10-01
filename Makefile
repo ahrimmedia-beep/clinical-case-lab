@@ -28,3 +28,10 @@ down:
 .PHONY: migrate
 migrate:
 	cd backend && uv run alembic upgrade head
+
+.PHONY: seed simulate
+seed:
+	cd backend && uv run python -m seeds.load --api $${API_BASE_URL:-http://localhost:8000}
+
+simulate:
+	cd backend && uv run python -m seeds.simulate_cohort --n 200
