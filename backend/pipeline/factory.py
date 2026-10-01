@@ -22,10 +22,13 @@ class UnknownModel(ValueError):
     """The requested model is not in pricing.yaml for this provider."""
 
 
-def get_provider(provider: Provider, model: str | None, settings: Settings) -> LLMProvider:
+def resolve_model(provider: Provider, model: str | None) -> str:
+    """The model a request will run on (default filled in), without building a client.
+
+    Raises UnknownModel for anything outside pricing.yaml. In fake mode any name is accepted.
+    """
     if os.environ.get(FAKE_ENV) == "1":
-        log.warning("fake_llm_provider_in_use", provider=provider.value)
-        return FakeProvider.default(name=provider.value, model=model or f"fake-{provider.value}")
+        return model or f"fake-{provider.value}"
     chosen = model or default_model(provider.value)
     allowed = allowed_models(provider.value)
     if chosen not in allowed:
@@ -33,6 +36,14 @@ def get_provider(provider: Provider, model: str | None, settings: Settings) -> L
             f"model {chosen!r} is not available for {provider.value}; "
             f"choose one of: {', '.join(allowed)}"
         )
+    return chosen
+
+
+def get_provider(provider: Provider, model: str | None, settings: Settings) -> LLMProvider:
+    chosen = resolve_model(provider, model)
+    if os.environ.get(FAKE_ENV) == "1":
+        log.warning("fake_llm_provider_in_use", provider=provider.value)
+        return FakeProvider.default(name=provider.value, model=chosen)
     if provider is Provider.GEMINI:
         return GeminiProvider(chosen, settings)
     return ClaudeProvider(chosen, settings)
