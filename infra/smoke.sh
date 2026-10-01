@@ -37,7 +37,8 @@ echo "API $API_URL"
 echo "WEB $WEB_URL"
 
 log "API health and docs"
-expect 200 "$(http GET "$API_URL/healthz")" "GET /healthz"
+# /healthz is reserved by the Cloud Run front end (404 from outside); the probes reach it
+# inside the container. /readyz below is the public health check.
 expect 200 "$(http GET "$API_URL/readyz")" "GET /readyz (database reachable)"
 expect 200 "$(http GET "$API_URL/docs")" "GET /docs"
 

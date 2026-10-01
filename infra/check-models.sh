@@ -35,7 +35,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 log "Deploying job check-models on $IMAGE"
 gc run jobs deploy check-models --image="$IMAGE" --region="$REGION" --service-account="$API_SA" \
-  --env-vars-file="$TMP_DIR/check.env.yaml" --clear-secrets \
+  --env-vars-file="$TMP_DIR/check.env.yaml" "$(secrets_flag "$(fallback_secret_list)")" \
   --command=python --args="-c,import base64;exec(base64.b64decode('$CODE'))" \
   --tasks=1 --max-retries=0 --task-timeout=300s >/dev/null
 

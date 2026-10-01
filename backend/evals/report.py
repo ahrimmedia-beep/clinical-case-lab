@@ -47,6 +47,11 @@ HONESTY_NOTES: list[str] = [
     "Findings count only on near-identical wording (token_sort_ratio >= 85, any word order), so "
     "a paraphrase that drops a qualifier is a miss; every model is scored the same way.",
 ]
+ROUTE_NOTE = (
+    "Route: Gemini runs on Vertex AI; Claude runs on the direct Anthropic API because Vertex AI "
+    "granted this new project no Claude quota (NOT_ENOUGH_USAGE_HISTORY). Both go through the "
+    "same provider interface with the same prompts, schema and scoring."
+)
 FAKE_NOTE = (
     "Rows with provider `fake` are a harness self-check (damaged gold labels, no model call), "
     "not a model result."
@@ -299,6 +304,8 @@ def build_report(
                 )
             )
     notes = list(HONESTY_NOTES)
+    if any(m.provider == "claude" for m in models):
+        notes.append(ROUTE_NOTE)
     if any(m.provider == "fake" for m in models):
         notes.append(FAKE_NOTE)
     return EvalReport(
