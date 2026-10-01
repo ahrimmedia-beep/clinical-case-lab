@@ -1,0 +1,59 @@
+name: case-lab
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: caselab
+      POSTGRES_PASSWORD: caselab
+      POSTGRES_DB: caselab
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caselab -d caselab"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    profiles: ["app"]
+    build: ./backend
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://caselab:caselab@db:5432/caselab
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    profiles: ["app"]
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://caselab:caselab@db:5432/caselab
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      INTERNAL_API_KEY: local-dev-key
+      GCP_PROJECT: ${GCP_PROJECT:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "127.0.0.1:8000:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    profiles: ["app"]
+    build: ./web
+    environment:
+      API_BASE_URL: http://api:8080
+      API_PUBLIC_URL: http://localhost:8000
+      INTERNAL_API_KEY: local-dev-key
+    ports:
+      - "127.0.0.1:3000:8080"
+    depends_on:
+      - api
+
+volumes:
+  pgdata: {}
