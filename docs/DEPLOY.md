@@ -63,7 +63,7 @@ Optional knobs: `MIN_INSTANCES` (default 0), `REGION` (default `us-central1`), `
 
 The api and both database jobs take their settings from one function in `infra/lib.sh` (`db_env`), so a migration cannot target a different database than the service.
 
-`POST /api/cases` checks `X-Internal-Key` only when `REQUIRE_INGEST_KEY=true`. The demo leaves it unset so reviewers can post a case from the API docs; every ingested case is validated and capped at 256 KB. `/api/extract`, review, approve, insights and AI attempts always require the key.
+`POST /api/cases` checks `X-Internal-Key` when `REQUIRE_INGEST_KEY=true`, which `deploy.sh` sets in production so nobody can add cases to the public catalogue; locally (compose) it stays open. New cases reach production through `/studio` (the web server holds the key) or `seeds.load --key`. Every ingested case is validated and capped at 256 KB. `/api/extract`, review, approve, insights and AI attempts always require the key.
 
 ## Secrets
 
