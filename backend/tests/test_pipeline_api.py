@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import structlog
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import NullPool
@@ -13,9 +14,8 @@ from sqlalchemy.pool import NullPool
 from app.config import get_settings
 from app.db.engine import get_engine
 from app.main import create_app
-from app.ratelimit import ExtractLimiter, RateLimited, get_limiter
 from pipeline.cache import get_extract_cache
-from pipeline.providers.base import ProviderUnavailable
+from pipeline.providers.base import ProviderError, ProviderUnavailable
 from pipeline.providers.fake import SAMPLE_TEXT_FILE, FakeProvider
 from pipeline.run import run_pipeline
 
@@ -44,14 +44,12 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     monkeypatch.setenv("EXTRACT_RATE_PER_MINUTE", "5")
     monkeypatch.delenv("EXTRACT_CACHE_DIR", raising=False)
     get_settings.cache_clear()
-    get_limiter.cache_clear()
     get_extract_cache.cache_clear()
-    app = create_app()
+    app = create_app()  # fresh per-IP windows (app.state.limits)
     app.dependency_overrides[get_engine] = lambda: create_async_engine(
         UNREACHABLE_DB_URL, poolclass=NullPool
     )
     yield TestClient(app)
-    get_limiter.cache_clear()
     get_extract_cache.cache_clear()
 
 
@@ -141,19 +139,72 @@ def test_unknown_model_is_422(client: TestClient, monkeypatch: pytest.MonkeyPatc
     assert response.status_code == 422 and response.json()["title"] == "Unknown model"
 
 
+NOT_AVAILABLE = "This model is not available on the server right now. Switch to the other model."
+BUSY = (
+    "The model provider is rate-limiting requests right now. "
+    "Try again in a minute, or switch to the other model."
+)
+NO_ANSWER = (
+    "The model provider did not respond. Try again in a moment, or switch to the other model."
+)
+UNUSABLE = (
+    "The model's answer could not be turned into a valid case. "
+    "Try again, or switch to the other model."
+)
+
+
 def test_missing_credentials_is_503(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("PIPELINE_FAKE_LLM")  # autouse fixture already removed every paid key
     response = post(client, provider="claude")
     assert response.status_code == 503
-    assert response.json()["title"] == "Model provider unavailable"
+    body = response.json()
+    assert body["title"] == "Model provider unavailable"
+    assert body["detail"] == NOT_AVAILABLE  # no env var names, no vendor names
 
 
-def test_quota_exhausted_is_503(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
-    quota = FakeProvider(
-        script=[ProviderUnavailable("429 RESOURCE_EXHAUSTED", retryable=True, status=429)]
-    )
-    monkeypatch.setattr("app.routers.extract.get_provider", lambda *args: quota)
-    assert post(client).status_code == 503
+@pytest.mark.parametrize(
+    ("error", "detail"),
+    [
+        (
+            ProviderUnavailable("429 RESOURCE_EXHAUSTED org-7f3 quota", retryable=True, status=429),
+            BUSY,
+        ),
+        (
+            ProviderUnavailable("529 overloaded_error: req_011", retryable=True, status=529),
+            NO_ANSWER,
+        ),
+        (ProviderUnavailable("network error calling Claude", retryable=True), NO_ANSWER),
+        (
+            ProviderUnavailable("403 PERMISSION_DENIED projects/p-1", retryable=False, status=403),
+            NOT_AVAILABLE,
+        ),
+    ],
+)
+def test_provider_outages_are_503_with_a_fixed_detail_and_the_raw_text_only_in_the_log(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, error: ProviderUnavailable, detail: str
+) -> None:
+    failing = FakeProvider(script=[error])
+    monkeypatch.setattr("app.routers.extract.get_provider", lambda *args: failing)
+    with structlog.testing.capture_logs() as logs:
+        response = post(client)
+    assert response.status_code == 503
+    assert response.json()["detail"] == detail
+    assert str(error) not in response.text
+    assert any(entry.get("error") == str(error) for entry in logs)
+
+
+def test_a_rejected_request_is_502_without_the_provider_text(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    raw = "provider rejected the request (400): org org-7f3 has exceeded the context window"
+    rejecting = FakeProvider(script=[ProviderError(raw)])
+    monkeypatch.setattr("app.routers.extract.get_provider", lambda *args: rejecting)
+    with structlog.testing.capture_logs() as logs:
+        response = post(client)
+    assert response.status_code == 502
+    assert response.json()["detail"] == UNUSABLE
+    assert "org-7f3" not in response.text
+    assert any(entry.get("error") == raw for entry in logs)
 
 
 def test_invalid_model_output_three_times_is_502(
@@ -163,19 +214,24 @@ def test_invalid_model_output_three_times_is_502(
     monkeypatch.setattr("app.routers.extract.get_provider", lambda *args: broken)
     response = post(client)
     assert response.status_code == 502
-    assert response.json()["detail"] == "the model output failed validation 3 times"
+    assert response.json()["detail"] == UNUSABLE
 
 
-def test_limiter_daily_cap_and_window_reset() -> None:
-    now = [1_000_000.0]
-    limiter = ExtractLimiter(per_minute=2, daily_cap=3, clock=lambda: now[0])
-    limiter.check("a")
-    limiter.check("a")
-    with pytest.raises(RateLimited, match="per minute"):
-        limiter.check("a")
-    now[0] += 61
-    limiter.check("a")  # window slid
-    with pytest.raises(RateLimited, match="daily"):
-        limiter.check("b")
-    now[0] += 86_400
-    limiter.check("b")  # new UTC day
+def test_daily_cap_holds_in_memory_while_postgres_is_unreachable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The budget lives in Postgres (tests/db/test_api_limits.py); this client's database is
+    # unreachable, so the instance's in-memory day budget stands in instead of lifting the cap.
+    monkeypatch.setenv("PIPELINE_FAKE_LLM", "1")
+    monkeypatch.setenv("EXTRACT_DAILY_CAP", "2")
+    get_settings.cache_clear()
+    get_extract_cache.cache_clear()
+    app = create_app()
+    app.dependency_overrides[get_engine] = lambda: create_async_engine(
+        UNREACHABLE_DB_URL, poolclass=NullPool
+    )
+    client = TestClient(app)
+    assert [post(client, text=f"{SAMPLE} Note {i}.").status_code for i in range(2)] == [200, 200]
+    refused = post(client, text=f"{SAMPLE} Note 3.")
+    assert refused.status_code == 429
+    assert "daily extraction budget" in refused.json()["detail"]

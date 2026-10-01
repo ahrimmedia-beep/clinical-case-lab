@@ -85,3 +85,22 @@ async def test_review_and_approve_require_the_internal_key(
     keyed = {"X-Internal-Key": "s3cret"}
     assert (await client.get(f"/api/cases/{slug}/review", headers=keyed)).status_code == 200
     assert (await client.post(f"/api/cases/{slug}/approve", headers=keyed)).status_code == 200
+
+
+async def test_a_failing_check_blocks_approval_on_the_server(
+    client: httpx.AsyncClient, case_pe: dict[str, Any]
+) -> None:
+    # The page disables the sign-off box on a FAIL, but the API is the gate: a Server Action is a
+    # public POST endpoint, so the checklist is recomputed here before the draft is promoted.
+    leaky = {**case_pe, "source": {**draft(case_pe)["source"], "text": f"{SOURCE} jd@example.com"}}
+    slug = await create(client, leaky)
+    checklist = (await client.get(f"/api/cases/{slug}/review")).json()["checklist"]
+    assert next(c for c in checklist if c["id"] == "phi")["status"] == "fail"
+
+    refused = await client.post(f"/api/cases/{slug}/approve")
+    assert refused.status_code == 409
+    assert refused.headers["content-type"].startswith("application/problem+json")
+    body = refused.json()
+    assert body["title"] == "Review checks failing"
+    assert "No identifiers in the source text" in body["detail"]
+    assert (await client.get(f"/api/cases/{slug}")).json()["review_status"] == "draft"

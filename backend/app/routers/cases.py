@@ -3,14 +3,17 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Path, Request, Response
+from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app import ratelimit
 from app.case_views import build_reveals
 from app.config import get_settings
 from app.db.engine import EngineDep
 from app.problems import raise_problem
 from app.repository import cases as cases_repo
+from app.repository import review as review_repo
 from app.schemas.attempt import MultiSelectStage, RevealIn, RevealOut
-from app.schemas.case import CaseCreated, CasePublic, CaseSummary, ClinicalCase
+from app.schemas.case import CaseCreated, CasePublic, CaseSummary, ClinicalCase, SourceKind
 from app.schemas.common import ProblemDetail
 from app.scoring import unknown_choices
 from app.security import require_ingest_key
@@ -36,6 +39,20 @@ async def limit_case_body(request: Request) -> None:
         raise_problem(413, "Payload too large", detail)
 
 
+async def _within_draft_cap(case: ClinicalCase, engine: AsyncEngine) -> None:
+    """429 once today's (UTC) AI drafts reach the cap. Re-publishing a stored draft is not new."""
+    cap = ratelimit.LLM_DRAFTS_PER_DAY
+    async with engine.connect() as conn:
+        if await review_repo.is_stored(conn, case):
+            return
+        if await review_repo.llm_drafts_today(conn) >= cap:
+            raise_problem(
+                429,
+                "Draft limit reached",
+                f"At most {cap} AI drafts can be published per day (UTC); try again tomorrow.",
+            )
+
+
 @router.post(
     "/cases",
     status_code=201,
@@ -45,9 +62,12 @@ async def limit_case_body(request: Request) -> None:
         200: {"model": CaseCreated, "description": "Identical case already stored"},
         401: {"model": ProblemDetail},
         **ERRORS,
+        429: {"model": ProblemDetail},
     },
 )
 async def create_case(case: ClinicalCase, response: Response, engine: EngineDep) -> CaseCreated:
+    if case.source is not None and case.source.kind is SourceKind.LLM:
+        await _within_draft_cap(case, engine)
     async with engine.connect() as conn:
         created = await cases_repo.insert_case(conn, case)
     if created.created:

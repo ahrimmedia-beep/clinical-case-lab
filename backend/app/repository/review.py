@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.case_views import given_items, present_stages
 from app.problems import raise_problem
-from app.repository.cases import load_stored_case
+from app.repository.cases import content_hash, load_stored_case
 from app.schemas.case import ClinicalCase, ReviewStatus, SourceKind
 from app.schemas.review import (
     AnswerKey,
@@ -195,6 +195,16 @@ def build_answer_key(case: ClinicalCase) -> AnswerKey:
     )
 
 
+def build_checklist(case: ClinicalCase) -> list[ReviewChecklistItem]:
+    return [
+        check_grounding(case),
+        check_harmful_options(case),
+        check_no_leak(case),
+        check_answer_key(case),
+        check_phi(case),
+    ]
+
+
 def build_case_review(slug: str, case: ClinicalCase, review_status: ReviewStatus) -> CaseReview:
     source = case.source
     return CaseReview(
@@ -208,13 +218,7 @@ def build_case_review(slug: str, case: ClinicalCase, review_status: ReviewStatus
             prompt_version=source.prompt_version if source else None,
         ),
         answer_key=build_answer_key(case),
-        checklist=[
-            check_grounding(case),
-            check_harmful_options(case),
-            check_no_leak(case),
-            check_answer_key(case),
-            check_phi(case),
-        ],
+        checklist=build_checklist(case),
     )
 
 
@@ -223,6 +227,23 @@ async def get_case_review(conn: AsyncConnection, slug: str) -> CaseReview | None
     if stored is None:
         return None
     return build_case_review(stored.slug, stored.case, stored.review_status)
+
+
+CHECKS_FAILING = "Review checks failing"
+LLM_DRAFTS_TODAY_SQL = text(
+    "SELECT count(*) FROM cases WHERE source_kind = 'llm' "
+    "AND created_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'"
+)
+STORED_SQL = text("SELECT EXISTS (SELECT 1 FROM cases WHERE content_hash = :hash)")
+
+
+async def llm_drafts_today(conn: AsyncConnection) -> int:
+    """AI-drafted cases ingested since midnight UTC (approved since or not)."""
+    return int(await conn.scalar(LLM_DRAFTS_TODAY_SQL) or 0)
+
+
+async def is_stored(conn: AsyncConnection, case: ClinicalCase) -> bool:
+    return bool(await conn.scalar(STORED_SQL, {"hash": content_hash(case)}))
 
 
 APPROVE_SQL = text(
@@ -234,11 +255,23 @@ EXISTS_SQL = text("SELECT review_status FROM cases WHERE slug = :slug")
 
 
 async def approve_case(conn: AsyncConnection, slug: str) -> ApproveResponse:
-    """Draft -> approved, once. Owns its transaction. 404 unknown slug, 409 not a draft.
+    """Draft -> approved, once. Owns its transaction. 404 unknown slug, 409 not a draft, 409
+    while any checklist item FAILs (recomputed here: the page's disabled checkbox is not a gate).
 
     The conditional UPDATE makes concurrent approvals safe: exactly one of them wins.
     """
     async with conn.begin():
+        stored = await load_stored_case(conn, slug)
+        if stored is not None and stored.review_status is ReviewStatus.DRAFT:
+            failing = [
+                c.label for c in build_checklist(stored.case) if c.status is CheckStatus.FAIL
+            ]
+            if failing:
+                raise_problem(
+                    409,
+                    CHECKS_FAILING,
+                    f"Approval is blocked while a check fails: {'; '.join(failing)}.",
+                )
         row = (await conn.execute(APPROVE_SQL, {"slug": slug})).one_or_none()
         if row is None:
             status = await conn.scalar(EXISTS_SQL, {"slug": slug})

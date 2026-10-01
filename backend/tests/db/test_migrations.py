@@ -20,6 +20,7 @@ SPEC_TABLES = {
     "attempts",
     "attempt_choices",
     "extract_cache",
+    "daily_usage",
 }
 TABLES_SQL = text(
     "SELECT table_name FROM information_schema.tables "

@@ -8,6 +8,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Identity,
@@ -233,4 +234,17 @@ extract_cache = Table(
     Column("prompt_version", Text),
     Column("response", JSONB, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+)
+
+# Daily budgets that must survive an instance restart (Cloud Run scales to zero): one row per UTC
+# day and kind. kind = 'extract' counts paid /api/extract runs, failed ones included; a slot is
+# reserved with a conditional upsert before the model is called (app.repository.extract_cache).
+daily_usage = Table(
+    "daily_usage",
+    metadata,
+    Column("day", Date, nullable=False),
+    Column("kind", Text, nullable=False),
+    Column("count", Integer, nullable=False),
+    PrimaryKeyConstraint("day", "kind"),
+    CheckConstraint("count >= 0", name="count"),
 )

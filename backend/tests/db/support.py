@@ -13,7 +13,7 @@ TEST_DATABASE_URL = os.environ.get(
 )
 TABLES = (
     "attempt_choices, attempts, decision_accepted_answers, decision_options, case_decisions, "
-    "case_diagnoses, case_measurements, case_findings, cases, extract_cache"
+    "case_diagnoses, case_measurements, case_findings, cases, extract_cache, daily_usage"
 )
 ALEMBIC = str(Path(sys.executable).parent / "alembic")
 

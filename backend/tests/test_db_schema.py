@@ -17,6 +17,7 @@ SPEC_TABLES = {
     "attempts",
     "attempt_choices",
     "extract_cache",
+    "daily_usage",
 }
 
 

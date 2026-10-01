@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.config import get_settings
-from app.ratelimit import get_limiter
+from app.db.tables import extract_cache
 from app.repository import extract_cache as extract_cache_db
 from app.schemas.extract import ExtractResponse
 from pipeline.cache import cache_key, get_extract_cache
@@ -35,10 +35,8 @@ def fake_llm_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("EXTRACT_RATE_PER_MINUTE", "2")
     monkeypatch.delenv("EXTRACT_CACHE_DIR", raising=False)
     get_settings.cache_clear()
-    get_limiter.cache_clear()
     get_extract_cache.cache_clear()
     yield
-    get_limiter.cache_clear()
     get_extract_cache.cache_clear()
 
 
@@ -123,6 +121,27 @@ async def test_db_lookup_failure_falls_back_to_running_the_pipeline(
     monkeypatch.undo()
     get_extract_cache.cache_clear()
     key = cache_key(SAMPLE, "gemini", "fake-gemini", PROMPT_VERSION)
+    assert await extract_cache_db.lookup(engine, key) == ExtractResponse.model_validate(
+        response.json()
+    )
+
+
+async def test_a_stored_row_that_no_longer_validates_is_a_miss_and_is_replaced(
+    client: httpx.AsyncClient, engine: AsyncEngine
+) -> None:
+    # A schema change without a PROMPT_VERSION bump leaves rows the new ExtractResponse rejects.
+    key = cache_key(SAMPLE, "gemini", "fake-gemini", PROMPT_VERSION)
+    async with engine.begin() as conn:
+        await conn.execute(
+            extract_cache.insert().values(
+                key=key, provider="gemini", model="fake-gemini", response={"stale": True}
+            )
+        )
+    assert await extract_cache_db.lookup(engine, key) is None
+
+    response = await post(client)
+    assert response.status_code == 200, response.text
+    # The fresh run replaced the stale row, so the next cold instance is served from Postgres.
     assert await extract_cache_db.lookup(engine, key) == ExtractResponse.model_validate(
         response.json()
     )

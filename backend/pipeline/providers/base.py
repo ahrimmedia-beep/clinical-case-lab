@@ -64,6 +64,35 @@ def error_for_status(status: int, message: str) -> ProviderError:
     return ProviderError(f"provider rejected the request ({status}): {message}")
 
 
+# What an API client is told. Fixed and provider-neutral: SDK messages can carry response bodies
+# (org-level quota text, request ids, project paths), so they go to the server log only.
+PUBLIC_NOT_AVAILABLE = (
+    "This model is not available on the server right now. Switch to the other model."
+)
+PUBLIC_BUSY = (
+    "The model provider is rate-limiting requests right now. "
+    "Try again in a minute, or switch to the other model."
+)
+PUBLIC_NO_ANSWER = (
+    "The model provider did not respond. Try again in a moment, or switch to the other model."
+)
+PUBLIC_UNUSABLE = (
+    "The model's answer could not be turned into a valid case. "
+    "Try again, or switch to the other model."
+)
+
+
+def public_detail(exc: ProviderError) -> str:
+    """The problem `detail` for a provider failure: one fixed sentence per kind of failure."""
+    if not isinstance(exc, ProviderUnavailable):
+        return PUBLIC_UNUSABLE  # 502: invalid output, a refusal, or a rejected request
+    if exc.status == 429:
+        return PUBLIC_BUSY
+    if exc.retryable:
+        return PUBLIC_NO_ANSWER  # 5xx or a network error
+    return PUBLIC_NOT_AVAILABLE  # not configured, bad credentials, or the model is not enabled
+
+
 def format_validation_errors(exc: ValidationError, limit: int = 20) -> str:
     """Compact "path: message" lines for a re-ask; never includes the offending input values."""
     lines = []
