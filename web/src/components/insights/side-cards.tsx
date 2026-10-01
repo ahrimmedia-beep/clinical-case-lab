@@ -2,6 +2,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { StateIcon } from "@/components/ui/state-icon";
 import type { Benchmark } from "@/lib/api/types";
 import type { WrongDiagnosis } from "@/lib/api/internal";
+import { modelLabel } from "@/lib/format";
 import { pct, wrongShare } from "./insights";
 
 /** The most common wrong calls, grouped the way the scorer normalizes them. */
@@ -63,7 +64,8 @@ export function AiBenchmarks({ items }: { items: Benchmark[] }) {
               {items.map((b) => (
                 <tr key={b.model} className="border-b border-line last:border-0">
                   <th scope="row" className="px-5 py-2.5 text-left font-medium text-ink">
-                    {b.label}
+                    {/* The API's label is the stored "ai:<model>" tag; show the model's own name. */}
+                    {b.model ? modelLabel(b.model) : b.label}
                   </th>
                   <td className="px-5 py-2.5 tabular-nums">
                     {b.points}/{b.max_points}

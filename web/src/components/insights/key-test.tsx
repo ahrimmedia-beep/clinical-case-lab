@@ -1,5 +1,5 @@
 import type { KeyTestEffect } from "@/lib/api/internal";
-import { keyTestHeadline, pct } from "./insights";
+import { keyTestHeadline, lowerFirst, pct } from "./insights";
 
 function Bar({ label, value, tone }: { label: string; value: number | null | undefined; tone: "primary" | "muted" }) {
   const width = typeof value === "number" ? Math.max(0, Math.min(100, value * 100)) : 0;
@@ -33,7 +33,7 @@ export function KeyTest({ tests }: { tests: KeyTestEffect[] }) {
         <div>
           <span className="font-mono text-eyebrow uppercase text-primary-hover">The key-test effect</span>
           <h2 id="key-test-title" className="mt-3 text-[clamp(21px,2.4vw,28px)] [overflow-wrap:anywhere]">
-            Ordered {head.test} → right diagnosis {head.chosen} vs {head.notChosen}
+            Ordered {lowerFirst(head.test)} → right diagnosis {head.chosen} vs {head.notChosen}
           </h2>
           <p className="mt-3 text-[14.5px]">
             {head.sentence} {head.choseRate} of the cohort ordered it.

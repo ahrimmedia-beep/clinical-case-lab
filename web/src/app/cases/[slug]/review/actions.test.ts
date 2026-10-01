@@ -7,7 +7,10 @@ const redirect = vi.fn();
 const approve = vi.fn();
 
 vi.mock("next/navigation", () => ({ redirect: (path: string) => redirect(path) }));
-vi.mock("@/lib/api/internal", () => ({ approveCase: (slug: string) => approve(slug) }));
+vi.mock("@/lib/api/internal", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/internal")>()),
+  approveCase: (slug: string) => approve(slug),
+}));
 
 const confirmed = () => {
   const fd = new FormData();

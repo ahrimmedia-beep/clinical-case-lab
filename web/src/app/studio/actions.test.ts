@@ -9,7 +9,10 @@ const publishDraft = vi.fn();
 
 vi.mock("next/navigation", () => ({ redirect: (path: string) => redirect(path) }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers({ "x-forwarded-for": "203.0.113.7, 10.0.0.1" }) }));
-vi.mock("@/lib/api/internal", () => ({ publishDraft: (body: unknown) => publishDraft(body) }));
+vi.mock("@/lib/api/internal", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/internal")>()),
+  publishDraft: (body: unknown) => publishDraft(body),
+}));
 
 function form(fields: Record<string, string>): FormData {
   const fd = new FormData();

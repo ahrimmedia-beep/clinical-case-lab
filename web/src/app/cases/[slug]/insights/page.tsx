@@ -13,8 +13,7 @@ import { Callout } from "@/components/ui/callout";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ArrowIcon } from "@/components/ui/icons";
 import { MonoTag } from "@/components/ui/mono-tag";
-import { friendlyMessage } from "@/lib/api/errors";
-import { getCaseInsights, type CaseInsights } from "@/lib/api/internal";
+import { getCaseInsights, internalMessage, type CaseInsights } from "@/lib/api/internal";
 import { isValidSlug } from "@/lib/forms";
 import { formatInt } from "@/lib/format";
 
@@ -63,7 +62,7 @@ export default async function InsightsPage({ params }: Props) {
   } catch (error) {
     return (
       <div className="mx-auto max-w-site px-4 py-16 sm:px-6">
-        <ServiceUnavailable message={friendlyMessage(error)} retryHref={`/cases/${slug}/insights`} />
+        <ServiceUnavailable message={internalMessage(error)} retryHref={`/cases/${slug}/insights`} />
       </div>
     );
   }

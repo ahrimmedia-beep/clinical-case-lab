@@ -13,8 +13,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ArrowIcon } from "@/components/ui/icons";
 import { MonoTag } from "@/components/ui/mono-tag";
-import { friendlyMessage } from "@/lib/api/errors";
-import { getCaseReview, type CaseReview } from "@/lib/api/internal";
+import { getCaseReview, internalMessage, type CaseReview } from "@/lib/api/internal";
 import { isValidSlug } from "@/lib/forms";
 import { modelLabel } from "@/lib/format";
 
@@ -27,7 +26,7 @@ const loadReview = cache(async (slug: string): Promise<Loaded> => {
     const review = await getCaseReview(slug);
     return review ? { kind: "ok", review } : { kind: "missing" };
   } catch (error) {
-    return { kind: "error", message: friendlyMessage(error) };
+    return { kind: "error", message: internalMessage(error) };
   }
 });
 

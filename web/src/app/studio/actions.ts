@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ExtractState, PublishState } from "@/lib/action-states";
 import * as api from "@/lib/api/client";
-import { ApiError, friendlyMessage } from "@/lib/api/errors";
-import { publishDraft } from "@/lib/api/internal";
+import { friendlyMessage } from "@/lib/api/errors";
+import { internalMessage, publishDraft } from "@/lib/api/internal";
 import type { ClinicalCase } from "@/lib/api/types";
 import { clientIp, parseExtractForm } from "@/lib/forms";
 
@@ -54,8 +54,7 @@ export async function publishCase(caseJson: string): Promise<PublishState> {
   } catch (error) {
     if (error instanceof SyntaxError) return { status: "error", message: "The extracted case is malformed." };
     console.error("publishCase failed", { error: String(error) });
-    const keyProblem = error instanceof ApiError && (error.status === 401 || error.status === 403);
-    return { status: "error", message: keyProblem ? "The case service didn't accept this server's key." : friendlyMessage(error) };
+    return { status: "error", message: internalMessage(error) };
   }
   redirect(`/cases/${slug}/review`); // outside try: redirect() works by throwing
 }

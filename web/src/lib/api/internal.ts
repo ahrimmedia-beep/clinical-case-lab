@@ -1,7 +1,7 @@
 import "server-only";
 import createClient from "openapi-fetch";
 import { apiBaseUrl, internalApiKey, isFixtureMode } from "@/lib/env";
-import { networkError, problemToError } from "./errors";
+import { ApiError, friendlyMessage, networkError, problemToError } from "./errors";
 import * as fixtures from "./fixtures-internal";
 import type { components, paths } from "./schema";
 import type { CaseCreated, ClinicalCase } from "./types";
@@ -27,6 +27,12 @@ export type KeyTestEffect = Schemas["KeyTestEffect"];
 export type WrongDiagnosis = Schemas["WrongDiagnosis"];
 
 const TIMEOUT_MS = 15_000;
+
+/** friendlyMessage() words 401/403 for the extraction endpoint; these calls need their own wording. */
+export function internalMessage(error: unknown): string {
+  if (error instanceof ApiError && (error.status === 401 || error.status === 403)) return "The case service didn't accept this server's key.";
+  return friendlyMessage(error);
+}
 
 function api() {
   const baseUrl = apiBaseUrl();

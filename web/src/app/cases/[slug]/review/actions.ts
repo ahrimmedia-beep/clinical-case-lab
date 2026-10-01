@@ -2,8 +2,7 @@
 
 import { redirect } from "next/navigation";
 import type { ApproveState } from "@/components/review/review";
-import { ApiError, friendlyMessage } from "@/lib/api/errors";
-import { approveCase as approve } from "@/lib/api/internal";
+import { approveCase as approve, internalMessage } from "@/lib/api/internal";
 import { isValidSlug } from "@/lib/forms";
 
 /**
@@ -20,8 +19,7 @@ export async function approveCase(slug: string, _prev: ApproveState, formData: F
     if (outcome.status === "not_found") return { status: "error", message: "This case doesn't exist, or it was removed." };
   } catch (error) {
     console.error("approveCase failed", { slug, error: String(error) });
-    const keyProblem = error instanceof ApiError && (error.status === 401 || error.status === 403);
-    return { status: "error", message: keyProblem ? "The case service didn't accept this server's key." : friendlyMessage(error) };
+    return { status: "error", message: internalMessage(error) };
   }
   redirect(`/cases/${slug}`); // outside try: redirect() works by throwing
 }
