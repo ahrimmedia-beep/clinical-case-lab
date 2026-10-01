@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { CaseFileCard, type CaseFileHint } from "@/components/case/case-file-card";
 import { ServiceUnavailable } from "@/components/case/service-unavailable";
+import { Reveal } from "@/components/motion/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ArrowIcon } from "@/components/ui/icons";
@@ -40,40 +41,44 @@ async function load(): Promise<Loaded> {
 function CaseGrid({ cases, draft }: { cases: CaseSummary[]; draft: boolean }) {
   return (
     <ul className="grid gap-6 md:grid-cols-2">
-      {cases.map((c, i) => (
-        <li key={c.slug} className="animate-rise" style={{ animationDelay: `${i * 55}ms` }}>
-          <CaseFileCard
-            number={c.id}
-            specialty={c.specialty}
-            minutes={c.estimated_minutes}
-            title={c.title}
-            patient={c.patient}
-            difficulty={c.difficulty}
-            chiefComplaint={c.chief_complaint}
-            hints={HINTS}
-            footer={
-              draft ? (
-                <>
-                  <span>AI-drafted · not yet checked</span>
-                  <Link href={`/cases/${c.slug}/review`} className={buttonClasses("ghost-sm", "ml-auto")}>
-                    Review
-                  </Link>
-                  <Link href={`/cases/${c.slug}`} className={buttonClasses("primary-sm")} aria-label={`Open case: ${c.title}`}>
-                    Open case <ArrowIcon />
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <span>
-                    {pluralize(c.attempts_count, "attempt")} · {c.source_kind === "llm" ? "LLM-authored" : "hand-written"}
-                  </span>
-                  <Link href={`/cases/${c.slug}`} className={buttonClasses("primary-sm", "ml-auto")} aria-label={`Open case: ${c.title}`}>
-                    Open case <ArrowIcon />
-                  </Link>
-                </>
-              )
-            }
-          />
+      {cases.map((c) => (
+        <li key={c.slug} data-reveal="">
+          {/* Leans toward a mouse pointer; the shadow layer fades in instead of animating box-shadow. */}
+          <div data-tilt="" className="relative h-full">
+            <span aria-hidden="true" data-tilt-shadow="" className="pointer-events-none absolute inset-0 rounded-card opacity-0 shadow-lift" />
+            <CaseFileCard
+              number={c.id}
+              specialty={c.specialty}
+              minutes={c.estimated_minutes}
+              title={c.title}
+              patient={c.patient}
+              difficulty={c.difficulty}
+              chiefComplaint={c.chief_complaint}
+              hints={HINTS}
+              footer={
+                draft ? (
+                  <>
+                    <span>AI-drafted · not yet checked</span>
+                    <Link href={`/cases/${c.slug}/review`} className={buttonClasses("ghost-sm", "ml-auto")}>
+                      Review
+                    </Link>
+                    <Link href={`/cases/${c.slug}`} className={buttonClasses("primary-sm")} aria-label={`Open case: ${c.title}`}>
+                      Open case <ArrowIcon />
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {pluralize(c.attempts_count, "attempt")} · {c.source_kind === "llm" ? "LLM-authored" : "hand-written"}
+                    </span>
+                    <Link href={`/cases/${c.slug}`} className={buttonClasses("primary-sm", "ml-auto")} aria-label={`Open case: ${c.title}`}>
+                      Open case <ArrowIcon />
+                    </Link>
+                  </>
+                )
+              }
+            />
+          </div>
         </li>
       ))}
     </ul>
@@ -87,8 +92,8 @@ export default async function CasesPage() {
   const drafts = loaded.ok ? loaded.cases.filter((c) => c.review_status === "draft") : [];
 
   return (
-    <div className="mx-auto max-w-site px-4 py-[clamp(48px,7vw,96px)] sm:px-6">
-      <header className="mb-10 max-w-head">
+    <Reveal tilt className="mx-auto max-w-site px-4 py-[clamp(48px,7vw,96px)] sm:px-6">
+      <header data-reveal="" className="mb-10 max-w-head">
         <Eyebrow>Case library</Eyebrow>
         <h1 className="mt-3 text-[clamp(27px,3.1vw,38px)]">Pick a patient</h1>
         <p className="mt-4 text-lead">
@@ -124,6 +129,6 @@ export default async function CasesPage() {
           ) : null}
         </div>
       )}
-    </div>
+    </Reveal>
   );
 }
