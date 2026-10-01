@@ -263,11 +263,11 @@ export default async function HomePage() {
                 data-flow-line="x"
                 className="pointer-events-none absolute inset-x-[calc((100%_-_60px)/12)] top-[13px] hidden h-[3px] rounded-full bg-primary lg:block"
               />
-              <span aria-hidden="true" className="pointer-events-none absolute bottom-10 left-[6px] top-10 w-px bg-line-strong sm:hidden" />
+              <span aria-hidden="true" className="pointer-events-none absolute bottom-12 left-[6px] top-12 w-px bg-line-strong sm:hidden" />
               <span
                 aria-hidden="true"
                 data-flow-line="y"
-                className="pointer-events-none absolute bottom-10 left-[5px] top-10 w-[3px] rounded-full bg-primary sm:hidden"
+                className="pointer-events-none absolute bottom-12 left-[5px] top-12 w-[3px] rounded-full bg-primary sm:hidden"
               />
               <ol className="grid gap-3 pl-7 sm:grid-cols-3 sm:pl-0 lg:grid-cols-6 lg:pt-9">
                 {FLOW.map(([title, hint], i) => (
