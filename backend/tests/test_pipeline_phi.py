@@ -54,6 +54,23 @@ def test_same_value_gets_the_same_placeholder() -> None:
     assert masked == "Mr. [NAME_1] called. Later Mr. [NAME_1] returned."
 
 
+@pytest.mark.parametrize("name", ["A. Brennan", "N. Okafor", "A. N. Okafor"])
+def test_initials_that_look_like_stop_words_are_still_names(name: str) -> None:
+    # Regression: "A." and "N." were read as the words "a" / "n" and the name stayed visible.
+    masked, phi = deidentify(f"Seen with Dr. {name} today. Patient: {name}, 67.")
+    assert "Brennan" not in masked and "Okafor" not in masked
+    assert masked == "Seen with Dr. [NAME_1] today. Patient: [NAME_1], 67."
+    assert {p.label: p.count for p in phi} == {"NAME": 2}
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["Patient: A 34-year-old woman.", "Patient: N/A", "Name: n/a", "Patient: The referral."],
+)
+def test_stop_words_after_a_label_are_not_names(text: str) -> None:
+    assert deidentify(text) == (text, [])
+
+
 def test_clinical_numbers_are_not_masked() -> None:
     text = (
         "ABG 7.32/58/61 on 2 L. BP 128/76 mmHg. WBC 14,200/uL. Platelets 250000. "

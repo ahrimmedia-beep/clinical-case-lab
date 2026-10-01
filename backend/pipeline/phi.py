@@ -46,8 +46,14 @@ def _is_state(m: re.Match[str]) -> bool:
     return m.group("state") in _STATES
 
 
+_INITIAL = re.compile(rf"{_UPPER}\.")
+
+
 def _is_name(m: re.Match[str]) -> bool:
-    return m.group("phi").split()[0].lower().rstrip(".") not in _NOT_A_NAME
+    first = m.group("phi").split()[0]
+    if _INITIAL.fullmatch(first):
+        return True  # an initial ("Dr. A. Brennan", "Dr. N. Okafor"), not the word "a" / "n"
+    return first.lower() not in _NOT_A_NAME
 
 
 @dataclass(frozen=True)
